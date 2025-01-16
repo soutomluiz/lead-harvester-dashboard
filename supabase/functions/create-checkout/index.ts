@@ -39,8 +39,8 @@ serve(async (req) => {
       limit: 1
     });
 
-    // Substitua este valor pelo seu Price ID do Stripe
-    const price_id = "seu_price_id_aqui";
+    // Usando o Price ID específico do seu produto
+    const price_id = "price_1Qi0cQGsvmmKmxxImPrcfuqG";
 
     let customer_id = undefined;
     if (customers.data.length > 0) {

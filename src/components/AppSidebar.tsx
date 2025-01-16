@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/sidebar";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
+import { CheckoutButton } from "@/components/CheckoutButton";
 
 interface AppSidebarProps {
   activeTab: string;
@@ -17,7 +18,6 @@ interface AppSidebarProps {
 }
 
 export function AppSidebar({ activeTab, setActiveTab }: AppSidebarProps) {
-  // Placeholder for user data - will be replaced with actual auth
   const user = {
     name: "Usuário",
     email: "usuario@exemplo.com",
@@ -84,8 +84,13 @@ export function AppSidebar({ activeTab, setActiveTab }: AppSidebarProps) {
         </SidebarMenu>
       </SidebarContent>
 
-      <SidebarFooter className="p-4">
-        <div className="flex items-center gap-2 mb-4">
+      <SidebarFooter className="p-4 flex flex-col gap-4">
+        <Button variant="outline" className="w-full mb-2" size="sm">
+          <LogOut className="h-4 w-4 mr-2" />
+          Sair
+        </Button>
+
+        <div className="flex items-center gap-2">
           <Avatar>
             <AvatarImage src={user.avatar} alt={user.name} />
             <AvatarFallback>{user.name[0]}</AvatarFallback>
@@ -95,10 +100,8 @@ export function AppSidebar({ activeTab, setActiveTab }: AppSidebarProps) {
             <p className="text-xs text-muted-foreground truncate">{user.email}</p>
           </div>
         </div>
-        <Button variant="outline" className="w-full" size="sm">
-          <LogOut className="h-4 w-4 mr-2" />
-          Sair
-        </Button>
+
+        <CheckoutButton />
       </SidebarFooter>
     </Sidebar>
   );

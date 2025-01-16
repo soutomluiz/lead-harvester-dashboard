@@ -37,25 +37,6 @@ const Index = () => {
   const uniqueLocations = new Set(leads.map((lead) => lead.location)).size;
   const uniqueIndustries = new Set(leads.map((lead) => lead.industry)).size;
 
-  const renderContent = () => {
-    switch (activeTab) {
-      case "table":
-        return <LeadTable leads={leads} />;
-      case "form":
-        return (
-          <div className="flex justify-center">
-            <LeadForm onSubmit={handleAddLead} />
-          </div>
-        );
-      case "prospect":
-        return <ProspectingForm onAddLeads={handleAddLeads} />;
-      case "config":
-        return <ConfigPanel />;
-      default:
-        return <LeadTable leads={leads} />;
-    }
-  };
-
   return (
     <SidebarProvider>
       <div className="flex min-h-screen w-full bg-background">
@@ -72,7 +53,12 @@ const Index = () => {
           />
 
           <div className="mt-6 animate-fadeIn">
-            {renderContent()}
+            <Dashboard 
+              activeTab={activeTab}
+              leads={leads}
+              onSubmit={handleAddLead}
+              onAddLeads={handleAddLeads}
+            />
           </div>
         </main>
         <AppFooter whitelabelName="Sua Empresa" />

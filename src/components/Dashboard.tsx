@@ -6,6 +6,9 @@ import { SubscriptionPanel } from "@/components/SubscriptionPanel";
 
 interface DashboardProps {
   activeTab: string;
+  leads: Lead[];
+  onSubmit: (data: any) => void;
+  onAddLeads: (leads: any[]) => void;
 }
 
 interface DashboardStatsProps {
@@ -33,12 +36,12 @@ export function DashboardStats({ totalLeads, uniqueLocations, uniqueIndustries }
   );
 }
 
-export function Dashboard({ activeTab }: DashboardProps) {
+export function Dashboard({ activeTab, leads, onSubmit, onAddLeads }: DashboardProps) {
   return (
     <div className="flex-1 overflow-auto">
-      {activeTab === "table" && <LeadTable />}
-      {activeTab === "form" && <LeadForm />}
-      {activeTab === "prospect" && <ProspectingForm />}
+      {activeTab === "table" && <LeadTable leads={leads} />}
+      {activeTab === "form" && <LeadForm onSubmit={onSubmit} />}
+      {activeTab === "prospect" && <ProspectingForm onAddLeads={onAddLeads} />}
       {activeTab === "config" && <ConfigPanel />}
       {activeTab === "subscription" && <SubscriptionPanel />}
     </div>

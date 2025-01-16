@@ -3,6 +3,7 @@ import { LeadForm } from "@/components/LeadForm";
 import { LeadTable } from "@/components/LeadTable";
 import { DashboardStats } from "@/components/Dashboard";
 import { ProspectingForm } from "@/components/ProspectingForm";
+import { ConfigPanel } from "@/components/ConfigPanel";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface Lead {
@@ -47,10 +48,11 @@ const Index = () => {
         />
 
         <Tabs defaultValue="table" className="w-full animate-fadeIn">
-          <TabsList className="grid w-full max-w-md mx-auto grid-cols-3">
+          <TabsList className="grid w-full max-w-md mx-auto grid-cols-4">
             <TabsTrigger value="table">Ver Leads</TabsTrigger>
             <TabsTrigger value="form">Adicionar Lead</TabsTrigger>
             <TabsTrigger value="prospect">Prospectar</TabsTrigger>
+            <TabsTrigger value="config">Configurações</TabsTrigger>
           </TabsList>
           <TabsContent value="table" className="mt-6">
             <LeadTable leads={leads} />
@@ -62,6 +64,9 @@ const Index = () => {
           </TabsContent>
           <TabsContent value="prospect" className="mt-6">
             <ProspectingForm onAddLeads={handleAddLeads} />
+          </TabsContent>
+          <TabsContent value="config" className="mt-6">
+            <ConfigPanel />
           </TabsContent>
         </Tabs>
       </div>

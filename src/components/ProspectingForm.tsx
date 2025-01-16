@@ -23,9 +23,22 @@ export const ProspectingForm = ({ onAddLeads }: { onAddLeads: (leads: any[]) => 
     e.preventDefault();
     setIsLoading(true);
 
+    const apiKey = localStorage.getItem("searchApiKey");
+    const searchEndpoint = localStorage.getItem("searchEndpoint");
+
+    if (!apiKey || !searchEndpoint) {
+      toast({
+        title: "Configuração necessária",
+        description: "Por favor, configure a API nas configurações antes de realizar buscas.",
+        variant: "destructive",
+      });
+      setIsLoading(false);
+      return;
+    }
+
     try {
       // Simulated search results for demonstration
-      // In a real implementation, this would make an API call to a search service
+      // In a real implementation, this would use the configured endpoint and API key
       const mockResults = [
         {
           title: `${industry} em ${location} - Empresa A`,
@@ -49,7 +62,7 @@ export const ProspectingForm = ({ onAddLeads }: { onAddLeads: (leads: any[]) => 
     } catch (error) {
       toast({
         title: "Erro na busca",
-        description: "Não foi possível realizar a busca. Tente novamente.",
+        description: "Não foi possível realizar a busca. Verifique suas configurações e tente novamente.",
         variant: "destructive",
       });
     } finally {

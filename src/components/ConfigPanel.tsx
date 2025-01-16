@@ -7,44 +7,33 @@ import { Search, Key } from "lucide-react";
 
 export const ConfigPanel = () => {
   const [apiKey, setApiKey] = useState(() => localStorage.getItem("searchApiKey") || "");
-  const [searchEndpoint, setSearchEndpoint] = useState(() => localStorage.getItem("searchEndpoint") || "");
+  const [searchEndpoint, setSearchEndpoint] = useState(() => localStorage.getItem("searchEndpoint") || "https://maps.googleapis.com/maps/api/place/textsearch/json");
   const { toast } = useToast();
 
   const handleSave = () => {
-    if (!apiKey.trim() || !searchEndpoint.trim()) {
+    if (!apiKey.trim()) {
       toast({
-        title: "Campos obrigatórios",
-        description: "Por favor, preencha todos os campos antes de salvar.",
+        title: "Campo obrigatório",
+        description: "Por favor, insira sua chave de API do Google Maps.",
         variant: "destructive",
       });
       return;
     }
 
-    try {
-      // Validar se o endpoint é uma URL válida
-      new URL(searchEndpoint);
-      
-      localStorage.setItem("searchApiKey", apiKey.trim());
-      localStorage.setItem("searchEndpoint", searchEndpoint.trim());
-      
-      toast({
-        title: "Configurações salvas",
-        description: "Suas configurações de API foram salvas com sucesso.",
-      });
-    } catch (error) {
-      toast({
-        title: "URL inválida",
-        description: "Por favor, insira um endpoint válido (ex: https://api.exemplo.com)",
-        variant: "destructive",
-      });
-    }
+    localStorage.setItem("searchApiKey", apiKey.trim());
+    localStorage.setItem("searchEndpoint", searchEndpoint.trim());
+    
+    toast({
+      title: "Configurações salvas",
+      description: "Suas configurações da API do Google Maps foram salvas com sucesso.",
+    });
   };
 
   const handleTestConnection = async () => {
-    if (!apiKey || !searchEndpoint) {
+    if (!apiKey) {
       toast({
         title: "Configuração necessária",
-        description: "Por favor, configure a API antes de testar a conexão.",
+        description: "Por favor, configure sua chave de API do Google Maps antes de testar.",
         variant: "destructive",
       });
       return;
@@ -56,26 +45,24 @@ export const ConfigPanel = () => {
     });
 
     try {
-      const response = await fetch(searchEndpoint, {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${apiKey}`,
-          'Content-Type': 'application/json',
-        },
-      });
+      // Montando a URL de teste com um query simples
+      const testUrl = `${searchEndpoint}?query=restaurants+in+São+Paulo&key=${apiKey}`;
+      
+      const response = await fetch(testUrl);
+      const data = await response.json();
 
-      if (response.ok) {
+      if (response.ok && data.status !== "REQUEST_DENIED") {
         toast({
           title: "Conexão bem-sucedida",
-          description: "Sua configuração de API está funcionando corretamente.",
+          description: "Sua configuração da API do Google Maps está funcionando corretamente.",
         });
       } else {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        throw new Error(data.error_message || "Erro na autenticação com o Google Maps");
       }
     } catch (error) {
       toast({
         title: "Erro na conexão",
-        description: "Não foi possível conectar com a API. Verifique suas configurações.",
+        description: error instanceof Error ? error.message : "Verifique sua chave de API do Google Maps.",
         variant: "destructive",
       });
     }
@@ -83,19 +70,19 @@ export const ConfigPanel = () => {
 
   return (
     <Card className="w-full p-6 animate-fadeIn">
-      <h2 className="text-2xl font-bold mb-6">Configurações da API</h2>
+      <h2 className="text-2xl font-bold mb-6">Configurações da API do Google Maps</h2>
       <div className="space-y-6">
         <div className="space-y-2">
           <label htmlFor="apiKey" className="text-sm font-medium flex items-center gap-2">
             <Key className="h-4 w-4" />
-            Chave da API
+            Chave da API do Google Maps
           </label>
           <Input
             id="apiKey"
             type="password"
             value={apiKey}
             onChange={(e) => setApiKey(e.target.value)}
-            placeholder="Insira sua chave de API"
+            placeholder="Insira sua chave de API do Google Maps"
             className="font-mono"
           />
         </div>
@@ -103,14 +90,15 @@ export const ConfigPanel = () => {
         <div className="space-y-2">
           <label htmlFor="endpoint" className="text-sm font-medium flex items-center gap-2">
             <Search className="h-4 w-4" />
-            Endpoint de Busca
+            Endpoint do Google Maps Places API
           </label>
           <Input
             id="endpoint"
             value={searchEndpoint}
             onChange={(e) => setSearchEndpoint(e.target.value)}
-            placeholder="https://api.exemplo.com/search"
+            placeholder="https://maps.googleapis.com/maps/api/place/textsearch/json"
             className="font-mono"
+            readOnly
           />
         </div>
 

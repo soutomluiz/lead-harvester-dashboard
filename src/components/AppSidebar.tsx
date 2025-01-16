@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { Home, UserPlus, Search, Settings, LogOut } from "lucide-react";
 import {
   Sidebar,
@@ -12,8 +11,12 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 
-export function AppSidebar() {
-  const [activeTab, setActiveTab] = useState("table");
+interface AppSidebarProps {
+  activeTab: string;
+  setActiveTab: (tab: string) => void;
+}
+
+export function AppSidebar({ activeTab, setActiveTab }: AppSidebarProps) {
   // Placeholder for user data - will be replaced with actual auth
   const user = {
     name: "Usuário",

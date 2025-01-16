@@ -59,7 +59,7 @@ const Index = () => {
   return (
     <SidebarProvider>
       <div className="flex min-h-screen w-full bg-background">
-        <AppSidebar />
+        <AppSidebar activeTab={activeTab} setActiveTab={setActiveTab} />
         <main className="flex-1 p-6 pb-16">
           <h1 className="text-4xl font-bold text-center mb-8 animate-fadeIn">
             Lead Management Dashboard

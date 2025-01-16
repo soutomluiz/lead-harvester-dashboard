@@ -1,4 +1,4 @@
-import { Home, UserPlus, Search, Settings, LogOut } from "lucide-react";
+import { Home, UserPlus, Search, Settings, LogOut, CreditCard } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -10,7 +10,6 @@ import {
 } from "@/components/ui/sidebar";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { CheckoutButton } from "@/components/CheckoutButton";
 
 interface AppSidebarProps {
   activeTab: string;
@@ -73,6 +72,17 @@ export function AppSidebar({ activeTab, setActiveTab }: AppSidebarProps) {
 
           <SidebarMenuItem>
             <SidebarMenuButton
+              onClick={() => setActiveTab("subscription")}
+              data-active={activeTab === "subscription"}
+              tooltip="Assinatura"
+            >
+              <CreditCard className="h-4 w-4" />
+              <span>Assinatura</span>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+
+          <SidebarMenuItem>
+            <SidebarMenuButton
               onClick={() => setActiveTab("config")}
               data-active={activeTab === "config"}
               tooltip="Configurações"
@@ -100,8 +110,6 @@ export function AppSidebar({ activeTab, setActiveTab }: AppSidebarProps) {
             <p className="text-xs text-muted-foreground truncate">{user.email}</p>
           </div>
         </div>
-
-        <CheckoutButton />
       </SidebarFooter>
     </Sidebar>
   );

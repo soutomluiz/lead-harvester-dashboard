@@ -2,6 +2,7 @@ import { useState } from "react";
 import { LeadForm } from "@/components/LeadForm";
 import { LeadTable } from "@/components/LeadTable";
 import { DashboardStats } from "@/components/Dashboard";
+import { ProspectingForm } from "@/components/ProspectingForm";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface Lead {
@@ -25,6 +26,10 @@ const Index = () => {
     setLeads([...leads, newLead]);
   };
 
+  const handleAddLeads = (newLeads: Lead[]) => {
+    setLeads([...leads, ...newLeads]);
+  };
+
   const uniqueLocations = new Set(leads.map((lead) => lead.location)).size;
   const uniqueIndustries = new Set(leads.map((lead) => lead.industry)).size;
 
@@ -42,9 +47,10 @@ const Index = () => {
         />
 
         <Tabs defaultValue="table" className="w-full animate-fadeIn">
-          <TabsList className="grid w-full max-w-md mx-auto grid-cols-2">
-            <TabsTrigger value="table">View Leads</TabsTrigger>
-            <TabsTrigger value="form">Add Lead</TabsTrigger>
+          <TabsList className="grid w-full max-w-md mx-auto grid-cols-3">
+            <TabsTrigger value="table">Ver Leads</TabsTrigger>
+            <TabsTrigger value="form">Adicionar Lead</TabsTrigger>
+            <TabsTrigger value="prospect">Prospectar</TabsTrigger>
           </TabsList>
           <TabsContent value="table" className="mt-6">
             <LeadTable leads={leads} />
@@ -53,6 +59,9 @@ const Index = () => {
             <div className="flex justify-center">
               <LeadForm onSubmit={handleAddLead} />
             </div>
+          </TabsContent>
+          <TabsContent value="prospect" className="mt-6">
+            <ProspectingForm onAddLeads={handleAddLeads} />
           </TabsContent>
         </Tabs>
       </div>

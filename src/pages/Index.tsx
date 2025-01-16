@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { LeadForm } from "@/components/LeadForm";
 import { LeadTable } from "@/components/LeadTable";
-import { DashboardStats } from "@/components/Dashboard";
+import { Dashboard, DashboardStats } from "@/components/Dashboard";
 import { ProspectingForm } from "@/components/ProspectingForm";
 import { ConfigPanel } from "@/components/ConfigPanel";
 import { SidebarProvider } from "@/components/ui/sidebar";

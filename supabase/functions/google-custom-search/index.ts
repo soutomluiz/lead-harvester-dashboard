@@ -11,9 +11,9 @@ serve(async (req) => {
   }
 
   try {
-    const { query, apiKey } = await req.json()
+    const { query } = await req.json()
+    const apiKey = Deno.env.get('GOOGLE_CUSTOM_SEARCH_API_KEY')
     console.log('Received request with query:', query)
-    console.log('API Key length:', apiKey?.length || 0)
     
     if (!query || !apiKey) {
       return new Response(
@@ -27,7 +27,6 @@ serve(async (req) => {
 
     const searchEngineId = "04876c2f3fd7a4e1f";
     
-    // Usando a URL base correta da API
     const searchUrl = new URL('https://www.googleapis.com/customsearch/v1');
     searchUrl.searchParams.append('q', query);
     searchUrl.searchParams.append('key', apiKey);

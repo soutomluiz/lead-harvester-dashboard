@@ -23,22 +23,22 @@ export const ProspectingForm = ({
     e.preventDefault();
     setIsLoading(true);
 
-    const apiKey = localStorage.getItem("searchApiKey");
     const searchQuery = `${industry} em ${location}`;
-
-    if (!apiKey) {
-      toast({
-        title: "Configuração necessária",
-        description:
-          "Por favor, configure a API nas configurações antes de realizar buscas.",
-        variant: "destructive",
-      });
-      setIsLoading(false);
-      return;
-    }
 
     try {
       if (searchType === "places") {
+        const apiKey = localStorage.getItem("searchApiKey");
+        if (!apiKey) {
+          toast({
+            title: "Configuração necessária",
+            description:
+              "Por favor, configure a API do Google Maps nas configurações antes de realizar buscas.",
+            variant: "destructive",
+          });
+          setIsLoading(false);
+          return;
+        }
+
         const { data, error } = await supabase.functions.invoke(
           "google-places-search",
           {
@@ -81,7 +81,6 @@ export const ProspectingForm = ({
           {
             body: {
               query: searchQuery,
-              apiKey: apiKey,
             },
           }
         );
@@ -89,17 +88,7 @@ export const ProspectingForm = ({
         if (error) throw error;
 
         if (data.results) {
-          const formattedResults: SearchResult[] = data.results.map((result: any) => ({
-            title: result.title,
-            link: result.link || "",
-            description: result.snippet || "",
-            companyName: result.title || "",
-            keyword: industry,
-            city: location,
-            extractionDate: new Date().toISOString(),
-            website: result.link || ""
-          }));
-          setResults(formattedResults);
+          setResults(data.results);
         }
       }
 

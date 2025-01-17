@@ -4,7 +4,7 @@ import { ProspectingForm } from "@/components/ProspectingForm";
 import { ConfigPanel } from "@/components/ConfigPanel";
 import { SubscriptionPanel } from "@/components/SubscriptionPanel";
 import { SearchResult } from "@/types/search";
-import { Search, Building2, Globe } from "lucide-react";
+import { Search, MapPin, Globe } from "lucide-react";
 import { Card } from "@/components/ui/card";
 
 interface Lead {
@@ -104,7 +104,7 @@ export function Dashboard({ activeTab, leads, onSubmit, onAddLeads }: DashboardP
           }}
         >
           <div className="flex flex-col items-center text-center space-y-4">
-            <Building2 className="h-12 w-12 text-primary" />
+            <MapPin className="h-12 w-12 text-primary" />
             <h3 className="text-xl font-medium">Google Places</h3>
             <p className="text-gray-600">
               Encontre empresas locais através do Google Places. Ideal para negócios com presença física e listados no Google Maps.

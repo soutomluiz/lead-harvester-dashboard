@@ -81,7 +81,7 @@ export const ProspectingForm = ({
           {
             body: {
               query: searchQuery,
-              apiKey: process.env.GOOGLE_CUSTOM_SEARCH_API_KEY,
+              apiKey: apiKey,
             },
           }
         );

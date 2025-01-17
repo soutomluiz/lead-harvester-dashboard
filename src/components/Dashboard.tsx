@@ -7,8 +7,6 @@ import { SubscriptionPanel } from "@/components/SubscriptionPanel";
 import { ExtractionCards } from "@/components/ExtractionCards";
 import { LeadCards } from "@/components/LeadCards";
 import { DashboardStats } from "@/components/DashboardStats";
-import { Card } from "@/components/ui/card";
-import { SearchResult } from "@/types/search";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { Lead } from "@/types/lead";

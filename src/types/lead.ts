@@ -7,7 +7,7 @@ export interface Lead {
   email: string | null;
   phone: string | null;
   extraction_date?: string;
-  type?: 'website' | 'place' | 'manual';
+  type: 'website' | 'place' | 'manual';
   rating?: number;
   user_ratings_total?: number;
   opening_date?: string;

@@ -11,16 +11,16 @@ interface SearchResult {
   link: string;
   description: string;
   companyName: string;
-  address: string;
-  phone: string;
-  email: string;
+  address?: string;
+  phone?: string;
+  email?: string;
   keyword: string;
   city: string;
   extractionDate: string;
-  rating: number;
-  user_ratings_total: number;
-  opening_date: string;
-  website: string;
+  rating?: number;
+  user_ratings_total?: number;
+  opening_date?: string;
+  website?: string;
 }
 
 export const ProspectingForm = ({
@@ -32,6 +32,7 @@ export const ProspectingForm = ({
   const [location, setLocation] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [results, setResults] = useState<SearchResult[]>([]);
+  const [searchType, setSearchType] = useState<"places" | "websites">("places");
   const { toast } = useToast();
 
   const handleSearch = async (e: React.FormEvent) => {
@@ -53,48 +54,69 @@ export const ProspectingForm = ({
     }
 
     try {
-      const { data, error } = await supabase.functions.invoke(
-        "google-places-search",
-        {
-          body: {
-            query: searchQuery,
-            apiKey: apiKey,
-          },
+      if (searchType === "places") {
+        const { data, error } = await supabase.functions.invoke(
+          "google-places-search",
+          {
+            body: {
+              query: searchQuery,
+              apiKey: apiKey,
+            },
+          }
+        );
+
+        if (error) throw error;
+
+        if (data.status === "REQUEST_DENIED") {
+          throw new Error("Chave de API inválida ou sem permissões necessárias");
         }
-      );
 
-      if (error) throw error;
+        if (data.results && Array.isArray(data.results)) {
+          const formattedResults = data.results.map((result: any) => ({
+            title: result.name,
+            link: `https://www.google.com/maps/place/?q=place_id:${result.place_id}`,
+            description: result.formatted_address || "Endereço não disponível",
+            companyName: result.name,
+            address: result.formatted_address || "",
+            phone: result.formatted_phone_number || "",
+            email: result.website || "",
+            keyword: industry,
+            city: location,
+            extractionDate: new Date().toISOString(),
+            rating: result.rating || 0,
+            user_ratings_total: result.user_ratings_total || 0,
+            opening_date: result.opening_hours?.weekday_text?.[0] || "",
+            website: result.website || ""
+          }));
 
-      if (data.status === "REQUEST_DENIED") {
-        throw new Error("Chave de API inválida ou sem permissões necessárias");
-      }
-
-      if (data.results && Array.isArray(data.results)) {
-        const formattedResults = data.results.map((result: any) => ({
-          title: result.name,
-          link: `https://www.google.com/maps/place/?q=place_id:${result.place_id}`,
-          description: result.formatted_address || "Endereço não disponível",
-          companyName: result.name,
-          address: result.formatted_address || "",
-          phone: result.formatted_phone_number || "",
-          email: result.website || "",
-          keyword: industry,
-          city: location,
-          extractionDate: new Date().toISOString(),
-          rating: result.rating || 0,
-          user_ratings_total: result.user_ratings_total || 0,
-          opening_date: result.opening_hours?.weekday_text?.[0] || "",
-          website: result.website || ""
-        }));
-
-        setResults(formattedResults);
-        toast({
-          title: "Busca realizada com sucesso",
-          description: `Encontrados ${formattedResults.length} resultados`,
-        });
+          setResults(formattedResults);
+        }
       } else {
-        throw new Error("Formato de resposta inválido");
+        const { data, error } = await supabase.functions.invoke(
+          "google-custom-search",
+          {
+            body: {
+              query: searchQuery,
+              apiKey: process.env.GOOGLE_CUSTOM_SEARCH_API_KEY,
+            },
+          }
+        );
+
+        if (error) throw error;
+
+        if (data.results) {
+          setResults(data.results.map((result: any) => ({
+            ...result,
+            keyword: industry,
+            city: location,
+          })));
+        }
       }
+
+      toast({
+        title: "Busca realizada com sucesso",
+        description: `Encontrados ${results.length} resultados`,
+      });
     } catch (error) {
       console.error("Erro na busca:", error);
       toast({
@@ -116,15 +138,15 @@ export const ProspectingForm = ({
       companyName: result.companyName,
       industry: result.keyword,
       location: result.city,
-      address: result.address,
+      address: result.address || "",
       contactName: "",
-      email: result.email,
-      phone: result.phone,
+      email: result.email || "",
+      phone: result.phone || "",
       extractionDate: result.extractionDate,
-      rating: result.rating,
-      user_ratings_total: result.user_ratings_total,
-      opening_date: result.opening_date,
-      website: result.website
+      rating: result.rating || 0,
+      user_ratings_total: result.user_ratings_total || 0,
+      opening_date: result.opening_date || "",
+      website: result.website || ""
     }));
 
     onAddLeads(newLeads);
@@ -142,8 +164,10 @@ export const ProspectingForm = ({
           industry={industry}
           location={location}
           isLoading={isLoading}
+          searchType={searchType}
           onIndustryChange={setIndustry}
           onLocationChange={setLocation}
+          onSearchTypeChange={setSearchType}
           onSubmit={handleSearch}
         />
       </div>

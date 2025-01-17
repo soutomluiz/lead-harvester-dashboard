@@ -27,12 +27,13 @@ interface DashboardStatsProps {
 }
 
 export function DashboardStats({ results }: DashboardStatsProps) {
-  // Calcula a média de avaliações
-  const averageRating = results.length > 0
-    ? (results.reduce((acc, curr) => acc + (curr.rating || 0), 0) / results.length).toFixed(1)
+  // Calculate average rating only for results that have a rating
+  const resultsWithRating = results.filter(result => result.rating !== undefined);
+  const averageRating = resultsWithRating.length > 0
+    ? (resultsWithRating.reduce((acc, curr) => acc + (curr.rating || 0), 0) / resultsWithRating.length).toFixed(1)
     : '0.0';
 
-  // Conta quantas empresas têm website
+  // Count companies with website
   const companiesWithWebsite = results.filter(result => result.website).length;
 
   return (

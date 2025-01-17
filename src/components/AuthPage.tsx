@@ -24,7 +24,7 @@ export function AuthPage() {
         <img 
           src="/logo.svg" 
           alt="Logo" 
-          className="mx-auto w-[972px] h-[306px] mb-6 animate-fadeIn"
+          className="mx-auto w-[972px] h-[306px] mb-3 animate-fadeIn"
         />
         <h1 className="text-3xl font-bold text-primary animate-slideUp">Lead Management Pro</h1>
         <p className="text-gray-600 mt-2 animate-slideUp">

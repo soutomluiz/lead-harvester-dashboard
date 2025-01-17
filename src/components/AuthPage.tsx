@@ -27,7 +27,7 @@ export function AuthPage() {
             alt="Logo" 
             className="mx-auto w-[972px] h-[306px] mb-0 animate-fadeIn"
           />
-          <h1 className="text-3xl font-bold text-primary animate-slideUp">Lead Management Pro</h1>
+          <h1 className="text-3xl font-bold text-primary animate-slideUp -mt-[1px]">Lead Management Pro</h1>
           <p className="text-gray-600 mt-2 animate-slideUp">
             Comece gratuitamente e desbloqueie recursos premium quando precisar
           </p>

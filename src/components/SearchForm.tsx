@@ -1,7 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
-import { Toggle } from "@/components/ui/toggle";
 
 interface SearchFormProps {
   industry: string;
@@ -10,7 +9,6 @@ interface SearchFormProps {
   searchType: "places" | "websites";
   onIndustryChange: (value: string) => void;
   onLocationChange: (value: string) => void;
-  onSearchTypeChange: (value: "places" | "websites") => void;
   onSubmit: (e: React.FormEvent) => void;
 }
 
@@ -21,26 +19,14 @@ export const SearchForm = ({
   searchType,
   onIndustryChange,
   onLocationChange,
-  onSearchTypeChange,
   onSubmit,
 }: SearchFormProps) => {
   return (
     <form onSubmit={onSubmit} className="space-y-6">
-      <div className="flex gap-4 justify-center mb-4">
-        <Toggle
-          pressed={searchType === "places"}
-          onPressedChange={() => onSearchTypeChange("places")}
-          className="data-[state=on]:bg-primary"
-        >
-          Google Places
-        </Toggle>
-        <Toggle
-          pressed={searchType === "websites"}
-          onPressedChange={() => onSearchTypeChange("websites")}
-          className="data-[state=on]:bg-primary"
-        >
-          Websites
-        </Toggle>
+      <div className="text-center mb-4">
+        <h2 className="text-xl font-semibold">
+          Buscar em {searchType === "places" ? "Google Places" : "Websites"}
+        </h2>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

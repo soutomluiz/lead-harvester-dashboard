@@ -1,8 +1,11 @@
-import { Home, UserPlus, Search, Settings, CreditCard } from "lucide-react";
+import { Home, UserPlus, Search, Settings, CreditCard, Globe, MapPin } from "lucide-react";
 import {
   SidebarMenu,
   SidebarMenuItem,
   SidebarMenuButton,
+  SidebarMenuSub,
+  SidebarMenuSubItem,
+  SidebarMenuSubButton,
 } from "@/components/ui/sidebar";
 
 interface SidebarMenuItemsProps {
@@ -14,7 +17,15 @@ export function SidebarMenuItems({ activeTab, setActiveTab }: SidebarMenuItemsPr
   const menuItems = [
     { id: "table", icon: Home, label: "Ver Leads" },
     { id: "form", icon: UserPlus, label: "Adicionar Lead" },
-    { id: "prospect", icon: Search, label: "Prospectar" },
+    {
+      id: "prospect",
+      icon: Search,
+      label: "Prospectar",
+      subItems: [
+        { id: "places", icon: MapPin, label: "Google Places" },
+        { id: "websites", icon: Globe, label: "Websites" },
+      ],
+    },
     { id: "subscription", icon: CreditCard, label: "Assinatura" },
     { id: "config", icon: Settings, label: "Configurações" },
   ];
@@ -23,19 +34,51 @@ export function SidebarMenuItems({ activeTab, setActiveTab }: SidebarMenuItemsPr
     <SidebarMenu>
       {menuItems.map((item) => (
         <SidebarMenuItem key={item.id}>
-          <SidebarMenuButton
-            onClick={() => setActiveTab(item.id)}
-            data-active={activeTab === item.id}
-            className={`w-full flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
-              activeTab === item.id
-                ? "bg-primary text-white"
-                : "hover:bg-gray-100"
-            }`}
-            tooltip={item.label}
-          >
-            <item.icon className="h-4 w-4" />
-            <span>{item.label}</span>
-          </SidebarMenuButton>
+          {item.subItems ? (
+            <>
+              <SidebarMenuButton
+                onClick={() => setActiveTab(item.id)}
+                data-active={activeTab === item.id}
+                className={`w-full flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
+                  activeTab === item.id
+                    ? "bg-primary text-white"
+                    : "hover:bg-gray-100"
+                }`}
+                tooltip={item.label}
+              >
+                <item.icon className="h-4 w-4" />
+                <span>{item.label}</span>
+              </SidebarMenuButton>
+              <SidebarMenuSub>
+                {item.subItems.map((subItem) => (
+                  <SidebarMenuSubItem key={subItem.id}>
+                    <SidebarMenuSubButton
+                      onClick={() => setActiveTab(`${item.id}-${subItem.id}`)}
+                      data-active={activeTab === `${item.id}-${subItem.id}`}
+                      className="flex items-center gap-2"
+                    >
+                      <subItem.icon className="h-4 w-4" />
+                      <span>{subItem.label}</span>
+                    </SidebarMenuSubButton>
+                  </SidebarMenuSubItem>
+                ))}
+              </SidebarMenuSub>
+            </>
+          ) : (
+            <SidebarMenuButton
+              onClick={() => setActiveTab(item.id)}
+              data-active={activeTab === item.id}
+              className={`w-full flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
+                activeTab === item.id
+                  ? "bg-primary text-white"
+                  : "hover:bg-gray-100"
+              }`}
+              tooltip={item.label}
+            >
+              <item.icon className="h-4 w-4" />
+              <span>{item.label}</span>
+            </SidebarMenuButton>
+          )}
         </SidebarMenuItem>
       ))}
     </SidebarMenu>

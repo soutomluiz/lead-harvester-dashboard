@@ -9,14 +9,15 @@ import { SearchResult } from "@/types/search";
 
 export const ProspectingForm = ({
   onAddLeads,
+  searchType = "places"
 }: {
   onAddLeads: (leads: any[]) => void;
+  searchType?: "places" | "websites";
 }) => {
   const [industry, setIndustry] = useState("");
   const [location, setLocation] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [results, setResults] = useState<SearchResult[]>([]);
-  const [searchType, setSearchType] = useState<"places" | "websites">("places");
   const { toast } = useToast();
 
   const handleSearch = async (e: React.FormEvent) => {
@@ -70,7 +71,8 @@ export const ProspectingForm = ({
             rating: result.rating,
             user_ratings_total: result.user_ratings_total,
             opening_date: result.opening_hours?.weekday_text?.[0] || "",
-            website: result.website || ""
+            website: result.website || "",
+            type: "place"
           }));
 
           setResults(formattedResults);
@@ -137,7 +139,7 @@ export const ProspectingForm = ({
 
   return (
     <Card className="w-full p-6 animate-fadeIn">
-      <DashboardStats results={results} />
+      <DashboardStats results={results} searchType={searchType} />
       <div className="mt-6">
         <SearchForm
           industry={industry}
@@ -146,7 +148,6 @@ export const ProspectingForm = ({
           searchType={searchType}
           onIndustryChange={setIndustry}
           onLocationChange={setLocation}
-          onSearchTypeChange={setSearchType}
           onSubmit={handleSearch}
         />
       </div>

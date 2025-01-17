@@ -5,6 +5,7 @@ import { ProspectingForm } from "@/components/ProspectingForm";
 import { ConfigPanel } from "@/components/ConfigPanel";
 import { SubscriptionPanel } from "@/components/SubscriptionPanel";
 import { ExtractionCards } from "@/components/ExtractionCards";
+import { LeadCards } from "@/components/LeadCards";
 import { Card } from "@/components/ui/card";
 import { SearchResult } from "@/types/search";
 import { supabase } from "@/integrations/supabase/client";
@@ -115,6 +116,9 @@ export function Dashboard({ activeTab, onSubmit, onAddLeads, setActiveTab }: Das
     <div className="flex-1 overflow-auto bg-gray-50 p-6 rounded-lg">
       {activeTab === "prospect" && (
         <ExtractionCards setActiveTab={setActiveTab} />
+      )}
+      {activeTab === "leads" && (
+        <LeadCards setActiveTab={setActiveTab} />
       )}
       {(activeTab === "leads-all" || 
         activeTab === "leads-manual" || 

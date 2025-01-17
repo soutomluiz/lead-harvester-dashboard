@@ -1,4 +1,4 @@
-import { Database, PlusCircle, MapPin, Globe, Users, Settings, CreditCard } from "lucide-react";
+import { Database, Users, MapPin, Globe, Settings, CreditCard, PlusCircle } from "lucide-react";
 import {
   SidebarMenu,
   SidebarMenuItem,
@@ -25,17 +25,7 @@ export function SidebarMenuItems({ activeTab, setActiveTab }: SidebarMenuItemsPr
         { id: "websites", icon: Globe, label: "Websites" },
       ],
     },
-    { 
-      id: "leads", 
-      icon: Users, 
-      label: "Leads",
-      subItems: [
-        { id: "all", icon: Users, label: "Todos os Leads" },
-        { id: "manual", icon: Users, label: "Leads Manuais" },
-        { id: "places", icon: MapPin, label: "Leads do Places" },
-        { id: "websites", icon: Globe, label: "Leads de Websites" },
-      ],
-    },
+    { id: "leads", icon: Users, label: "Leads" },
     { id: "subscription", icon: CreditCard, label: "Assinatura" },
     { id: "config", icon: Settings, label: "Configurações" },
   ];

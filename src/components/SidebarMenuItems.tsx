@@ -1,4 +1,4 @@
-import { Database, Users, MapPin, Globe, Settings, CreditCard, PlusCircle } from "lucide-react";
+import { Database, Users, MapPin, Globe, Settings, CreditCard, PlusCircle, LayoutDashboard } from "lucide-react";
 import {
   SidebarMenu,
   SidebarMenuItem,
@@ -12,6 +12,7 @@ interface SidebarMenuItemsProps {
 
 export function SidebarMenuItems({ activeTab, setActiveTab }: SidebarMenuItemsProps) {
   const menuItems = [
+    { id: "dashboard", icon: LayoutDashboard, label: "Dashboard" },
     {
       id: "prospect",
       icon: Database,

@@ -6,6 +6,7 @@ import { ConfigPanel } from "@/components/ConfigPanel";
 import { SubscriptionPanel } from "@/components/SubscriptionPanel";
 import { ExtractionCards } from "@/components/ExtractionCards";
 import { LeadCards } from "@/components/LeadCards";
+import { DashboardStats } from "@/components/DashboardStats";
 import { Card } from "@/components/ui/card";
 import { SearchResult } from "@/types/search";
 import { supabase } from "@/integrations/supabase/client";
@@ -75,8 +76,8 @@ export function DashboardStats({ results, searchType }: DashboardStatsProps) {
   );
 }
 
-export function Dashboard({ activeTab, onSubmit, onAddLeads, setActiveTab }: DashboardProps) {
-  const [leads, setLeads] = useState<Lead[]>([]);
+export function Dashboard({ activeTab, leads, onSubmit, onAddLeads, setActiveTab }: DashboardProps) {
+  const [dbLeads, setDbLeads] = useState<Lead[]>([]);
   const { toast } = useToast();
   const searchType = activeTab.includes("prospect-places") 
     ? "places" 
@@ -98,7 +99,7 @@ export function Dashboard({ activeTab, onSubmit, onAddLeads, setActiveTab }: Das
           type: lead.type as 'website' | 'place' | 'manual'
         }));
 
-        setLeads(typedLeads);
+        setDbLeads(typedLeads);
       } catch (error) {
         console.error("Error fetching leads:", error);
         toast({
@@ -114,6 +115,9 @@ export function Dashboard({ activeTab, onSubmit, onAddLeads, setActiveTab }: Das
 
   return (
     <div className="flex-1 overflow-auto bg-gray-50 p-6 rounded-lg">
+      {activeTab === "dashboard" && (
+        <DashboardStats leads={dbLeads} />
+      )}
       {activeTab === "prospect" && (
         <ExtractionCards setActiveTab={setActiveTab} />
       )}
@@ -125,7 +129,7 @@ export function Dashboard({ activeTab, onSubmit, onAddLeads, setActiveTab }: Das
         activeTab === "leads-places" || 
         activeTab === "leads-websites") && (
         <LeadTable 
-          leads={leads.filter(lead => {
+          leads={dbLeads.filter(lead => {
             if (activeTab === "leads-manual") return lead.type === 'manual';
             if (activeTab === "leads-places") return lead.type === 'place';
             if (activeTab === "leads-websites") return lead.type === 'website';

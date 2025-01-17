@@ -6,6 +6,7 @@ import { AppFooter } from "@/components/AppFooter";
 import { WelcomeTour } from "@/components/WelcomeTour";
 import { Lead } from "@/types/lead";
 import { supabase } from "@/integrations/supabase/client";
+import { SidebarUserSection } from "@/components/SidebarUserSection";
 
 const Index = () => {
   const [leads, setLeads] = useState<Lead[]>([]);
@@ -48,10 +49,11 @@ const Index = () => {
       <div className="flex min-h-screen w-full bg-background">
         <AppSidebar activeTab={activeTab} setActiveTab={setActiveTab} />
         <main className="flex-1 p-6 pb-16">
-          <div className="flex flex-col items-center mb-8 animate-fadeIn">
-            <h1 className="text-4xl font-bold">
+          <div className="flex justify-between items-center mb-8 animate-fadeIn">
+            <h1 className="text-2xl font-bold">
               Olá {userName ? userName + "," : ""}
             </h1>
+            <SidebarUserSection className="static" />
           </div>
 
           <div className="mt-6 animate-fadeIn">

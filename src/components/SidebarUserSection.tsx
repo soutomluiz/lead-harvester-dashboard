@@ -4,8 +4,13 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { UserProfilePanel } from "./UserProfilePanel";
 import { supabase } from "@/integrations/supabase/client";
+import { cn } from "@/lib/utils";
 
-export function SidebarUserSection() {
+interface SidebarUserSectionProps {
+  className?: string;
+}
+
+export function SidebarUserSection({ className }: SidebarUserSectionProps) {
   const user = {
     name: "Usuário",
     email: "usuario@exemplo.com",
@@ -17,17 +22,7 @@ export function SidebarUserSection() {
   };
 
   return (
-    <div className="p-4 border-t border-gray-200">
-      <Button 
-        variant="outline" 
-        className="w-full mb-2 text-primary hover:bg-primary hover:text-white" 
-        size="sm"
-        onClick={handleLogout}
-      >
-        <LogOut className="h-4 w-4 mr-2" />
-        Sair
-      </Button>
-
+    <div className={cn("p-4", className)}>
       <Popover>
         <PopoverTrigger asChild>
           <div className="flex items-center gap-2 cursor-pointer p-2 rounded-lg hover:bg-gray-100">
@@ -43,6 +38,15 @@ export function SidebarUserSection() {
         </PopoverTrigger>
         <PopoverContent className="w-80">
           <UserProfilePanel />
+          <Button 
+            variant="outline" 
+            className="w-full mt-4 text-primary hover:bg-primary hover:text-white" 
+            size="sm"
+            onClick={handleLogout}
+          >
+            <LogOut className="h-4 w-4 mr-2" />
+            Sair
+          </Button>
         </PopoverContent>
       </Popover>
     </div>

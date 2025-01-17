@@ -24,9 +24,9 @@ export const ProspectingForm = ({ onAddLeads }: { onAddLeads: (leads: any[]) => 
     setIsLoading(true);
 
     const apiKey = localStorage.getItem("searchApiKey");
-    const searchEndpoint = localStorage.getItem("searchEndpoint");
+    const searchQuery = `${industry} em ${location}`;
 
-    if (!apiKey || !searchEndpoint) {
+    if (!apiKey) {
       toast({
         title: "Configuração necessária",
         description: "Por favor, configure a API nas configurações antes de realizar buscas.",
@@ -37,29 +37,41 @@ export const ProspectingForm = ({ onAddLeads }: { onAddLeads: (leads: any[]) => 
     }
 
     try {
-      // Simulated search results for demonstration
-      // In a real implementation, this would use the configured endpoint and API key
-      const mockResults = [
-        {
-          title: `${industry} em ${location} - Empresa A`,
-          link: "https://empresaa.com",
-          description: "Descrição da empresa A especializada no setor.",
-          companyName: "Empresa A"
+      const response = await fetch("/api/google-places-search", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
         },
-        {
-          title: `${industry} em ${location} - Empresa B`,
-          link: "https://empresab.com",
-          description: "Descrição da empresa B especializada no setor.",
-          companyName: "Empresa B"
-        }
-      ];
-
-      setResults(mockResults);
-      toast({
-        title: "Busca realizada com sucesso",
-        description: `Encontrados ${mockResults.length} resultados`,
+        body: JSON.stringify({
+          query: searchQuery,
+          apiKey: apiKey,
+        }),
       });
+
+      if (!response.ok) {
+        throw new Error("Falha na busca");
+      }
+
+      const data = await response.json();
+      
+      if (data.results && Array.isArray(data.results)) {
+        const formattedResults = data.results.map((result: any) => ({
+          title: result.name,
+          link: `https://www.google.com/maps/place/?q=place_id:${result.place_id}`,
+          description: result.formatted_address || "Endereço não disponível",
+          companyName: result.name,
+        }));
+
+        setResults(formattedResults);
+        toast({
+          title: "Busca realizada com sucesso",
+          description: `Encontrados ${formattedResults.length} resultados`,
+        });
+      } else {
+        throw new Error("Formato de resposta inválido");
+      }
     } catch (error) {
+      console.error("Erro na busca:", error);
       toast({
         title: "Erro na busca",
         description: "Não foi possível realizar a busca. Verifique suas configurações e tente novamente.",
@@ -143,7 +155,7 @@ export const ProspectingForm = ({ onAddLeads }: { onAddLeads: (leads: any[]) => 
                   rel="noopener noreferrer"
                   className="text-sm text-blue-500 hover:underline mt-2 inline-block"
                 >
-                  Visitar website
+                  Visitar no Google Maps
                 </a>
               </Card>
             ))}

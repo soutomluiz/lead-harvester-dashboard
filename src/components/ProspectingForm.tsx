@@ -165,7 +165,7 @@ export const ProspectingForm = ({ onAddLeads }: { onAddLeads: (leads: any[]) => 
                   <p className="text-sm"><strong>Email:</strong> {result.email || "Não disponível"}</p>
                   <p className="text-sm"><strong>Cidade:</strong> {result.city}</p>
                   <p className="text-sm"><strong>Palavra-chave:</strong> {result.keyword}</p>
-                  <p className="text-sm"><strong>Data de Extração:</strong> {new Date(result.extractionDate).toLocaleDateString()}</p>
+                  <p className="text-sm"><strong>Data de Exportação:</strong> {new Date(result.extractionDate).toLocaleDateString()}</p>
                 </div>
                 <a
                   href={result.link}

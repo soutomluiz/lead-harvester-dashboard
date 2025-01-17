@@ -52,10 +52,6 @@ export function AuthPage() {
               providers={[]}
             />
           </Card>
-
-          <div className="mt-4 text-center text-sm text-gray-500 animate-fadeIn mb-4">
-            <p>Versão gratuita limitada</p>
-          </div>
         </div>
       </div>
     </div>

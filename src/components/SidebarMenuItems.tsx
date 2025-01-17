@@ -2,10 +2,9 @@ import { Database, Users, MapPin, Globe, Settings, CreditCard, PlusCircle } from
 import {
   SidebarMenu,
   SidebarMenuItem,
-  SidebarMenuButton,
-  SidebarMenuSub,
-  SidebarMenuSubItem,
-  SidebarMenuSubButton,
+  SidebarMenuLink,
+  SidebarMenuTrigger,
+  SidebarMenuContent,
 } from "@/components/ui/sidebar";
 
 interface SidebarMenuItemsProps {
@@ -36,52 +35,33 @@ export function SidebarMenuItems({ activeTab, setActiveTab }: SidebarMenuItemsPr
         <SidebarMenuItem key={item.id}>
           {item.subItems ? (
             <>
-              <SidebarMenuButton
-                onClick={() => setActiveTab(item.id)}
-                data-active={activeTab === item.id}
-                className={`w-full flex items-center gap-2 px-4 py-2 rounded-lg transition-colors cursor-pointer ${
-                  activeTab === item.id
-                    ? "bg-primary text-white"
-                    : "hover:bg-gray-100"
-                }`}
-                tooltip={item.label}
+              <SidebarMenuTrigger
+                active={activeTab.startsWith(item.id)}
+                icon={item.icon}
               >
-                <item.icon className="h-4 w-4" />
-                <span>{item.label}</span>
-              </SidebarMenuButton>
-              <SidebarMenuSub>
+                {item.label}
+              </SidebarMenuTrigger>
+              <SidebarMenuContent>
                 {item.subItems.map((subItem) => (
-                  <SidebarMenuSubItem key={subItem.id}>
-                    <SidebarMenuSubButton
-                      onClick={() => setActiveTab(`${item.id}-${subItem.id}`)}
-                      data-active={activeTab === `${item.id}-${subItem.id}`}
-                      className={`flex items-center gap-2 w-full px-4 py-2 rounded-lg transition-colors cursor-pointer ${
-                        activeTab === `${item.id}-${subItem.id}`
-                          ? "bg-primary text-white"
-                          : "hover:bg-gray-100 text-gray-700"
-                      }`}
-                    >
-                      <subItem.icon className="h-4 w-4" />
-                      <span>{subItem.label}</span>
-                    </SidebarMenuSubButton>
-                  </SidebarMenuSubItem>
+                  <SidebarMenuLink
+                    key={`${item.id}-${subItem.id}`}
+                    active={activeTab === `${item.id}-${subItem.id}`}
+                    icon={subItem.icon}
+                    onClick={() => setActiveTab(`${item.id}-${subItem.id}`)}
+                  >
+                    {subItem.label}
+                  </SidebarMenuLink>
                 ))}
-              </SidebarMenuSub>
+              </SidebarMenuContent>
             </>
           ) : (
-            <SidebarMenuButton
+            <SidebarMenuLink
+              active={activeTab === item.id}
+              icon={item.icon}
               onClick={() => setActiveTab(item.id)}
-              data-active={activeTab === item.id}
-              className={`w-full flex items-center gap-2 px-4 py-2 rounded-lg transition-colors cursor-pointer ${
-                activeTab === item.id
-                  ? "bg-primary text-white"
-                  : "hover:bg-gray-100"
-              }`}
-              tooltip={item.label}
             >
-              <item.icon className="h-4 w-4" />
-              <span>{item.label}</span>
-            </SidebarMenuButton>
+              {item.label}
+            </SidebarMenuLink>
           )}
         </SidebarMenuItem>
       ))}

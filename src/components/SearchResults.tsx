@@ -1,21 +1,21 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 
-interface SearchResult {
-  title: string;
+export interface SearchResult {
+  title?: string;
   link: string;
-  description: string;
+  description?: string;
   companyName: string;
-  address: string;
-  phone: string;
-  email: string;
+  address?: string;
+  phone?: string;
+  email?: string;
   keyword: string;
   city: string;
   extractionDate: string;
-  rating: number;
-  user_ratings_total: number;
-  opening_date: string;
-  website: string;
+  rating?: number;
+  user_ratings_total?: number;
+  opening_date?: string;
+  website?: string;
 }
 
 interface SearchResultsProps {
@@ -40,7 +40,7 @@ export const SearchResults = ({ results, onAddToLeads }: SearchResultsProps) => 
             <h4 className="font-medium">{result.companyName}</h4>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mt-2">
               <p className="text-sm">
-                <strong>Endereço:</strong> {result.address}
+                <strong>Endereço:</strong> {result.address || "Não disponível"}
               </p>
               <p className="text-sm">
                 <strong>Telefone:</strong> {result.phone || "Não disponível"}

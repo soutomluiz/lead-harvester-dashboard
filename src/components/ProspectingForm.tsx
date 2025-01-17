@@ -3,25 +3,8 @@ import { Card } from "@/components/ui/card";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { SearchForm } from "./SearchForm";
-import { SearchResults } from "./SearchResults";
+import { SearchResults, SearchResult } from "./SearchResults";
 import { DashboardStats } from "./Dashboard";
-
-interface SearchResult {
-  title: string;
-  link: string;
-  description: string;
-  companyName: string;
-  address?: string;
-  phone?: string;
-  email?: string;
-  keyword: string;
-  city: string;
-  extractionDate: string;
-  rating?: number;
-  user_ratings_total?: number;
-  opening_date?: string;
-  website?: string;
-}
 
 export const ProspectingForm = ({
   onAddLeads,
@@ -72,7 +55,7 @@ export const ProspectingForm = ({
         }
 
         if (data.results && Array.isArray(data.results)) {
-          const formattedResults = data.results.map((result: any) => ({
+          const formattedResults: SearchResult[] = data.results.map((result: any) => ({
             title: result.name,
             link: `https://www.google.com/maps/place/?q=place_id:${result.place_id}`,
             description: result.formatted_address || "Endereço não disponível",
@@ -105,11 +88,14 @@ export const ProspectingForm = ({
         if (error) throw error;
 
         if (data.results) {
-          setResults(data.results.map((result: any) => ({
+          const formattedResults: SearchResult[] = data.results.map((result: any) => ({
             ...result,
             keyword: industry,
             city: location,
-          })));
+            link: result.link || "",
+            companyName: result.title || "",
+          }));
+          setResults(formattedResults);
         }
       }
 

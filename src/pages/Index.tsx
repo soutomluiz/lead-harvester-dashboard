@@ -34,9 +34,6 @@ const Index = () => {
     setLeads([...leads, ...newLeads]);
   };
 
-  // Since we're not using the stats on this page anymore, we can remove them
-  // The stats are now handled directly in the ProspectingForm component
-
   return (
     <SidebarProvider>
       <div className="flex min-h-screen w-full bg-background">
@@ -52,6 +49,7 @@ const Index = () => {
               leads={leads}
               onSubmit={handleAddLead}
               onAddLeads={handleAddLeads}
+              setActiveTab={setActiveTab}
             />
           </div>
         </main>

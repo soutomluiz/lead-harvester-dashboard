@@ -60,6 +60,7 @@ export function AuthPage() {
               },
             },
           }}
+          providers={['google']}
           localization={{
             variables: {
               sign_in: {

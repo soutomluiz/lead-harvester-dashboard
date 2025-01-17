@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { LeadTable } from "@/components/LeadTable";
 import { LeadForm } from "@/components/LeadForm";
 import { ProspectingForm } from "@/components/ProspectingForm";
@@ -6,17 +7,24 @@ import { SubscriptionPanel } from "@/components/SubscriptionPanel";
 import { Search, MapPin, Globe, UserPlus } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { SearchResult } from "@/types/search";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/components/ui/use-toast";
 
 interface Lead {
   id: number;
-  companyName: string;
+  company_name: string;
   industry: string;
   location: string;
-  contactName: string;
+  contact_name: string;
   email: string;
   phone: string;
-  extractionDate?: string;
-  type?: 'website' | 'place';
+  extraction_date?: string;
+  type?: 'website' | 'place' | 'manual';
+  rating?: number;
+  user_ratings_total?: number;
+  opening_date?: string;
+  website?: string;
+  address?: string;
 }
 
 interface DashboardProps {
@@ -82,17 +90,42 @@ export function DashboardStats({ results, searchType }: DashboardStatsProps) {
   );
 }
 
-export function Dashboard({ activeTab, leads, onSubmit, onAddLeads, setActiveTab }: DashboardProps) {
+export function Dashboard({ activeTab, onSubmit, onAddLeads, setActiveTab }: DashboardProps) {
+  const [leads, setLeads] = useState<Lead[]>([]);
+  const { toast } = useToast();
   const searchType = activeTab.includes("prospect-places") 
     ? "places" 
     : activeTab.includes("prospect-websites") 
     ? "websites" 
     : undefined;
 
+  useEffect(() => {
+    const fetchLeads = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('leads')
+          .select('*');
+
+        if (error) throw error;
+
+        setLeads(data || []);
+      } catch (error) {
+        console.error("Error fetching leads:", error);
+        toast({
+          title: "Error fetching leads",
+          description: "Could not load your leads. Please try again.",
+          variant: "destructive",
+        });
+      }
+    };
+
+    fetchLeads();
+  }, [toast]);
+
   const renderLeadsOverview = () => {
-    const manualLeads = leads.filter(lead => !lead.extractionDate);
-    const placesLeads = leads.filter(lead => lead.extractionDate && lead.type === 'place');
-    const websiteLeads = leads.filter(lead => lead.extractionDate && lead.type === 'website');
+    const manualLeads = leads.filter(lead => lead.type === 'manual');
+    const placesLeads = leads.filter(lead => lead.type === 'place');
+    const websiteLeads = leads.filter(lead => lead.type === 'website');
 
     return (
       <div className="space-y-6 animate-fadeIn">
@@ -152,9 +185,9 @@ export function Dashboard({ activeTab, leads, onSubmit, onAddLeads, setActiveTab
         activeTab === "prospect-websites-leads") && (
         <LeadTable 
           leads={leads.filter(lead => {
-            if (activeTab === "prospect-manual-leads") return !lead.extractionDate;
-            if (activeTab === "prospect-places-leads") return lead.extractionDate && lead.type === 'place';
-            if (activeTab === "prospect-websites-leads") return lead.extractionDate && lead.type === 'website';
+            if (activeTab === "prospect-manual-leads") return lead.type === 'manual';
+            if (activeTab === "prospect-places-leads") return lead.type === 'place';
+            if (activeTab === "prospect-websites-leads") return lead.type === 'website';
             return true;
           })} 
         />

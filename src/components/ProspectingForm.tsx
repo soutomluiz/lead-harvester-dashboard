@@ -113,28 +113,54 @@ export const ProspectingForm = ({
     }
   };
 
-  const handleAddToLeads = () => {
-    const newLeads = results.map((result, index) => ({
-      id: Date.now() + index,
-      companyName: result.companyName,
-      industry: result.keyword,
-      location: result.city,
-      address: result.address || "",
-      contactName: "",
-      email: result.email || "",
-      phone: result.phone || "",
-      extractionDate: result.extractionDate,
-      rating: result.rating,
-      user_ratings_total: result.user_ratings_total,
-      opening_date: result.opening_date || "",
-      website: result.website || ""
-    }));
+  const handleAddToLeads = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        toast({
+          title: "Erro",
+          description: "Você precisa estar logado para salvar leads.",
+          variant: "destructive",
+        });
+        return;
+      }
 
-    onAddLeads(newLeads);
-    toast({
-      title: "Leads adicionados",
-      description: `${newLeads.length} leads foram adicionados à sua lista`,
-    });
+      const newLeads = results.map((result) => ({
+        company_name: result.companyName,
+        industry: result.keyword,
+        location: result.city,
+        address: result.address || "",
+        contact_name: "",
+        email: result.email || "",
+        phone: result.phone || "",
+        extraction_date: result.extractionDate,
+        type: searchType === "places" ? "place" : "website",
+        rating: result.rating,
+        user_ratings_total: result.user_ratings_total,
+        opening_date: result.opening_date || "",
+        website: result.website || "",
+        user_id: user.id
+      }));
+
+      const { error } = await supabase
+        .from('leads')
+        .insert(newLeads);
+
+      if (error) throw error;
+
+      onAddLeads(newLeads);
+      toast({
+        title: "Leads adicionados",
+        description: `${newLeads.length} leads foram salvos com sucesso`,
+      });
+    } catch (error) {
+      console.error("Erro ao salvar leads:", error);
+      toast({
+        title: "Erro ao salvar leads",
+        description: "Não foi possível salvar os leads. Tente novamente.",
+        variant: "destructive",
+      });
+    }
   };
 
   return (

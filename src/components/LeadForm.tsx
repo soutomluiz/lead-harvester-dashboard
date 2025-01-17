@@ -4,41 +4,65 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 export const LeadForm = ({ onSubmit }: { onSubmit: (data: any) => void }) => {
   const [formData, setFormData] = useState({
-    companyName: "",
+    company_name: "",
     industry: "",
     location: "",
-    contactName: "",
+    contact_name: "",
     email: "",
     phone: "",
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit(formData);
-    setFormData({
-      companyName: "",
-      industry: "",
-      location: "",
-      contactName: "",
-      email: "",
-      phone: "",
-    });
-    toast.success("Lead added successfully!");
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        toast.error("Você precisa estar logado para adicionar leads.");
+        return;
+      }
+
+      const newLead = {
+        ...formData,
+        type: 'manual',
+        user_id: user.id
+      };
+
+      const { error } = await supabase
+        .from('leads')
+        .insert([newLead]);
+
+      if (error) throw error;
+
+      onSubmit(newLead);
+      setFormData({
+        company_name: "",
+        industry: "",
+        location: "",
+        contact_name: "",
+        email: "",
+        phone: "",
+      });
+      toast.success("Lead adicionado com sucesso!");
+    } catch (error) {
+      console.error("Erro ao adicionar lead:", error);
+      toast.error("Erro ao adicionar lead. Tente novamente.");
+    }
   };
 
   return (
     <Card className="w-full max-w-md p-6 space-y-6 animate-fadeIn">
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="space-y-2">
-          <Label htmlFor="companyName">Company Name</Label>
+          <Label htmlFor="company_name">Nome da Empresa</Label>
           <Input
-            id="companyName"
-            value={formData.companyName}
+            id="company_name"
+            value={formData.company_name}
             onChange={(e) =>
-              setFormData({ ...formData, companyName: e.target.value })
+              setFormData({ ...formData, company_name: e.target.value })
             }
             required
             className="w-full"
@@ -46,7 +70,7 @@ export const LeadForm = ({ onSubmit }: { onSubmit: (data: any) => void }) => {
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="industry">Industry/Niche</Label>
+          <Label htmlFor="industry">Indústria/Nicho</Label>
           <Input
             id="industry"
             value={formData.industry}
@@ -59,7 +83,7 @@ export const LeadForm = ({ onSubmit }: { onSubmit: (data: any) => void }) => {
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="location">Location</Label>
+          <Label htmlFor="location">Localização</Label>
           <Input
             id="location"
             value={formData.location}
@@ -72,12 +96,12 @@ export const LeadForm = ({ onSubmit }: { onSubmit: (data: any) => void }) => {
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="contactName">Contact Name</Label>
+          <Label htmlFor="contact_name">Nome do Contato</Label>
           <Input
-            id="contactName"
-            value={formData.contactName}
+            id="contact_name"
+            value={formData.contact_name}
             onChange={(e) =>
-              setFormData({ ...formData, contactName: e.target.value })
+              setFormData({ ...formData, contact_name: e.target.value })
             }
             required
             className="w-full"
@@ -97,7 +121,7 @@ export const LeadForm = ({ onSubmit }: { onSubmit: (data: any) => void }) => {
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="phone">Phone</Label>
+          <Label htmlFor="phone">Telefone</Label>
           <Input
             id="phone"
             type="tel"
@@ -109,7 +133,7 @@ export const LeadForm = ({ onSubmit }: { onSubmit: (data: any) => void }) => {
         </div>
 
         <Button type="submit" className="w-full">
-          Add Lead
+          Adicionar Lead
         </Button>
       </form>
     </Card>

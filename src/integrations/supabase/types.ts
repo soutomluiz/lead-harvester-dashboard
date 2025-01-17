@@ -9,6 +9,63 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      leads: {
+        Row: {
+          address: string | null
+          company_name: string
+          contact_name: string | null
+          created_at: string | null
+          email: string | null
+          extraction_date: string | null
+          id: string
+          industry: string | null
+          location: string | null
+          opening_date: string | null
+          phone: string | null
+          rating: number | null
+          type: string | null
+          user_id: string
+          user_ratings_total: number | null
+          website: string | null
+        }
+        Insert: {
+          address?: string | null
+          company_name: string
+          contact_name?: string | null
+          created_at?: string | null
+          email?: string | null
+          extraction_date?: string | null
+          id?: string
+          industry?: string | null
+          location?: string | null
+          opening_date?: string | null
+          phone?: string | null
+          rating?: number | null
+          type?: string | null
+          user_id: string
+          user_ratings_total?: number | null
+          website?: string | null
+        }
+        Update: {
+          address?: string | null
+          company_name?: string
+          contact_name?: string | null
+          created_at?: string | null
+          email?: string | null
+          extraction_date?: string | null
+          id?: string
+          industry?: string | null
+          location?: string | null
+          opening_date?: string | null
+          phone?: string | null
+          rating?: number | null
+          type?: string | null
+          user_id?: string
+          user_ratings_total?: number | null
+          website?: string | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null

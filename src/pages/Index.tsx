@@ -27,8 +27,7 @@ const Index = () => {
       <div className="flex min-h-screen w-full bg-background">
         <AppSidebar activeTab={activeTab} setActiveTab={setActiveTab} />
         <main className="flex-1 p-6 pb-16">
-          <div className="flex flex-col items-center mb-8 animate-fadeIn relative">
-            <img src="/logo.svg" alt="Logo" className="h-8 w-auto absolute left-0 top-0" />
+          <div className="flex flex-col items-center mb-8 animate-fadeIn">
             <h1 className="text-4xl font-bold">
               Lead Management Dashboard
             </h1>

@@ -30,17 +30,17 @@ interface DashboardStatsProps {
 export function DashboardStats({ totalLeads, uniqueLocations, uniqueIndustries }: DashboardStatsProps) {
   return (
     <div className="grid gap-4 md:grid-cols-3">
-      <div className="rounded-lg border p-4 text-center">
-        <h3 className="text-lg font-semibold">Total Leads</h3>
-        <p className="text-3xl font-bold">{totalLeads}</p>
+      <div className="rounded-lg border bg-white p-4 text-center shadow-sm hover:shadow-md transition-shadow">
+        <h3 className="text-lg font-semibold text-primary">Total Leads</h3>
+        <p className="text-3xl font-bold text-primary">{totalLeads}</p>
       </div>
-      <div className="rounded-lg border p-4 text-center">
-        <h3 className="text-lg font-semibold">Unique Locations</h3>
-        <p className="text-3xl font-bold">{uniqueLocations}</p>
+      <div className="rounded-lg border bg-white p-4 text-center shadow-sm hover:shadow-md transition-shadow">
+        <h3 className="text-lg font-semibold text-primary">Localizações Únicas</h3>
+        <p className="text-3xl font-bold text-primary">{uniqueLocations}</p>
       </div>
-      <div className="rounded-lg border p-4 text-center">
-        <h3 className="text-lg font-semibold">Unique Industries</h3>
-        <p className="text-3xl font-bold">{uniqueIndustries}</p>
+      <div className="rounded-lg border bg-white p-4 text-center shadow-sm hover:shadow-md transition-shadow">
+        <h3 className="text-lg font-semibold text-primary">Indústrias Únicas</h3>
+        <p className="text-3xl font-bold text-primary">{uniqueIndustries}</p>
       </div>
     </div>
   );
@@ -48,7 +48,7 @@ export function DashboardStats({ totalLeads, uniqueLocations, uniqueIndustries }
 
 export function Dashboard({ activeTab, leads, onSubmit, onAddLeads }: DashboardProps) {
   return (
-    <div className="flex-1 overflow-auto">
+    <div className="flex-1 overflow-auto bg-gray-50 p-6 rounded-lg">
       {activeTab === "table" && <LeadTable leads={leads} />}
       {activeTab === "form" && <LeadForm onSubmit={onSubmit} />}
       {activeTab === "prospect" && <ProspectingForm onAddLeads={onAddLeads} />}

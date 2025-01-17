@@ -24,8 +24,8 @@ export function AppSidebar({ activeTab, setActiveTab }: AppSidebarProps) {
   };
 
   return (
-    <Sidebar>
-      <SidebarHeader className="p-4">
+    <Sidebar className="bg-white border-r border-gray-200">
+      <SidebarHeader className="p-4 border-b border-gray-200">
         <div className="flex items-center justify-center mb-4">
           <img
             src="/placeholder.svg"
@@ -41,6 +41,11 @@ export function AppSidebar({ activeTab, setActiveTab }: AppSidebarProps) {
             <SidebarMenuButton
               onClick={() => setActiveTab("table")}
               data-active={activeTab === "table"}
+              className={`w-full flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
+                activeTab === "table"
+                  ? "bg-primary text-white"
+                  : "hover:bg-gray-100"
+              }`}
               tooltip="Ver Leads"
             >
               <Home className="h-4 w-4" />
@@ -52,6 +57,11 @@ export function AppSidebar({ activeTab, setActiveTab }: AppSidebarProps) {
             <SidebarMenuButton
               onClick={() => setActiveTab("form")}
               data-active={activeTab === "form"}
+              className={`w-full flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
+                activeTab === "form"
+                  ? "bg-primary text-white"
+                  : "hover:bg-gray-100"
+              }`}
               tooltip="Adicionar Lead"
             >
               <UserPlus className="h-4 w-4" />
@@ -63,6 +73,11 @@ export function AppSidebar({ activeTab, setActiveTab }: AppSidebarProps) {
             <SidebarMenuButton
               onClick={() => setActiveTab("prospect")}
               data-active={activeTab === "prospect"}
+              className={`w-full flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
+                activeTab === "prospect"
+                  ? "bg-primary text-white"
+                  : "hover:bg-gray-100"
+              }`}
               tooltip="Prospectar"
             >
               <Search className="h-4 w-4" />
@@ -74,6 +89,11 @@ export function AppSidebar({ activeTab, setActiveTab }: AppSidebarProps) {
             <SidebarMenuButton
               onClick={() => setActiveTab("subscription")}
               data-active={activeTab === "subscription"}
+              className={`w-full flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
+                activeTab === "subscription"
+                  ? "bg-primary text-white"
+                  : "hover:bg-gray-100"
+              }`}
               tooltip="Assinatura"
             >
               <CreditCard className="h-4 w-4" />
@@ -85,6 +105,11 @@ export function AppSidebar({ activeTab, setActiveTab }: AppSidebarProps) {
             <SidebarMenuButton
               onClick={() => setActiveTab("config")}
               data-active={activeTab === "config"}
+              className={`w-full flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
+                activeTab === "config"
+                  ? "bg-primary text-white"
+                  : "hover:bg-gray-100"
+              }`}
               tooltip="Configurações"
             >
               <Settings className="h-4 w-4" />
@@ -94,8 +119,8 @@ export function AppSidebar({ activeTab, setActiveTab }: AppSidebarProps) {
         </SidebarMenu>
       </SidebarContent>
 
-      <SidebarFooter className="p-4 flex flex-col gap-4">
-        <Button variant="outline" className="w-full mb-2" size="sm">
+      <SidebarFooter className="p-4 border-t border-gray-200">
+        <Button variant="outline" className="w-full mb-2 text-primary hover:bg-primary hover:text-white" size="sm">
           <LogOut className="h-4 w-4 mr-2" />
           Sair
         </Button>
@@ -103,7 +128,7 @@ export function AppSidebar({ activeTab, setActiveTab }: AppSidebarProps) {
         <div className="flex items-center gap-2">
           <Avatar>
             <AvatarImage src={user.avatar} alt={user.name} />
-            <AvatarFallback>{user.name[0]}</AvatarFallback>
+            <AvatarFallback className="bg-primary text-white">{user.name[0]}</AvatarFallback>
           </Avatar>
           <div className="flex-1 overflow-hidden">
             <p className="text-sm font-medium leading-none truncate">{user.name}</p>

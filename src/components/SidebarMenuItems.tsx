@@ -19,7 +19,7 @@ export function SidebarMenuItems({ activeTab, setActiveTab }: SidebarMenuItemsPr
       label: "Extração",
       subItems: [
         { id: "form", icon: PlusCircle, label: "Adicionar Lead" },
-        { id: "places", icon: MapPin, label: "Google Places" },
+        { id: "places", icon: MapPin, label: "Google Maps" },
         { id: "websites", icon: Globe, label: "Websites" },
       ],
     },

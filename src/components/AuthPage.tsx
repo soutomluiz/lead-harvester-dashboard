@@ -46,6 +46,24 @@ export function AuthPage() {
                       brandAccent: '#2b7291',
                     }
                   }
+                },
+                className: {
+                  button: 'supabase-auth-button',
+                  anchor: 'supabase-auth-link',
+                },
+              }}
+              localization={{
+                variables: {
+                  sign_in: {
+                    email_label: 'Email',
+                    password_label: 'Senha',
+                    button_label: 'Login',
+                  },
+                  sign_up: {
+                    email_label: 'Email',
+                    password_label: 'Senha',
+                    button_label: 'Inscrever-se',
+                  },
                 }
               }}
               theme="light"

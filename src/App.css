@@ -40,3 +40,23 @@
 .read-the-docs {
   color: #888;
 }
+
+/* Custom styles for auth buttons */
+.supabase-auth-button {
+  width: 100%;
+  padding: 8px 16px;
+  border-radius: 4px;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.supabase-auth-link {
+  color: #3080a3;
+  text-decoration: none;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.supabase-auth-link:hover {
+  color: #2b7291;
+}

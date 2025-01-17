@@ -22,7 +22,6 @@ export function AuthPage() {
         setError(null);
       } else if (event === "USER_UPDATED") {
         console.log("User updated");
-      } else if (event === "USER_DELETED") {
         setError(null);
       }
     });

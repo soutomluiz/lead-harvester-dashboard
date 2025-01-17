@@ -96,7 +96,13 @@ export function Dashboard({ activeTab, leads, onSubmit, onAddLeads }: DashboardP
         Selecione um dos métodos de prospecção disponíveis no menu lateral para começar sua busca por leads.
       </p>
       <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto mt-8">
-        <Card className="p-6 hover:shadow-lg transition-shadow">
+        <Card 
+          className="p-6 hover:shadow-lg transition-shadow cursor-pointer hover:scale-105 transition-transform"
+          onClick={() => {
+            const event = new CustomEvent('setActiveTab', { detail: 'prospect-places' });
+            window.dispatchEvent(event);
+          }}
+        >
           <div className="flex flex-col items-center text-center space-y-4">
             <Building2 className="h-12 w-12 text-primary" />
             <h3 className="text-xl font-medium">Google Places</h3>
@@ -105,7 +111,13 @@ export function Dashboard({ activeTab, leads, onSubmit, onAddLeads }: DashboardP
             </p>
           </div>
         </Card>
-        <Card className="p-6 hover:shadow-lg transition-shadow">
+        <Card 
+          className="p-6 hover:shadow-lg transition-shadow cursor-pointer hover:scale-105 transition-transform"
+          onClick={() => {
+            const event = new CustomEvent('setActiveTab', { detail: 'prospect-websites' });
+            window.dispatchEvent(event);
+          }}
+        >
           <div className="flex flex-col items-center text-center space-y-4">
             <Globe className="h-12 w-12 text-primary" />
             <h3 className="text-xl font-medium">Websites</h3>

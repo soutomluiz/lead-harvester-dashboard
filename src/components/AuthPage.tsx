@@ -19,13 +19,13 @@ export function AuthPage() {
   }, [navigate]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
-      <div className="w-full max-w-[972px] flex flex-col items-center justify-center p-4">
+    <div className="h-screen flex items-center justify-center bg-gray-50 overflow-hidden">
+      <div className="w-full max-w-[972px] flex flex-col items-center justify-center p-4 h-full">
         <div className="text-center">
           <img 
             src="/logo.svg" 
             alt="Logo" 
-            className="mx-auto w-[972px] h-[306px] mb-[1px] animate-fadeIn"
+            className="mx-auto w-full max-w-[600px] h-auto mb-[1px] animate-fadeIn"
           />
           <h1 className="text-3xl font-bold text-primary animate-slideUp">Lead Management Pro</h1>
           <p className="text-gray-600 mt-2 animate-slideUp">
@@ -33,7 +33,7 @@ export function AuthPage() {
           </p>
         </div>
 
-        <Card className="w-full max-w-md p-6 mt-8 animate-fadeIn">
+        <Card className="w-full max-w-md p-6 mt-6 animate-fadeIn">
           <Auth
             supabaseClient={supabase}
             appearance={{ 
@@ -52,7 +52,7 @@ export function AuthPage() {
           />
         </Card>
 
-        <div className="mt-8 text-center text-sm text-gray-500 animate-fadeIn">
+        <div className="mt-6 text-center text-sm text-gray-500 animate-fadeIn">
           <p>Versão gratuita inclui:</p>
           <ul className="mt-2">
             <li>• Até 50 leads por mês</li>

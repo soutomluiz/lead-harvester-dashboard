@@ -15,7 +15,7 @@ serve(async (req) => {
     
     if (!query || !apiKey) {
       return new Response(
-        JSON.stringify({ error: 'Query and API key are required' }),
+        JSON.stringify({ error: 'Query e chave da API são obrigatórios' }),
         { 
           status: 400,
           headers: { ...corsHeaders, 'Content-Type': 'application/json' }
@@ -23,14 +23,20 @@ serve(async (req) => {
       )
     }
 
-    const searchUrl = `https://www.googleapis.com/customsearch/v1?q=${encodeURIComponent(query)}&key=${apiKey}&cx=017576662512468239146:omuauf_lfve`
-    const response = await fetch(searchUrl)
-    const data = await response.json()
+    // ID do mecanismo de pesquisa personalizado do Google (Search Engine ID)
+    const searchEngineId = "017576662512468239146:omuauf_lfve";
+    
+    const searchUrl = `https://www.googleapis.com/customsearch/v1?q=${encodeURIComponent(query)}&key=${apiKey}&cx=${searchEngineId}`;
+    
+    console.log('Fazendo requisição para:', searchUrl);
+    
+    const response = await fetch(searchUrl);
+    const data = await response.json();
 
-    console.log('Google Custom Search response:', data)
+    console.log('Resposta da API do Google:', data);
 
     if (data.error) {
-      throw new Error(data.error.message)
+      throw new Error(data.error.message || 'Erro na API de pesquisa do Google');
     }
 
     const results = data.items?.map((item: any) => ({
@@ -40,16 +46,21 @@ serve(async (req) => {
       companyName: item.title,
       website: item.link,
       extractionDate: new Date().toISOString(),
-    })) || []
+      keyword: query.split(' em ')[0], // Extrai o nicho da query
+      city: query.split(' em ')[1], // Extrai a cidade da query
+    })) || [];
 
     return new Response(
       JSON.stringify({ results }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     )
   } catch (error) {
-    console.error('Error in google-custom-search:', error)
+    console.error('Erro na pesquisa personalizada:', error);
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ 
+        error: error instanceof Error ? error.message : 'Erro ao realizar a pesquisa personalizada',
+        details: error 
+      }),
       { 
         status: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }

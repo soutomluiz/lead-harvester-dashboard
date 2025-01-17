@@ -8,7 +8,7 @@ import { Lead } from "@/types/lead";
 
 const Index = () => {
   const [leads, setLeads] = useState<Lead[]>([]);
-  const [activeTab, setActiveTab] = useState("table");
+  const [activeTab, setActiveTab] = useState("dashboard"); // Changed initial state to "dashboard"
 
   const handleAddLead = (data: Omit<Lead, "id">) => {
     const newLead = {

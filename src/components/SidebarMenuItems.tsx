@@ -39,7 +39,7 @@ export function SidebarMenuItems({ activeTab, setActiveTab }: SidebarMenuItemsPr
               <SidebarMenuButton
                 onClick={() => setActiveTab(item.id)}
                 data-active={activeTab === item.id}
-                className={`w-full flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
+                className={`w-full flex items-center gap-2 px-4 py-2 rounded-lg transition-colors cursor-pointer ${
                   activeTab === item.id
                     ? "bg-primary text-white"
                     : "hover:bg-gray-100"
@@ -55,7 +55,11 @@ export function SidebarMenuItems({ activeTab, setActiveTab }: SidebarMenuItemsPr
                     <SidebarMenuSubButton
                       onClick={() => setActiveTab(`${item.id}-${subItem.id}`)}
                       data-active={activeTab === `${item.id}-${subItem.id}`}
-                      className="flex items-center gap-2"
+                      className={`flex items-center gap-2 w-full px-4 py-2 rounded-lg transition-colors cursor-pointer ${
+                        activeTab === `${item.id}-${subItem.id}`
+                          ? "bg-primary text-white"
+                          : "hover:bg-gray-100 text-gray-700"
+                      }`}
                     >
                       <subItem.icon className="h-4 w-4" />
                       <span>{subItem.label}</span>
@@ -68,7 +72,7 @@ export function SidebarMenuItems({ activeTab, setActiveTab }: SidebarMenuItemsPr
             <SidebarMenuButton
               onClick={() => setActiveTab(item.id)}
               data-active={activeTab === item.id}
-              className={`w-full flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
+              className={`w-full flex items-center gap-2 px-4 py-2 rounded-lg transition-colors cursor-pointer ${
                 activeTab === item.id
                   ? "bg-primary text-white"
                   : "hover:bg-gray-100"

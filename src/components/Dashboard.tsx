@@ -5,8 +5,8 @@ import { ConfigPanel } from "@/components/ConfigPanel";
 import { SubscriptionPanel } from "@/components/SubscriptionPanel";
 import { Search, MapPin, Globe, UserPlus } from "lucide-react";
 import { Card } from "@/components/ui/card";
-import { useEffect } from "react";
 import { SearchResult } from "@/types/search";
+import { useEffect } from "react";
 
 interface Lead {
   id: number;
@@ -23,6 +23,7 @@ interface DashboardProps {
   leads: Lead[];
   onSubmit: (data: any) => void;
   onAddLeads: (leads: any[]) => void;
+  setActiveTab: (tab: string) => void;
 }
 
 interface DashboardStatsProps {
@@ -80,29 +81,15 @@ export function DashboardStats({ results, searchType }: DashboardStatsProps) {
   );
 }
 
-export function Dashboard({ activeTab, leads, onSubmit, onAddLeads }: DashboardProps) {
+export function Dashboard({ activeTab, leads, onSubmit, onAddLeads, setActiveTab }: DashboardProps) {
   const searchType = activeTab.includes("prospect-places") 
     ? "places" 
     : activeTab.includes("prospect-websites") 
     ? "websites" 
     : undefined;
 
-  useEffect(() => {
-    const handleSetActiveTab = (event: CustomEvent<string>) => {
-      const newTab = event.detail;
-      const customEvent = new CustomEvent('setActiveTab', { detail: newTab });
-      window.dispatchEvent(customEvent);
-    };
-
-    window.addEventListener('setActiveTab', handleSetActiveTab as EventListener);
-    return () => {
-      window.removeEventListener('setActiveTab', handleSetActiveTab as EventListener);
-    };
-  }, []);
-
   const handleCardClick = (tab: string) => {
-    const event = new CustomEvent('setActiveTab', { detail: tab });
-    window.dispatchEvent(event);
+    setActiveTab(tab);
   };
 
   const renderProspectingWelcome = () => (

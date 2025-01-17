@@ -9,31 +9,13 @@ import { Card } from "@/components/ui/card";
 import { SearchResult } from "@/types/search";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
-
-interface Lead {
-  id: string;
-  company_name: string;
-  industry: string;
-  location: string;
-  contact_name: string;
-  email: string;
-  phone: string;
-  extraction_date?: string;
-  type?: 'website' | 'place' | 'manual';
-  rating?: number;
-  user_ratings_total?: number;
-  opening_date?: string;
-  website?: string;
-  address?: string;
-  created_at?: string;
-  user_id?: string;
-}
+import { Lead } from "@/types/lead";
 
 interface DashboardProps {
   activeTab: string;
   leads: Lead[];
   onSubmit: (data: any) => void;
-  onAddLeads: (leads: any[]) => void;
+  onAddLeads: (leads: Lead[]) => void;
   setActiveTab: (tab: string) => void;
 }
 

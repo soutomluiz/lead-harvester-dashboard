@@ -1,22 +1,9 @@
 import { useState } from "react";
-import { LeadForm } from "@/components/LeadForm";
-import { LeadTable } from "@/components/LeadTable";
-import { Dashboard, DashboardStats } from "@/components/Dashboard";
-import { ProspectingForm } from "@/components/ProspectingForm";
-import { ConfigPanel } from "@/components/ConfigPanel";
+import { Dashboard } from "@/components/Dashboard";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
 import { AppFooter } from "@/components/AppFooter";
-
-interface Lead {
-  id: number;
-  companyName: string;
-  industry: string;
-  location: string;
-  contactName: string;
-  email: string;
-  phone: string;
-}
+import { Lead } from "@/types/lead";
 
 const Index = () => {
   const [leads, setLeads] = useState<Lead[]>([]);
@@ -25,7 +12,7 @@ const Index = () => {
   const handleAddLead = (data: Omit<Lead, "id">) => {
     const newLead = {
       ...data,
-      id: leads.length + 1,
+      id: crypto.randomUUID(),
     };
     setLeads([...leads, newLead]);
   };

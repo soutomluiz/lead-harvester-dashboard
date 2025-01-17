@@ -11,23 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Download, Search } from "lucide-react";
-
-interface Lead {
-  id: string;
-  company_name: string;
-  industry: string;
-  location: string;
-  contact_name: string;
-  email: string;
-  phone: string;
-  extraction_date?: string;
-  type?: 'website' | 'place' | 'manual';
-  rating?: number;
-  user_ratings_total?: number;
-  opening_date?: string;
-  website?: string;
-  address?: string;
-}
+import { Lead } from "@/types/lead";
 
 export const LeadTable = ({ leads }: { leads: Lead[] }) => {
   const [searchTerm, setSearchTerm] = useState("");

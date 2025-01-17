@@ -65,7 +65,7 @@ export const ProspectingForm = ({ onAddLeads }: { onAddLeads: (leads: any[]) => 
           companyName: result.name,
           address: result.formatted_address || "",
           phone: result.formatted_phone_number || "",
-          email: result.email || "",
+          email: "",
           keyword: industry,
           city: location,
           extractionDate: new Date().toISOString(),

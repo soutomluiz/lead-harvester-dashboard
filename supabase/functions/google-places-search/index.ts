@@ -20,13 +20,34 @@ serve(async (req) => {
       )
     }
 
-    const url = `https://maps.googleapis.com/maps/api/place/textsearch/json?query=${encodeURIComponent(query)}&key=${apiKey}`
-    
-    const response = await fetch(url)
-    const data = await response.json()
+    // Primeiro, fazemos a busca por texto para obter os lugares
+    const searchUrl = `https://maps.googleapis.com/maps/api/place/textsearch/json?query=${encodeURIComponent(query)}&key=${apiKey}`
+    const searchResponse = await fetch(searchUrl)
+    const searchData = await searchResponse.json()
+
+    if (searchData.status === "REQUEST_DENIED") {
+      throw new Error("Chave de API inválida ou sem permissões necessárias")
+    }
+
+    // Para cada lugar encontrado, buscamos os detalhes adicionais
+    const detailedResults = await Promise.all(
+      searchData.results.map(async (place: any) => {
+        const detailsUrl = `https://maps.googleapis.com/maps/api/place/details/json?place_id=${place.place_id}&fields=formatted_phone_number,formatted_address,name,website&key=${apiKey}`
+        const detailsResponse = await fetch(detailsUrl)
+        const detailsData = await detailsResponse.json()
+
+        return {
+          ...place,
+          formatted_phone_number: detailsData.result?.formatted_phone_number || '',
+          website: detailsData.result?.website || '',
+        }
+      })
+    )
+
+    searchData.results = detailedResults
 
     return new Response(
-      JSON.stringify(data),
+      JSON.stringify(searchData),
       { 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }
       }

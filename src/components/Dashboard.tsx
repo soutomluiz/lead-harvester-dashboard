@@ -6,7 +6,6 @@ import { SubscriptionPanel } from "@/components/SubscriptionPanel";
 import { Search, MapPin, Globe, UserPlus } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { SearchResult } from "@/types/search";
-import { useEffect } from "react";
 
 interface Lead {
   id: number;
@@ -88,64 +87,77 @@ export function Dashboard({ activeTab, leads, onSubmit, onAddLeads, setActiveTab
     ? "websites" 
     : undefined;
 
-  const handleCardClick = (tab: string) => {
-    setActiveTab(tab);
-  };
+  const renderLeadsOverview = () => {
+    const manualLeads = leads.filter(lead => !lead.extractionDate);
+    const placesLeads = leads.filter(lead => lead.extractionDate && lead.type === 'place');
+    const websiteLeads = leads.filter(lead => lead.extractionDate && lead.type === 'website');
 
-  const renderProspectingWelcome = () => (
-    <div className="space-y-6 animate-fadeIn">
-      <h2 className="text-2xl font-semibold text-center text-gray-800">
-        Escolha uma Opção de Prospecção
-      </h2>
-      <p className="text-center text-gray-600 max-w-2xl mx-auto">
-        Selecione um dos métodos de prospecção disponíveis para começar sua busca por leads.
-      </p>
-      <div className="grid md:grid-cols-3 gap-6 max-w-6xl mx-auto mt-8">
-        <Card 
-          className="p-6 hover:shadow-lg transition-shadow cursor-pointer hover:scale-105 transition-transform"
-          onClick={() => handleCardClick('prospect-form')}
-        >
-          <div className="flex flex-col items-center text-center space-y-4">
-            <UserPlus className="h-12 w-12 text-primary" />
-            <h3 className="text-xl font-medium">Adicionar Lead</h3>
-            <p className="text-gray-600">
-              Adicione leads manualmente com informações detalhadas de contato e empresa.
-            </p>
-          </div>
-        </Card>
-        <Card 
-          className="p-6 hover:shadow-lg transition-shadow cursor-pointer hover:scale-105 transition-transform"
-          onClick={() => handleCardClick('prospect-places')}
-        >
-          <div className="flex flex-col items-center text-center space-y-4">
-            <MapPin className="h-12 w-12 text-primary" />
-            <h3 className="text-xl font-medium">Google Places</h3>
-            <p className="text-gray-600">
-              Encontre empresas locais através do Google Places. Ideal para negócios com presença física e listados no Google Maps.
-            </p>
-          </div>
-        </Card>
-        <Card 
-          className="p-6 hover:shadow-lg transition-shadow cursor-pointer hover:scale-105 transition-transform"
-          onClick={() => handleCardClick('prospect-websites')}
-        >
-          <div className="flex flex-col items-center text-center space-y-4">
-            <Globe className="h-12 w-12 text-primary" />
-            <h3 className="text-xl font-medium">Websites</h3>
-            <p className="text-gray-600">
-              Pesquise leads através de websites. Perfeito para encontrar empresas com presença online e contatos disponíveis na web.
-            </p>
-          </div>
-        </Card>
+    return (
+      <div className="space-y-6 animate-fadeIn">
+        <h2 className="text-2xl font-semibold text-center text-gray-800">
+          Seus Leads por Origem
+        </h2>
+        <div className="grid md:grid-cols-3 gap-6 max-w-6xl mx-auto mt-8">
+          <Card 
+            className="p-6 hover:shadow-lg transition-shadow cursor-pointer hover:scale-105 transition-transform"
+            onClick={() => setActiveTab('prospect-manual-leads')}
+          >
+            <div className="flex flex-col items-center text-center space-y-4">
+              <UserPlus className="h-12 w-12 text-primary" />
+              <h3 className="text-xl font-medium">Leads Manuais</h3>
+              <p className="text-3xl font-bold text-primary">{manualLeads.length}</p>
+              <p className="text-gray-600">
+                Leads adicionados manualmente através do formulário
+              </p>
+            </div>
+          </Card>
+          <Card 
+            className="p-6 hover:shadow-lg transition-shadow cursor-pointer hover:scale-105 transition-transform"
+            onClick={() => setActiveTab('prospect-places-leads')}
+          >
+            <div className="flex flex-col items-center text-center space-y-4">
+              <MapPin className="h-12 w-12 text-primary" />
+              <h3 className="text-xl font-medium">Google Places</h3>
+              <p className="text-3xl font-bold text-primary">{placesLeads.length}</p>
+              <p className="text-gray-600">
+                Leads encontrados através do Google Places
+              </p>
+            </div>
+          </Card>
+          <Card 
+            className="p-6 hover:shadow-lg transition-shadow cursor-pointer hover:scale-105 transition-transform"
+            onClick={() => setActiveTab('prospect-websites-leads')}
+          >
+            <div className="flex flex-col items-center text-center space-y-4">
+              <Globe className="h-12 w-12 text-primary" />
+              <h3 className="text-xl font-medium">Websites</h3>
+              <p className="text-3xl font-bold text-primary">{websiteLeads.length}</p>
+              <p className="text-gray-600">
+                Leads encontrados através de websites
+              </p>
+            </div>
+          </Card>
+        </div>
       </div>
-    </div>
-  );
+    );
+  };
 
   return (
     <div className="flex-1 overflow-auto bg-gray-50 p-6 rounded-lg">
-      {activeTab === "table" && <LeadTable leads={leads} />}
+      {activeTab === "prospect-leads" && renderLeadsOverview()}
+      {(activeTab === "prospect-manual-leads" || 
+        activeTab === "prospect-places-leads" || 
+        activeTab === "prospect-websites-leads") && (
+        <LeadTable 
+          leads={leads.filter(lead => {
+            if (activeTab === "prospect-manual-leads") return !lead.extractionDate;
+            if (activeTab === "prospect-places-leads") return lead.extractionDate && lead.type === 'place';
+            if (activeTab === "prospect-websites-leads") return lead.extractionDate && lead.type === 'website';
+            return true;
+          })} 
+        />
+      )}
       {activeTab === "prospect-form" && <LeadForm onSubmit={onSubmit} />}
-      {activeTab === "prospect" && renderProspectingWelcome()}
       {(activeTab === "prospect-places" || activeTab === "prospect-websites") && (
         <ProspectingForm onAddLeads={onAddLeads} searchType={searchType} />
       )}

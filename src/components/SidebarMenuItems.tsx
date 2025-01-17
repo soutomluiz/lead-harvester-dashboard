@@ -1,4 +1,4 @@
-import { Home, UserPlus, Search, Settings, CreditCard, Globe, MapPin } from "lucide-react";
+import { Home, UserPlus, Search, Settings, CreditCard, Globe, MapPin, List } from "lucide-react";
 import {
   SidebarMenu,
   SidebarMenuItem,
@@ -15,12 +15,12 @@ interface SidebarMenuItemsProps {
 
 export function SidebarMenuItems({ activeTab, setActiveTab }: SidebarMenuItemsProps) {
   const menuItems = [
-    { id: "table", icon: Home, label: "Ver Leads" },
     {
       id: "prospect",
       icon: Search,
       label: "Prospectar",
       subItems: [
+        { id: "leads", icon: List, label: "Leads" },
         { id: "form", icon: UserPlus, label: "Adicionar Lead" },
         { id: "places", icon: MapPin, label: "Google Places" },
         { id: "websites", icon: Globe, label: "Websites" },

@@ -16,12 +16,12 @@ interface SidebarMenuItemsProps {
 export function SidebarMenuItems({ activeTab, setActiveTab }: SidebarMenuItemsProps) {
   const menuItems = [
     { id: "table", icon: Home, label: "Ver Leads" },
-    { id: "form", icon: UserPlus, label: "Adicionar Lead" },
     {
       id: "prospect",
       icon: Search,
       label: "Prospectar",
       subItems: [
+        { id: "form", icon: UserPlus, label: "Adicionar Lead" },
         { id: "places", icon: MapPin, label: "Google Places" },
         { id: "websites", icon: Globe, label: "Websites" },
       ],

@@ -4,7 +4,7 @@ import { ProspectingForm } from "@/components/ProspectingForm";
 import { ConfigPanel } from "@/components/ConfigPanel";
 import { SubscriptionPanel } from "@/components/SubscriptionPanel";
 import { SearchResult } from "@/types/search";
-import { Search, MapPin, Globe } from "lucide-react";
+import { Search, MapPin, Globe, UserPlus } from "lucide-react";
 import { Card } from "@/components/ui/card";
 
 interface Lead {
@@ -53,7 +53,6 @@ export function DashboardStats({ results, searchType }: DashboardStatsProps) {
     );
   }
 
-  // Stats for Google Places
   const resultsWithRating = results.filter(result => result.rating !== undefined);
   const averageRating = resultsWithRating.length > 0
     ? (resultsWithRating.reduce((acc, curr) => acc + (curr.rating || 0), 0) / resultsWithRating.length).toFixed(1)
@@ -93,9 +92,24 @@ export function Dashboard({ activeTab, leads, onSubmit, onAddLeads }: DashboardP
         Escolha uma Opção de Prospecção
       </h2>
       <p className="text-center text-gray-600 max-w-2xl mx-auto">
-        Selecione um dos métodos de prospecção disponíveis no menu lateral para começar sua busca por leads.
+        Selecione um dos métodos de prospecção disponíveis para começar sua busca por leads.
       </p>
-      <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto mt-8">
+      <div className="grid md:grid-cols-3 gap-6 max-w-6xl mx-auto mt-8">
+        <Card 
+          className="p-6 hover:shadow-lg transition-shadow cursor-pointer hover:scale-105 transition-transform"
+          onClick={() => {
+            const event = new CustomEvent('setActiveTab', { detail: 'prospect-form' });
+            window.dispatchEvent(event);
+          }}
+        >
+          <div className="flex flex-col items-center text-center space-y-4">
+            <UserPlus className="h-12 w-12 text-primary" />
+            <h3 className="text-xl font-medium">Adicionar Lead</h3>
+            <p className="text-gray-600">
+              Adicione leads manualmente com informações detalhadas de contato e empresa.
+            </p>
+          </div>
+        </Card>
         <Card 
           className="p-6 hover:shadow-lg transition-shadow cursor-pointer hover:scale-105 transition-transform"
           onClick={() => {
@@ -133,7 +147,7 @@ export function Dashboard({ activeTab, leads, onSubmit, onAddLeads }: DashboardP
   return (
     <div className="flex-1 overflow-auto bg-gray-50 p-6 rounded-lg">
       {activeTab === "table" && <LeadTable leads={leads} />}
-      {activeTab === "form" && <LeadForm onSubmit={onSubmit} />}
+      {activeTab === "prospect-form" && <LeadForm onSubmit={onSubmit} />}
       {activeTab === "prospect" && renderProspectingWelcome()}
       {(activeTab === "prospect-places" || activeTab === "prospect-websites") && (
         <ProspectingForm onAddLeads={onAddLeads} searchType={searchType} />

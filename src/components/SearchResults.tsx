@@ -12,8 +12,8 @@ export interface SearchResult {
   keyword: string;
   city: string;
   extractionDate: string;
-  rating?: number;
-  user_ratings_total?: number;
+  rating: number;
+  user_ratings_total: number;
   opening_date?: string;
   website?: string;
 }

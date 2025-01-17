@@ -21,7 +21,7 @@ export function AuthPage() {
   return (
     <div className="h-screen flex items-center justify-center bg-gray-50 overflow-hidden">
       <div className="w-full max-w-[972px] flex flex-col items-center justify-center p-[1px] h-full">
-        <div className="text-center -mb-16">
+        <div className="text-center -mb-24">
           <img 
             src="/logo.svg" 
             alt="Logo" 

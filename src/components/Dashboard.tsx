@@ -11,7 +11,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 
 interface Lead {
-  id: number;
+  id: string;
   company_name: string;
   industry: string;
   location: string;
@@ -25,6 +25,8 @@ interface Lead {
   opening_date?: string;
   website?: string;
   address?: string;
+  created_at?: string;
+  user_id?: string;
 }
 
 interface DashboardProps {

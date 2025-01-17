@@ -13,15 +13,20 @@ import { Card } from "@/components/ui/card";
 import { Download, Search } from "lucide-react";
 
 interface Lead {
-  id: number;
-  companyName: string;
+  id: string;
+  company_name: string;
   industry: string;
   location: string;
-  contactName: string;
+  contact_name: string;
   email: string;
   phone: string;
-  extractionDate?: string;
-  type?: 'website' | 'place';
+  extraction_date?: string;
+  type?: 'website' | 'place' | 'manual';
+  rating?: number;
+  user_ratings_total?: number;
+  opening_date?: string;
+  website?: string;
+  address?: string;
 }
 
 export const LeadTable = ({ leads }: { leads: Lead[] }) => {
@@ -29,7 +34,7 @@ export const LeadTable = ({ leads }: { leads: Lead[] }) => {
 
   const filteredLeads = leads.filter((lead) =>
     Object.values(lead).some((value) =>
-      value.toString().toLowerCase().includes(searchTerm.toLowerCase())
+      value?.toString().toLowerCase().includes(searchTerm.toLowerCase())
     )
   );
 
@@ -48,10 +53,10 @@ export const LeadTable = ({ leads }: { leads: Lead[] }) => {
         headers.join(","),
         ...filteredLeads.map((lead) =>
           [
-            lead.companyName,
+            lead.company_name,
             lead.industry,
             lead.location,
-            lead.contactName,
+            lead.contact_name,
             lead.email,
             lead.phone,
           ].join(",")
@@ -100,10 +105,10 @@ export const LeadTable = ({ leads }: { leads: Lead[] }) => {
           <TableBody>
             {filteredLeads.map((lead) => (
               <TableRow key={lead.id}>
-                <TableCell>{lead.companyName}</TableCell>
+                <TableCell>{lead.company_name}</TableCell>
                 <TableCell>{lead.industry}</TableCell>
                 <TableCell>{lead.location}</TableCell>
-                <TableCell>{lead.contactName}</TableCell>
+                <TableCell>{lead.contact_name}</TableCell>
                 <TableCell>{lead.email}</TableCell>
                 <TableCell>{lead.phone}</TableCell>
               </TableRow>

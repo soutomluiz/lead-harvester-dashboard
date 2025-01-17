@@ -16,8 +16,8 @@ export function ExtractionCards({ setActiveTab }: ExtractionCardsProps) {
     {
       id: "prospect-places",
       icon: MapPin,
-      title: "Google Places",
-      description: "Extraia leads do Google Places",
+      title: "Google Maps",
+      description: "Extraia leads do Google Maps",
     },
     {
       id: "prospect-websites",

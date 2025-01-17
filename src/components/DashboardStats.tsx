@@ -89,7 +89,7 @@ export function DashboardStats({ leads, results, searchType }: DashboardStatsPro
 
     const chartData = [
       { name: 'Manual', value: leads.filter(lead => lead.type === 'manual').length },
-      { name: 'Google Places', value: leads.filter(lead => lead.type === 'place').length },
+      { name: 'Google Maps', value: leads.filter(lead => lead.type === 'place').length },
       { name: 'Websites', value: leads.filter(lead => lead.type === 'website').length },
     ];
 

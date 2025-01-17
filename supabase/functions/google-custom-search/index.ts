@@ -7,7 +7,7 @@ const corsHeaders = {
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: corsHeaders })
+    return new Response(null, { headers: corsHeaders })
   }
 
   try {
@@ -24,7 +24,7 @@ serve(async (req) => {
     }
 
     // Usando o ID do seu Custom Search Engine
-    const searchEngineId = "YOUR_SEARCH_ENGINE_ID"; // Você precisa substituir por seu ID real
+    const searchEngineId = "04876c2f3fd7a4e1f";
     
     const searchUrl = `https://www.googleapis.com/customsearch/v1?q=${encodeURIComponent(query)}&key=${apiKey}&cx=${searchEngineId}`;
     

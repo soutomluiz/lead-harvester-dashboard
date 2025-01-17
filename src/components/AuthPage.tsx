@@ -36,9 +36,15 @@ export function AuthPage() {
 
   return (
     <div className="container max-w-lg mx-auto py-8">
-      <Card className="p-6">
-        <div className="mb-6">
-          <img src="/logo.svg" alt="Logo" className="h-8 mx-auto" />
+      <Card className="p-8">
+        <div className="mb-8 space-y-4">
+          <img src="/logo.svg" alt="Logo" className="h-12 mx-auto" />
+          <h1 className="text-2xl font-semibold text-center text-gray-800">
+            Bem-vindo ao Prospecção Inteligente
+          </h1>
+          <p className="text-center text-gray-600">
+            Faça login para acessar sua conta
+          </p>
         </div>
 
         {error && (

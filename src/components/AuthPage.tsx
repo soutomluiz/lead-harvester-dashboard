@@ -19,45 +19,47 @@ export function AuthPage() {
   }, [navigate]);
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 p-4">
-      <div className="w-full max-w-[972px] text-center mb-8">
-        <img 
-          src="/logo.svg" 
-          alt="Logo" 
-          className="mx-auto w-[972px] h-[306px] mb-[1px] animate-fadeIn"
-        />
-        <h1 className="text-3xl font-bold text-primary animate-slideUp">Lead Management Pro</h1>
-        <p className="text-gray-600 mt-2 animate-slideUp">
-          Comece gratuitamente e desbloqueie recursos premium quando precisar
-        </p>
-      </div>
+    <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="w-full max-w-[972px] flex flex-col items-center justify-center p-4">
+        <div className="text-center">
+          <img 
+            src="/logo.svg" 
+            alt="Logo" 
+            className="mx-auto w-[972px] h-[306px] mb-[1px] animate-fadeIn"
+          />
+          <h1 className="text-3xl font-bold text-primary animate-slideUp">Lead Management Pro</h1>
+          <p className="text-gray-600 mt-2 animate-slideUp">
+            Comece gratuitamente e desbloqueie recursos premium quando precisar
+          </p>
+        </div>
 
-      <Card className="w-full max-w-md p-6 animate-fadeIn">
-        <Auth
-          supabaseClient={supabase}
-          appearance={{ 
-            theme: ThemeSupa,
-            variables: {
-              default: {
-                colors: {
-                  brand: '#3080a3',
-                  brandAccent: '#2b7291',
+        <Card className="w-full max-w-md p-6 mt-8 animate-fadeIn">
+          <Auth
+            supabaseClient={supabase}
+            appearance={{ 
+              theme: ThemeSupa,
+              variables: {
+                default: {
+                  colors: {
+                    brand: '#3080a3',
+                    brandAccent: '#2b7291',
+                  }
                 }
               }
-            }
-          }}
-          theme="light"
-          providers={[]}
-        />
-      </Card>
+            }}
+            theme="light"
+            providers={[]}
+          />
+        </Card>
 
-      <div className="mt-8 text-center text-sm text-gray-500 animate-fadeIn">
-        <p>Versão gratuita inclui:</p>
-        <ul className="mt-2">
-          <li>• Até 50 leads por mês</li>
-          <li>• Busca básica no Google Places</li>
-          <li>• Exportação limitada</li>
-        </ul>
+        <div className="mt-8 text-center text-sm text-gray-500 animate-fadeIn">
+          <p>Versão gratuita inclui:</p>
+          <ul className="mt-2">
+            <li>• Até 50 leads por mês</li>
+            <li>• Busca básica no Google Places</li>
+            <li>• Exportação limitada</li>
+          </ul>
+        </div>
       </div>
     </div>
   );

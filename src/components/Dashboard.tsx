@@ -4,7 +4,7 @@ import { LeadForm } from "@/components/LeadForm";
 import { ProspectingForm } from "@/components/ProspectingForm";
 import { ConfigPanel } from "@/components/ConfigPanel";
 import { SubscriptionPanel } from "@/components/SubscriptionPanel";
-import { Search, MapPin, Globe, UserPlus } from "lucide-react";
+import { ExtractionCards } from "@/components/ExtractionCards";
 import { Card } from "@/components/ui/card";
 import { SearchResult } from "@/types/search";
 import { supabase } from "@/integrations/supabase/client";
@@ -92,7 +92,6 @@ export function Dashboard({ activeTab, onSubmit, onAddLeads, setActiveTab }: Das
 
         if (error) throw error;
 
-        // Ensure the type field is properly typed
         const typedLeads = (data || []).map(lead => ({
           ...lead,
           type: lead.type as 'website' | 'place' | 'manual'
@@ -112,72 +111,20 @@ export function Dashboard({ activeTab, onSubmit, onAddLeads, setActiveTab }: Das
     fetchLeads();
   }, [toast]);
 
-  const renderLeadsOverview = () => {
-    const manualLeads = leads.filter(lead => lead.type === 'manual');
-    const placesLeads = leads.filter(lead => lead.type === 'place');
-    const websiteLeads = leads.filter(lead => lead.type === 'website');
-
-    return (
-      <div className="space-y-6 animate-fadeIn">
-        <h2 className="text-2xl font-semibold text-center text-gray-800">
-          Seus Leads por Origem
-        </h2>
-        <div className="grid md:grid-cols-3 gap-6 max-w-6xl mx-auto mt-8">
-          <Card 
-            className="p-6 hover:shadow-lg transition-shadow cursor-pointer hover:scale-105 transition-transform"
-            onClick={() => setActiveTab('prospect-manual-leads')}
-          >
-            <div className="flex flex-col items-center text-center space-y-4">
-              <UserPlus className="h-12 w-12 text-primary" />
-              <h3 className="text-xl font-medium">Leads Manuais</h3>
-              <p className="text-3xl font-bold text-primary">{manualLeads.length}</p>
-              <p className="text-gray-600">
-                Leads adicionados manualmente através do formulário
-              </p>
-            </div>
-          </Card>
-          <Card 
-            className="p-6 hover:shadow-lg transition-shadow cursor-pointer hover:scale-105 transition-transform"
-            onClick={() => setActiveTab('prospect-places-leads')}
-          >
-            <div className="flex flex-col items-center text-center space-y-4">
-              <MapPin className="h-12 w-12 text-primary" />
-              <h3 className="text-xl font-medium">Google Places</h3>
-              <p className="text-3xl font-bold text-primary">{placesLeads.length}</p>
-              <p className="text-gray-600">
-                Leads encontrados através do Google Places
-              </p>
-            </div>
-          </Card>
-          <Card 
-            className="p-6 hover:shadow-lg transition-shadow cursor-pointer hover:scale-105 transition-transform"
-            onClick={() => setActiveTab('prospect-websites-leads')}
-          >
-            <div className="flex flex-col items-center text-center space-y-4">
-              <Globe className="h-12 w-12 text-primary" />
-              <h3 className="text-xl font-medium">Websites</h3>
-              <p className="text-3xl font-bold text-primary">{websiteLeads.length}</p>
-              <p className="text-gray-600">
-                Leads encontrados através de websites
-              </p>
-            </div>
-          </Card>
-        </div>
-      </div>
-    );
-  };
-
   return (
     <div className="flex-1 overflow-auto bg-gray-50 p-6 rounded-lg">
-      {activeTab === "prospect-leads" && renderLeadsOverview()}
-      {(activeTab === "prospect-manual-leads" || 
-        activeTab === "prospect-places-leads" || 
-        activeTab === "prospect-websites-leads") && (
+      {activeTab === "prospect" && (
+        <ExtractionCards setActiveTab={setActiveTab} />
+      )}
+      {(activeTab === "leads-all" || 
+        activeTab === "leads-manual" || 
+        activeTab === "leads-places" || 
+        activeTab === "leads-websites") && (
         <LeadTable 
           leads={leads.filter(lead => {
-            if (activeTab === "prospect-manual-leads") return lead.type === 'manual';
-            if (activeTab === "prospect-places-leads") return lead.type === 'place';
-            if (activeTab === "prospect-websites-leads") return lead.type === 'website';
+            if (activeTab === "leads-manual") return lead.type === 'manual';
+            if (activeTab === "leads-places") return lead.type === 'place';
+            if (activeTab === "leads-websites") return lead.type === 'website';
             return true;
           })} 
         />

@@ -54,6 +54,28 @@ export function Dashboard({ activeTab, leads, onSubmit, onAddLeads, setActiveTab
     };
 
     fetchLeads();
+
+    // Subscribe to real-time changes
+    const channel = supabase
+      .channel('public:leads')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'leads'
+        },
+        (payload) => {
+          console.log('Real-time update:', payload);
+          fetchLeads(); // Refresh the leads data
+        }
+      )
+      .subscribe();
+
+    // Cleanup subscription
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, [toast]);
 
   return (

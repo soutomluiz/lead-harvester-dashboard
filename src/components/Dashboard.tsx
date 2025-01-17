@@ -21,61 +21,6 @@ interface DashboardProps {
   setActiveTab: (tab: string) => void;
 }
 
-interface DashboardStatsProps {
-  results: SearchResult[];
-  searchType?: "places" | "websites";
-}
-
-export function DashboardStats({ results, searchType }: DashboardStatsProps) {
-  if (searchType === "websites") {
-    const totalWebsites = results.length;
-    const websitesWithContact = results.filter(result => result.email || result.phone).length;
-    const uniqueDomains = new Set(results.map(result => result.source)).size;
-
-    return (
-      <div className="grid gap-4 md:grid-cols-3">
-        <div className="rounded-lg border bg-white p-4 text-center shadow-sm hover:shadow-md transition-shadow">
-          <h3 className="text-lg font-semibold text-primary">Websites Encontrados</h3>
-          <p className="text-3xl font-bold text-primary">{totalWebsites}</p>
-        </div>
-        <div className="rounded-lg border bg-white p-4 text-center shadow-sm hover:shadow-md transition-shadow">
-          <h3 className="text-lg font-semibold text-primary">Com Informações de Contato</h3>
-          <p className="text-3xl font-bold text-primary">{websitesWithContact}</p>
-        </div>
-        <div className="rounded-lg border bg-white p-4 text-center shadow-sm hover:shadow-md transition-shadow">
-          <h3 className="text-lg font-semibold text-primary">Domínios Únicos</h3>
-          <p className="text-3xl font-bold text-primary">{uniqueDomains}</p>
-        </div>
-      </div>
-    );
-  }
-
-  const resultsWithRating = results.filter(result => result.rating !== undefined);
-  const averageRating = resultsWithRating.length > 0
-    ? (resultsWithRating.reduce((acc, curr) => acc + (curr.rating || 0), 0) / resultsWithRating.length).toFixed(1)
-    : '0.0';
-
-  const companiesWithWebsite = results.filter(result => result.website).length;
-  const companiesWithPhone = results.filter(result => result.phone).length;
-
-  return (
-    <div className="grid gap-4 md:grid-cols-3">
-      <div className="rounded-lg border bg-white p-4 text-center shadow-sm hover:shadow-md transition-shadow">
-        <h3 className="text-lg font-semibold text-primary">Empresas Encontradas</h3>
-        <p className="text-3xl font-bold text-primary">{results.length}</p>
-      </div>
-      <div className="rounded-lg border bg-white p-4 text-center shadow-sm hover:shadow-md transition-shadow">
-        <h3 className="text-lg font-semibold text-primary">Média de Avaliações</h3>
-        <p className="text-3xl font-bold text-primary">{averageRating}/5</p>
-      </div>
-      <div className="rounded-lg border bg-white p-4 text-center shadow-sm hover:shadow-md transition-shadow">
-        <h3 className="text-lg font-semibold text-primary">Com Telefone</h3>
-        <p className="text-3xl font-bold text-primary">{companiesWithPhone}</p>
-      </div>
-    </div>
-  );
-}
-
 export function Dashboard({ activeTab, leads, onSubmit, onAddLeads, setActiveTab }: DashboardProps) {
   const [dbLeads, setDbLeads] = useState<Lead[]>([]);
   const { toast } = useToast();

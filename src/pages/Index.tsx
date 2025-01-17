@@ -34,8 +34,8 @@ const Index = () => {
     setLeads([...leads, ...newLeads]);
   };
 
-  const uniqueLocations = new Set(leads.map((lead) => lead.location)).size;
-  const uniqueIndustries = new Set(leads.map((lead) => lead.industry)).size;
+  // Since we're not using the stats on this page anymore, we can remove them
+  // The stats are now handled directly in the ProspectingForm component
 
   return (
     <SidebarProvider>
@@ -45,12 +45,6 @@ const Index = () => {
           <h1 className="text-4xl font-bold text-center mb-8 animate-fadeIn">
             Lead Management Dashboard
           </h1>
-
-          <DashboardStats
-            totalLeads={leads.length}
-            uniqueLocations={uniqueLocations}
-            uniqueIndustries={uniqueIndustries}
-          />
 
           <div className="mt-6 animate-fadeIn">
             <Dashboard 

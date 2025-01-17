@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { Search } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 interface SearchResult {
   title: string;
@@ -37,23 +38,19 @@ export const ProspectingForm = ({ onAddLeads }: { onAddLeads: (leads: any[]) => 
     }
 
     try {
-      const response = await fetch("/api/google-places-search", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
+      const { data, error } = await supabase.functions.invoke('google-places-search', {
+        body: {
           query: searchQuery,
-          apiKey: apiKey,
-        }),
+          apiKey: apiKey
+        }
       });
 
-      if (!response.ok) {
-        throw new Error("Falha na busca");
+      if (error) throw error;
+
+      if (data.status === "REQUEST_DENIED") {
+        throw new Error("Chave de API inválida ou sem permissões necessárias");
       }
 
-      const data = await response.json();
-      
       if (data.results && Array.isArray(data.results)) {
         const formattedResults = data.results.map((result: any) => ({
           title: result.name,
@@ -74,7 +71,7 @@ export const ProspectingForm = ({ onAddLeads }: { onAddLeads: (leads: any[]) => 
       console.error("Erro na busca:", error);
       toast({
         title: "Erro na busca",
-        description: "Não foi possível realizar a busca. Verifique suas configurações e tente novamente.",
+        description: error instanceof Error ? error.message : "Não foi possível realizar a busca. Verifique suas configurações e tente novamente.",
         variant: "destructive",
       });
     } finally {

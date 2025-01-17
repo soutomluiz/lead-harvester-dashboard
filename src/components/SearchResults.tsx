@@ -23,12 +23,28 @@ export const SearchResults = ({ results, onAddToLeads }: SearchResultsProps) => 
           <Card key={index} className="p-4">
             <h4 className="font-medium">{result.companyName}</h4>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mt-2">
-              <p className="text-sm">
-                <strong>Endereço:</strong> {result.address || "Não disponível"}
-              </p>
-              <p className="text-sm">
-                <strong>Telefone:</strong> {result.phone || "Não disponível"}
-              </p>
+              {result.type !== 'website' && (
+                <>
+                  <p className="text-sm">
+                    <strong>Endereço:</strong> {result.address || "Não disponível"}
+                  </p>
+                  <p className="text-sm">
+                    <strong>Telefone:</strong> {result.phone || "Não disponível"}
+                  </p>
+                  <p className="text-sm">
+                    <strong>Avaliação:</strong>{" "}
+                    {result.rating ? `${result.rating}/5` : "Sem avaliação"}
+                  </p>
+                  <p className="text-sm">
+                    <strong>Total de Avaliações:</strong>{" "}
+                    {result.user_ratings_total || 0}
+                  </p>
+                  <p className="text-sm">
+                    <strong>Horário de Funcionamento:</strong>{" "}
+                    {result.opening_date || "Não disponível"}
+                  </p>
+                </>
+              )}
               <p className="text-sm">
                 <strong>Website:</strong>{" "}
                 {result.website ? (
@@ -54,18 +70,11 @@ export const SearchResults = ({ results, onAddToLeads }: SearchResultsProps) => 
                 <strong>Data de Exportação:</strong>{" "}
                 {new Date(result.extractionDate).toLocaleDateString()}
               </p>
-              <p className="text-sm">
-                <strong>Horário de Funcionamento:</strong>{" "}
-                {result.opening_date || "Não disponível"}
-              </p>
-              <p className="text-sm">
-                <strong>Avaliação:</strong>{" "}
-                {result.rating ? `${result.rating}/5` : "Sem avaliação"}
-              </p>
-              <p className="text-sm">
-                <strong>Total de Avaliações:</strong>{" "}
-                {result.user_ratings_total || 0}
-              </p>
+              {result.type === 'website' && (
+                <p className="text-sm">
+                  <strong>Fonte:</strong> {result.source}
+                </p>
+              )}
             </div>
             <a
               href={result.link}
@@ -73,7 +82,7 @@ export const SearchResults = ({ results, onAddToLeads }: SearchResultsProps) => 
               rel="noopener noreferrer"
               className="text-sm text-blue-500 hover:underline mt-2 inline-block"
             >
-              Visitar no Google Maps
+              Visitar {result.type === 'website' ? 'Website' : 'no Google Maps'}
             </a>
           </Card>
         ))}

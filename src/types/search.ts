@@ -13,4 +13,6 @@ export interface SearchResult {
   user_ratings_total?: number;
   opening_date?: string;
   website?: string;
+  source?: string;
+  type?: 'website' | 'place';
 }

@@ -77,6 +77,8 @@ serve(async (req) => {
       extractionDate: new Date().toISOString(),
       keyword: query.split(' em ')[0],
       city: query.split(' em ')[1],
+      source: new URL(item.link).hostname,
+      type: 'website'
     }));
 
     console.log('Processed results:', results);

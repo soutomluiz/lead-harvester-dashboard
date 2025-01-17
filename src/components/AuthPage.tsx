@@ -4,7 +4,6 @@ import { ThemeSupa } from "@supabase/auth-ui-shared";
 import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
-import { Button } from "./ui/button";
 
 export function AuthPage() {
   const navigate = useNavigate();
@@ -56,13 +55,6 @@ export function AuthPage() {
 
           <div className="mt-4 text-center text-sm text-gray-500 animate-fadeIn mb-4">
             <p>Versão gratuita limitada</p>
-            <Button 
-              variant="link" 
-              className="text-primary hover:text-primary/80 mt-1"
-              onClick={() => navigate("/pricing")}
-            >
-              Assine agora para desfrutar a ferramenta completa
-            </Button>
           </div>
         </div>
       </div>

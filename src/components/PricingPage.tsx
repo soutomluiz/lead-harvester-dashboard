@@ -17,19 +17,19 @@ export function PricingPage() {
     }
 
     try {
-      const response = await fetch("/api/create-checkout", {
-        method: "POST",
+      const { data, error } = await supabase.functions.invoke('create-checkout', {
         headers: {
-          "Authorization": `Bearer ${session.access_token}`
+          Authorization: `Bearer ${session.access_token}`
         }
       });
       
-      const { url } = await response.json();
+      if (error) throw error;
       
-      if (url) {
-        window.location.href = url;
+      if (data?.url) {
+        window.location.href = data.url;
       }
     } catch (error) {
+      console.error('Erro ao processar pagamento:', error);
       toast.error("Erro ao processar pagamento. Tente novamente.");
     }
   };
@@ -113,7 +113,7 @@ export function PricingPage() {
             </CardFooter>
           </Card>
 
-          {/* Plano Gold (anteriormente Enterprise) */}
+          {/* Plano Gold */}
           <Card className="relative">
             <CardHeader>
               <CardTitle>Gold</CardTitle>

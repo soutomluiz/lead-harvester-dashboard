@@ -2,9 +2,7 @@ import { Database, Users, MapPin, Globe, Settings, CreditCard, PlusCircle } from
 import {
   SidebarMenu,
   SidebarMenuItem,
-  SidebarMenuLink,
-  SidebarMenuTrigger,
-  SidebarMenuContent,
+  SidebarMenuButton,
 } from "@/components/ui/sidebar";
 
 interface SidebarMenuItemsProps {
@@ -35,33 +33,34 @@ export function SidebarMenuItems({ activeTab, setActiveTab }: SidebarMenuItemsPr
         <SidebarMenuItem key={item.id}>
           {item.subItems ? (
             <>
-              <SidebarMenuTrigger
+              <SidebarMenuButton
                 active={activeTab.startsWith(item.id)}
-                icon={item.icon}
+                onClick={() => setActiveTab(item.id)}
               >
-                {item.label}
-              </SidebarMenuTrigger>
-              <SidebarMenuContent>
+                <item.icon className="h-4 w-4" />
+                <span>{item.label}</span>
+              </SidebarMenuButton>
+              <div className="ml-4 mt-1 space-y-1">
                 {item.subItems.map((subItem) => (
-                  <SidebarMenuLink
+                  <SidebarMenuButton
                     key={`${item.id}-${subItem.id}`}
                     active={activeTab === `${item.id}-${subItem.id}`}
-                    icon={subItem.icon}
                     onClick={() => setActiveTab(`${item.id}-${subItem.id}`)}
                   >
-                    {subItem.label}
-                  </SidebarMenuLink>
+                    <subItem.icon className="h-4 w-4" />
+                    <span>{subItem.label}</span>
+                  </SidebarMenuButton>
                 ))}
-              </SidebarMenuContent>
+              </div>
             </>
           ) : (
-            <SidebarMenuLink
+            <SidebarMenuButton
               active={activeTab === item.id}
-              icon={item.icon}
               onClick={() => setActiveTab(item.id)}
             >
-              {item.label}
-            </SidebarMenuLink>
+              <item.icon className="h-4 w-4" />
+              <span>{item.label}</span>
+            </SidebarMenuButton>
           )}
         </SidebarMenuItem>
       ))}

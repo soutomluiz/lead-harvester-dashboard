@@ -1,22 +1,41 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Auth } from "@supabase/auth-ui-react";
 import { ThemeSupa } from "@supabase/auth-ui-shared";
 import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
+import { AuthError } from "@supabase/supabase-js";
+import { toast } from "sonner";
 
 export function AuthPage() {
   const navigate = useNavigate();
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      if (event === "SIGNED_IN") {
+      console.log("Auth event:", event);
+      if (event === "SIGNED_IN" && session) {
+        console.log("User signed in successfully");
         navigate("/");
+      } else if (event === "SIGNED_OUT") {
+        console.log("User signed out");
+        setError(null);
+      } else if (event === "USER_UPDATED") {
+        console.log("User updated");
       }
     });
 
     return () => subscription.unsubscribe();
   }, [navigate]);
+
+  const handleError = (error: AuthError) => {
+    console.error("Auth error:", error);
+    const errorMessage = error.message === "Invalid login credentials"
+      ? "Email ou senha inválidos"
+      : error.message;
+    setError(errorMessage);
+    toast.error(errorMessage);
+  };
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
@@ -35,6 +54,11 @@ export function AuthPage() {
 
         <div className="flex-1 flex flex-col items-center justify-center mt-4">
           <Card className="w-full max-w-md p-6 animate-fadeIn">
+            {error && (
+              <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
+                {error}
+              </div>
+            )}
             <Auth
               supabaseClient={supabase}
               appearance={{ 
@@ -68,6 +92,7 @@ export function AuthPage() {
               }}
               theme="light"
               providers={[]}
+              onError={handleError}
             />
           </Card>
         </div>

@@ -24,15 +24,15 @@ export function AuthPage() {
         <img 
           src="/logo.svg" 
           alt="Logo" 
-          className="mx-auto h-16 w-auto mb-4"
+          className="mx-auto h-24 w-auto mb-6 animate-fadeIn"
         />
-        <h1 className="text-3xl font-bold text-primary">Lead Management Pro</h1>
-        <p className="text-gray-600 mt-2">
+        <h1 className="text-3xl font-bold text-primary animate-slideUp">Lead Management Pro</h1>
+        <p className="text-gray-600 mt-2 animate-slideUp">
           Comece gratuitamente e desbloqueie recursos premium quando precisar
         </p>
       </div>
 
-      <Card className="w-full max-w-md p-6">
+      <Card className="w-full max-w-md p-6 animate-fadeIn">
         <Auth
           supabaseClient={supabase}
           appearance={{ 
@@ -51,7 +51,7 @@ export function AuthPage() {
         />
       </Card>
 
-      <div className="mt-8 text-center text-sm text-gray-500">
+      <div className="mt-8 text-center text-sm text-gray-500 animate-fadeIn">
         <p>Versão gratuita inclui:</p>
         <ul className="mt-2">
           <li>• Até 50 leads por mês</li>

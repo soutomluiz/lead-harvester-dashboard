@@ -69,8 +69,8 @@ serve(async (req) => {
         },
       ],
       mode: 'subscription',
-      success_url: `${req.headers.get('origin')}/`,
-      cancel_url: `${req.headers.get('origin')}/`,
+      success_url: `${req.headers.get('origin')}/subscription/success`,
+      cancel_url: `${req.headers.get('origin')}/pricing`,
     });
 
     console.log('Sessão de pagamento criada:', session.id);

@@ -3,6 +3,8 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as SonnerToaster } from "@/components/ui/sonner";
 import Index from "@/pages/Index";
 import { AuthPage } from "@/components/AuthPage";
+import { PricingPage } from "@/components/PricingPage";
+import { SubscriptionSuccess } from "@/components/SubscriptionSuccess";
 import { useEffect, useState } from "react";
 import { supabase } from "./integrations/supabase/client";
 
@@ -31,6 +33,14 @@ function App() {
         <Route 
           path="/login" 
           element={isAuthenticated ? <Navigate to="/" /> : <AuthPage />} 
+        />
+        <Route 
+          path="/pricing" 
+          element={<PricingPage />} 
+        />
+        <Route 
+          path="/subscription/success" 
+          element={<SubscriptionSuccess />} 
         />
         <Route 
           path="/" 

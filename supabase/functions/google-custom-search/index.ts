@@ -35,6 +35,20 @@ serve(async (req) => {
 
     console.log('Resposta da API do Google:', data);
 
+    // Tratamento específico para erro de API bloqueada
+    if (data.error?.message?.includes('blocked')) {
+      return new Response(
+        JSON.stringify({ 
+          error: 'A API do Google Custom Search não está ativada. Por favor, ative o serviço no Console do Google Cloud e certifique-se de que sua chave de API tem as permissões necessárias.',
+          details: data.error
+        }),
+        { 
+          status: 403,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        }
+      )
+    }
+
     if (data.error) {
       throw new Error(data.error.message || 'Erro na API de pesquisa do Google');
     }

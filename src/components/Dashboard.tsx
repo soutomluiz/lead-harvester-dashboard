@@ -15,6 +15,8 @@ interface Lead {
   contactName: string;
   email: string;
   phone: string;
+  extractionDate?: string;
+  type?: 'website' | 'place';
 }
 
 interface DashboardProps {

@@ -113,10 +113,10 @@ export function PricingPage() {
             </CardFooter>
           </Card>
 
-          {/* Plano Enterprise */}
+          {/* Plano Gold (anteriormente Enterprise) */}
           <Card className="relative">
             <CardHeader>
-              <CardTitle>Enterprise</CardTitle>
+              <CardTitle>Gold</CardTitle>
               <CardDescription>Para grandes equipes</CardDescription>
               <div className="text-3xl font-bold mt-4">Personalizado</div>
             </CardHeader>

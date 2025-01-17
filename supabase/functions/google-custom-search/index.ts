@@ -13,6 +13,7 @@ serve(async (req) => {
   try {
     const { query, apiKey } = await req.json()
     console.log('Received request with query:', query)
+    console.log('API Key length:', apiKey?.length || 0)
     
     if (!query || !apiKey) {
       return new Response(
@@ -26,22 +27,32 @@ serve(async (req) => {
 
     const searchEngineId = "04876c2f3fd7a4e1f";
     
-    const searchUrl = `https://customsearch.googleapis.com/customsearch/v1?q=${encodeURIComponent(query)}&key=${apiKey}&cx=${searchEngineId}`;
+    // Usando a URL base correta da API
+    const searchUrl = new URL('https://www.googleapis.com/customsearch/v1');
+    searchUrl.searchParams.append('q', query);
+    searchUrl.searchParams.append('key', apiKey);
+    searchUrl.searchParams.append('cx', searchEngineId);
     
-    console.log('Making request to Google API...');
+    console.log('Making request to Google API URL:', searchUrl.toString());
     
-    const response = await fetch(searchUrl);
-    const data = await response.json();
+    const response = await fetch(searchUrl.toString(), {
+      headers: {
+        'Accept': 'application/json',
+      }
+    });
 
     console.log('Google API response status:', response.status);
-    console.log('Google API response:', data);
+    
+    const data = await response.json();
+    console.log('Google API response:', JSON.stringify(data, null, 2));
 
     if (!response.ok) {
       console.error('Error from Google API:', data);
       return new Response(
         JSON.stringify({ 
           error: 'Erro na API do Google Custom Search',
-          details: data
+          details: data.error?.message || 'Unknown error',
+          status: response.status
         }),
         { 
           status: response.status,
@@ -50,7 +61,15 @@ serve(async (req) => {
       )
     }
 
-    const results = data.items?.map((item: any) => ({
+    if (!data.items) {
+      console.log('No results found');
+      return new Response(
+        JSON.stringify({ results: [] }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      )
+    }
+
+    const results = data.items.map((item: any) => ({
       title: item.title,
       link: item.link,
       description: item.snippet,
@@ -59,7 +78,7 @@ serve(async (req) => {
       extractionDate: new Date().toISOString(),
       keyword: query.split(' em ')[0],
       city: query.split(' em ')[1],
-    })) || [];
+    }));
 
     console.log('Processed results:', results);
 

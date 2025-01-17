@@ -12,6 +12,7 @@ serve(async (req) => {
 
   try {
     const { query, apiKey } = await req.json()
+    console.log('Received request with query:', query)
     
     if (!query || !apiKey) {
       return new Response(
@@ -23,34 +24,30 @@ serve(async (req) => {
       )
     }
 
-    // Usando o ID do seu Custom Search Engine
     const searchEngineId = "04876c2f3fd7a4e1f";
     
-    const searchUrl = `https://www.googleapis.com/customsearch/v1?q=${encodeURIComponent(query)}&key=${apiKey}&cx=${searchEngineId}`;
+    const searchUrl = `https://customsearch.googleapis.com/customsearch/v1?q=${encodeURIComponent(query)}&key=${apiKey}&cx=${searchEngineId}`;
     
-    console.log('Fazendo requisição para:', searchUrl);
+    console.log('Making request to Google API...');
     
     const response = await fetch(searchUrl);
     const data = await response.json();
 
-    console.log('Resposta da API do Google:', data);
+    console.log('Google API response status:', response.status);
+    console.log('Google API response:', data);
 
-    // Tratamento específico para erro de API bloqueada
-    if (data.error?.code === 403) {
+    if (!response.ok) {
+      console.error('Error from Google API:', data);
       return new Response(
         JSON.stringify({ 
-          error: 'Erro de autenticação com a API do Google Custom Search. Verifique sua chave de API e as permissões.',
-          details: data.error
+          error: 'Erro na API do Google Custom Search',
+          details: data
         }),
         { 
-          status: 403,
+          status: response.status,
           headers: { ...corsHeaders, 'Content-Type': 'application/json' }
         }
       )
-    }
-
-    if (data.error) {
-      throw new Error(data.error.message || 'Erro na API de pesquisa do Google');
     }
 
     const results = data.items?.map((item: any) => ({
@@ -60,16 +57,18 @@ serve(async (req) => {
       companyName: item.title,
       website: item.link,
       extractionDate: new Date().toISOString(),
-      keyword: query.split(' em ')[0], // Extrai o nicho da query
-      city: query.split(' em ')[1], // Extrai a cidade da query
+      keyword: query.split(' em ')[0],
+      city: query.split(' em ')[1],
     })) || [];
+
+    console.log('Processed results:', results);
 
     return new Response(
       JSON.stringify({ results }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     )
   } catch (error) {
-    console.error('Erro na pesquisa personalizada:', error);
+    console.error('Error in custom search:', error);
     return new Response(
       JSON.stringify({ 
         error: error instanceof Error ? error.message : 'Erro ao realizar a pesquisa personalizada',

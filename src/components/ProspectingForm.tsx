@@ -11,6 +11,12 @@ interface SearchResult {
   link: string;
   description: string;
   companyName: string;
+  address: string;
+  phone: string;
+  email: string;
+  keyword: string;
+  city: string;
+  extractionDate: string;
 }
 
 export const ProspectingForm = ({ onAddLeads }: { onAddLeads: (leads: any[]) => void }) => {
@@ -57,6 +63,12 @@ export const ProspectingForm = ({ onAddLeads }: { onAddLeads: (leads: any[]) => 
           link: `https://www.google.com/maps/place/?q=place_id:${result.place_id}`,
           description: result.formatted_address || "Endereço não disponível",
           companyName: result.name,
+          address: result.formatted_address || "",
+          phone: result.formatted_phone_number || "",
+          email: result.email || "",
+          keyword: industry,
+          city: location,
+          extractionDate: new Date().toISOString(),
         }));
 
         setResults(formattedResults);
@@ -83,11 +95,13 @@ export const ProspectingForm = ({ onAddLeads }: { onAddLeads: (leads: any[]) => 
     const newLeads = results.map((result, index) => ({
       id: Date.now() + index,
       companyName: result.companyName,
-      industry: industry,
-      location: location,
+      industry: result.keyword,
+      location: result.city,
+      address: result.address,
       contactName: "",
-      email: "",
-      phone: "",
+      email: result.email,
+      phone: result.phone,
+      extractionDate: result.extractionDate,
     }));
 
     onAddLeads(newLeads);
@@ -144,8 +158,15 @@ export const ProspectingForm = ({ onAddLeads }: { onAddLeads: (leads: any[]) => 
           <div className="space-y-4">
             {results.map((result, index) => (
               <Card key={index} className="p-4">
-                <h4 className="font-medium">{result.title}</h4>
-                <p className="text-sm text-muted-foreground mt-1">{result.description}</p>
+                <h4 className="font-medium">{result.companyName}</h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mt-2">
+                  <p className="text-sm"><strong>Endereço:</strong> {result.address}</p>
+                  <p className="text-sm"><strong>Telefone:</strong> {result.phone || "Não disponível"}</p>
+                  <p className="text-sm"><strong>Email:</strong> {result.email || "Não disponível"}</p>
+                  <p className="text-sm"><strong>Cidade:</strong> {result.city}</p>
+                  <p className="text-sm"><strong>Palavra-chave:</strong> {result.keyword}</p>
+                  <p className="text-sm"><strong>Data de Extração:</strong> {new Date(result.extractionDate).toLocaleDateString()}</p>
+                </div>
                 <a
                   href={result.link}
                   target="_blank"

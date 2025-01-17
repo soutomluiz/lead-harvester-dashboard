@@ -19,21 +19,21 @@ export function AuthPage() {
   }, [navigate]);
 
   return (
-    <div className="min-h-screen flex flex-col bg-gray-50 overflow-hidden">
-      <div className="w-full max-w-[972px] mx-auto flex flex-col p-[1px]">
-        <div className="text-center mt-[20px]">
+    <div className="min-h-screen flex flex-col bg-gray-50">
+      <div className="w-full max-w-[972px] mx-auto flex flex-col">
+        <div className="text-center mt-1">
           <img 
             src="/logo.svg" 
             alt="Logo" 
-            className="mx-auto w-[972px] h-[306px] mb-0 animate-fadeIn"
+            className="mx-auto w-[972px] h-[240px] object-contain animate-fadeIn"
           />
-          <h1 className="text-3xl font-bold text-primary animate-slideUp -mt [-15px]">Lead Management Pro</h1>
-          <p className="text-gray-600 mt-2 animate-slideUp">
+          <h1 className="text-3xl font-bold text-primary animate-slideUp -mt-4">Lead Management Pro</h1>
+          <p className="text-gray-600 mt-1 animate-slideUp">
             Comece gratuitamente e desbloqueie recursos premium quando precisar
           </p>
         </div>
 
-        <div className="flex-1 flex flex-col items-center justify-center mt-8">
+        <div className="flex-1 flex flex-col items-center justify-center mt-4">
           <Card className="w-full max-w-md p-6 animate-fadeIn">
             <Auth
               supabaseClient={supabase}
@@ -53,9 +53,9 @@ export function AuthPage() {
             />
           </Card>
 
-          <div className="mt-6 text-center text-sm text-gray-500 animate-fadeIn">
+          <div className="mt-4 text-center text-sm text-gray-500 animate-fadeIn mb-4">
             <p>Versão gratuita inclui:</p>
-            <ul className="mt-2">
+            <ul className="mt-1">
               <li>• Até 50 leads por mês</li>
               <li>• Busca básica no Google Places</li>
               <li>• Exportação limitada</li>

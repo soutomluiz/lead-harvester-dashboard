@@ -4,6 +4,8 @@ import { ProspectingForm } from "@/components/ProspectingForm";
 import { ConfigPanel } from "@/components/ConfigPanel";
 import { SubscriptionPanel } from "@/components/SubscriptionPanel";
 import { SearchResult } from "@/types/search";
+import { Search, Building2, Globe } from "lucide-react";
+import { Card } from "@/components/ui/card";
 
 interface Lead {
   id: number;
@@ -85,10 +87,42 @@ export function Dashboard({ activeTab, leads, onSubmit, onAddLeads }: DashboardP
     ? "websites" 
     : undefined;
 
+  const renderProspectingWelcome = () => (
+    <div className="space-y-6 animate-fadeIn">
+      <h2 className="text-2xl font-semibold text-center text-gray-800">
+        Escolha uma Opção de Prospecção
+      </h2>
+      <p className="text-center text-gray-600 max-w-2xl mx-auto">
+        Selecione um dos métodos de prospecção disponíveis no menu lateral para começar sua busca por leads.
+      </p>
+      <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto mt-8">
+        <Card className="p-6 hover:shadow-lg transition-shadow">
+          <div className="flex flex-col items-center text-center space-y-4">
+            <Building2 className="h-12 w-12 text-primary" />
+            <h3 className="text-xl font-medium">Google Places</h3>
+            <p className="text-gray-600">
+              Encontre empresas locais através do Google Places. Ideal para negócios com presença física e listados no Google Maps.
+            </p>
+          </div>
+        </Card>
+        <Card className="p-6 hover:shadow-lg transition-shadow">
+          <div className="flex flex-col items-center text-center space-y-4">
+            <Globe className="h-12 w-12 text-primary" />
+            <h3 className="text-xl font-medium">Websites</h3>
+            <p className="text-gray-600">
+              Pesquise leads através de websites. Perfeito para encontrar empresas com presença online e contatos disponíveis na web.
+            </p>
+          </div>
+        </Card>
+      </div>
+    </div>
+  );
+
   return (
     <div className="flex-1 overflow-auto bg-gray-50 p-6 rounded-lg">
       {activeTab === "table" && <LeadTable leads={leads} />}
       {activeTab === "form" && <LeadForm onSubmit={onSubmit} />}
+      {activeTab === "prospect" && renderProspectingWelcome()}
       {(activeTab === "prospect-places" || activeTab === "prospect-websites") && (
         <ProspectingForm onAddLeads={onAddLeads} searchType={searchType} />
       )}

@@ -1,5 +1,5 @@
-import { SearchResult } from "@/types/search";
 import { Lead } from "@/types/lead";
+import { SearchResult } from "@/types/search";
 import { Card } from "@/components/ui/card";
 import { Mail, Phone, Users } from "lucide-react";
 import { ChartContainer } from "@/components/ui/chart";

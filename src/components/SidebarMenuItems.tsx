@@ -34,7 +34,7 @@ export function SidebarMenuItems({ activeTab, setActiveTab }: SidebarMenuItemsPr
           {item.subItems ? (
             <>
               <SidebarMenuButton
-                active={activeTab.startsWith(item.id)}
+                isActive={activeTab.startsWith(item.id)}
                 onClick={() => setActiveTab(item.id)}
               >
                 <item.icon className="h-4 w-4" />
@@ -44,7 +44,7 @@ export function SidebarMenuItems({ activeTab, setActiveTab }: SidebarMenuItemsPr
                 {item.subItems.map((subItem) => (
                   <SidebarMenuButton
                     key={`${item.id}-${subItem.id}`}
-                    active={activeTab === `${item.id}-${subItem.id}`}
+                    isActive={activeTab === `${item.id}-${subItem.id}`}
                     onClick={() => setActiveTab(`${item.id}-${subItem.id}`)}
                   >
                     <subItem.icon className="h-4 w-4" />
@@ -55,7 +55,7 @@ export function SidebarMenuItems({ activeTab, setActiveTab }: SidebarMenuItemsPr
             </>
           ) : (
             <SidebarMenuButton
-              active={activeTab === item.id}
+              isActive={activeTab === item.id}
               onClick={() => setActiveTab(item.id)}
             >
               <item.icon className="h-4 w-4" />

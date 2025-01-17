@@ -20,12 +20,12 @@ export function AuthPage() {
 
   return (
     <div className="h-screen flex items-center justify-center bg-gray-50 overflow-hidden">
-      <div className="w-full max-w-[972px] flex flex-col items-center justify-center p-4 h-full">
+      <div className="w-full max-w-[972px] flex flex-col items-center justify-center p-[1px] h-full">
         <div className="text-center">
           <img 
             src="/logo.svg" 
             alt="Logo" 
-            className="mx-auto w-full max-w-[600px] h-auto mb-[1px] animate-fadeIn"
+            className="mx-auto w-[972px] h-[306px] mb-[0.2px] animate-fadeIn"
           />
           <h1 className="text-3xl font-bold text-primary animate-slideUp">Lead Management Pro</h1>
           <p className="text-gray-600 mt-2 animate-slideUp">

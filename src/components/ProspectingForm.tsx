@@ -6,6 +6,7 @@ import { SearchForm } from "./SearchForm";
 import { SearchResults } from "./SearchResults";
 import { DashboardStats } from "./Dashboard";
 import { SearchResult } from "@/types/search";
+import { useNavigate } from "react-router-dom";
 
 export const ProspectingForm = ({
   onAddLeads,
@@ -19,6 +20,7 @@ export const ProspectingForm = ({
   const [isLoading, setIsLoading] = useState(false);
   const [results, setResults] = useState<SearchResult[]>([]);
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -27,6 +29,17 @@ export const ProspectingForm = ({
     const searchQuery = `${industry} em ${location}`;
 
     try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        toast({
+          title: "Autenticação necessária",
+          description: "Por favor, faça login para continuar.",
+          variant: "destructive",
+        });
+        navigate("/login");
+        return;
+      }
+
       if (searchType === "places") {
         const apiKey = localStorage.getItem("searchApiKey");
         if (!apiKey) {
@@ -118,10 +131,11 @@ export const ProspectingForm = ({
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
         toast({
-          title: "Erro",
-          description: "Você precisa estar logado para salvar leads.",
+          title: "Autenticação necessária",
+          description: "Por favor, faça login para salvar leads.",
           variant: "destructive",
         });
+        navigate("/login");
         return;
       }
 

@@ -4,6 +4,16 @@ import { ProspectingForm } from "@/components/ProspectingForm";
 import { ConfigPanel } from "@/components/ConfigPanel";
 import { SubscriptionPanel } from "@/components/SubscriptionPanel";
 
+interface Lead {
+  id: number;
+  companyName: string;
+  industry: string;
+  location: string;
+  contactName: string;
+  email: string;
+  phone: string;
+}
+
 interface DashboardProps {
   activeTab: string;
   leads: Lead[];

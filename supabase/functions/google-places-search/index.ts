@@ -32,7 +32,7 @@ serve(async (req) => {
     // Para cada lugar encontrado, buscamos os detalhes adicionais
     const detailedResults = await Promise.all(
       searchData.results.map(async (place: any) => {
-        const detailsUrl = `https://maps.googleapis.com/maps/api/place/details/json?place_id=${place.place_id}&fields=formatted_phone_number,formatted_address,name,website&key=${apiKey}`
+        const detailsUrl = `https://maps.googleapis.com/maps/api/place/details/json?place_id=${place.place_id}&fields=formatted_phone_number,formatted_address,name,website,email,opening_date,rating,user_ratings_total&key=${apiKey}`
         const detailsResponse = await fetch(detailsUrl)
         const detailsData = await detailsResponse.json()
 
@@ -40,6 +40,10 @@ serve(async (req) => {
           ...place,
           formatted_phone_number: detailsData.result?.formatted_phone_number || '',
           website: detailsData.result?.website || '',
+          email: detailsData.result?.email || '',
+          opening_date: detailsData.result?.opening_date || '',
+          rating: detailsData.result?.rating || 0,
+          user_ratings_total: detailsData.result?.user_ratings_total || 0
         }
       })
     )
@@ -53,6 +57,7 @@ serve(async (req) => {
       }
     )
   } catch (error) {
+    console.error('Error in google-places-search:', error)
     return new Response(
       JSON.stringify({ error: error.message }),
       { 

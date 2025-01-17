@@ -17,6 +17,9 @@ interface SearchResult {
   keyword: string;
   city: string;
   extractionDate: string;
+  rating: number;
+  user_ratings_total: number;
+  opening_date: string;
 }
 
 export const ProspectingForm = ({ onAddLeads }: { onAddLeads: (leads: any[]) => void }) => {
@@ -65,10 +68,13 @@ export const ProspectingForm = ({ onAddLeads }: { onAddLeads: (leads: any[]) => 
           companyName: result.name,
           address: result.formatted_address || "",
           phone: result.formatted_phone_number || "",
-          email: "",
+          email: result.email || "",
           keyword: industry,
           city: location,
           extractionDate: new Date().toISOString(),
+          rating: result.rating || 0,
+          user_ratings_total: result.user_ratings_total || 0,
+          opening_date: result.opening_date || ""
         }));
 
         setResults(formattedResults);
@@ -102,6 +108,9 @@ export const ProspectingForm = ({ onAddLeads }: { onAddLeads: (leads: any[]) => 
       email: result.email,
       phone: result.phone,
       extractionDate: result.extractionDate,
+      rating: result.rating,
+      user_ratings_total: result.user_ratings_total,
+      opening_date: result.opening_date
     }));
 
     onAddLeads(newLeads);
@@ -166,6 +175,9 @@ export const ProspectingForm = ({ onAddLeads }: { onAddLeads: (leads: any[]) => 
                   <p className="text-sm"><strong>Cidade:</strong> {result.city}</p>
                   <p className="text-sm"><strong>Palavra-chave:</strong> {result.keyword}</p>
                   <p className="text-sm"><strong>Data de Exportação:</strong> {new Date(result.extractionDate).toLocaleDateString()}</p>
+                  <p className="text-sm"><strong>Data de Fundação:</strong> {result.opening_date || "Não disponível"}</p>
+                  <p className="text-sm"><strong>Avaliação:</strong> {result.rating ? `${result.rating}/5` : "Sem avaliação"}</p>
+                  <p className="text-sm"><strong>Total de Avaliações:</strong> {result.user_ratings_total || 0}</p>
                 </div>
                 <a
                   href={result.link}

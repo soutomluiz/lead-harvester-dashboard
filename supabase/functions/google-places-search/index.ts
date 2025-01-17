@@ -29,19 +29,20 @@ serve(async (req) => {
       throw new Error("Chave de API inválida ou sem permissões necessárias")
     }
 
-    // Para cada lugar encontrado, buscamos os detalhes adicionais
+    // Para cada lugar encontrado, buscamos os detalhes adicionais usando place/details
     const detailedResults = await Promise.all(
-      searchData.results.map(async (place: any) => {
-        const detailsUrl = `https://maps.googleapis.com/maps/api/place/details/json?place_id=${place.place_id}&fields=formatted_phone_number,formatted_address,name,website,email,opening_date,rating,user_ratings_total&key=${apiKey}`
+      searchData.results.slice(0, 10).map(async (place: any) => {
+        const detailsUrl = `https://maps.googleapis.com/maps/api/place/details/json?place_id=${place.place_id}&fields=name,formatted_phone_number,formatted_address,website,rating,user_ratings_total,opening_hours&key=${apiKey}`
         const detailsResponse = await fetch(detailsUrl)
         const detailsData = await detailsResponse.json()
+        
+        console.log("Place details:", detailsData.result)
 
         return {
           ...place,
           formatted_phone_number: detailsData.result?.formatted_phone_number || '',
           website: detailsData.result?.website || '',
-          email: detailsData.result?.email || '',
-          opening_date: detailsData.result?.opening_date || '',
+          opening_hours: detailsData.result?.opening_hours,
           rating: detailsData.result?.rating || 0,
           user_ratings_total: detailsData.result?.user_ratings_total || 0
         }

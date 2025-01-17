@@ -15,6 +15,7 @@ interface SearchResult {
   rating: number;
   user_ratings_total: number;
   opening_date: string;
+  website: string;
 }
 
 interface SearchResultsProps {
@@ -45,7 +46,19 @@ export const SearchResults = ({ results, onAddToLeads }: SearchResultsProps) => 
                 <strong>Telefone:</strong> {result.phone || "Não disponível"}
               </p>
               <p className="text-sm">
-                <strong>Email:</strong> {result.email || "Não disponível"}
+                <strong>Website:</strong>{" "}
+                {result.website ? (
+                  <a
+                    href={result.website}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-500 hover:underline"
+                  >
+                    {result.website}
+                  </a>
+                ) : (
+                  "Não disponível"
+                )}
               </p>
               <p className="text-sm">
                 <strong>Cidade:</strong> {result.city}
@@ -58,7 +71,7 @@ export const SearchResults = ({ results, onAddToLeads }: SearchResultsProps) => 
                 {new Date(result.extractionDate).toLocaleDateString()}
               </p>
               <p className="text-sm">
-                <strong>Data de Fundação:</strong>{" "}
+                <strong>Horário de Funcionamento:</strong>{" "}
                 {result.opening_date || "Não disponível"}
               </p>
               <p className="text-sm">

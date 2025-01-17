@@ -19,6 +19,7 @@ interface SearchResult {
   rating: number;
   user_ratings_total: number;
   opening_date: string;
+  website: string;
 }
 
 export const ProspectingForm = ({
@@ -75,13 +76,14 @@ export const ProspectingForm = ({
           companyName: result.name,
           address: result.formatted_address || "",
           phone: result.formatted_phone_number || "",
-          email: result.email || "",
+          email: result.website || "",
           keyword: industry,
           city: location,
           extractionDate: new Date().toISOString(),
           rating: result.rating || 0,
           user_ratings_total: result.user_ratings_total || 0,
-          opening_date: result.opening_date || "",
+          opening_date: result.opening_hours?.weekday_text?.[0] || "",
+          website: result.website || ""
         }));
 
         setResults(formattedResults);
@@ -121,6 +123,7 @@ export const ProspectingForm = ({
       rating: result.rating,
       user_ratings_total: result.user_ratings_total,
       opening_date: result.opening_date,
+      website: result.website
     }));
 
     onAddLeads(newLeads);

@@ -4,6 +4,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { SearchForm } from "./SearchForm";
 import { SearchResults } from "./SearchResults";
+import { DashboardStats } from "./Dashboard";
 
 interface SearchResult {
   title: string;
@@ -135,14 +136,17 @@ export const ProspectingForm = ({
 
   return (
     <Card className="w-full p-6 animate-fadeIn">
-      <SearchForm
-        industry={industry}
-        location={location}
-        isLoading={isLoading}
-        onIndustryChange={setIndustry}
-        onLocationChange={setLocation}
-        onSubmit={handleSearch}
-      />
+      <DashboardStats results={results} />
+      <div className="mt-6">
+        <SearchForm
+          industry={industry}
+          location={location}
+          isLoading={isLoading}
+          onIndustryChange={setIndustry}
+          onLocationChange={setLocation}
+          onSubmit={handleSearch}
+        />
+      </div>
       <SearchResults results={results} onAddToLeads={handleAddToLeads} />
     </Card>
   );

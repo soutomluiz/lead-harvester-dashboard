@@ -21,26 +21,37 @@ interface DashboardProps {
   onAddLeads: (leads: any[]) => void;
 }
 
-interface DashboardStatsProps {
-  totalLeads: number;
-  uniqueLocations: number;
-  uniqueIndustries: number;
+interface SearchResult {
+  rating: number;
+  website?: string;
 }
 
-export function DashboardStats({ totalLeads, uniqueLocations, uniqueIndustries }: DashboardStatsProps) {
+interface DashboardStatsProps {
+  results: SearchResult[];
+}
+
+export function DashboardStats({ results }: DashboardStatsProps) {
+  // Calcula a média de avaliações
+  const averageRating = results.length > 0
+    ? (results.reduce((acc, curr) => acc + (curr.rating || 0), 0) / results.length).toFixed(1)
+    : '0.0';
+
+  // Conta quantas empresas têm website
+  const companiesWithWebsite = results.filter(result => result.website).length;
+
   return (
     <div className="grid gap-4 md:grid-cols-3">
       <div className="rounded-lg border bg-white p-4 text-center shadow-sm hover:shadow-md transition-shadow">
-        <h3 className="text-lg font-semibold text-primary">Total Leads</h3>
-        <p className="text-3xl font-bold text-primary">{totalLeads}</p>
+        <h3 className="text-lg font-semibold text-primary">Resultados Encontrados</h3>
+        <p className="text-3xl font-bold text-primary">{results.length}</p>
       </div>
       <div className="rounded-lg border bg-white p-4 text-center shadow-sm hover:shadow-md transition-shadow">
-        <h3 className="text-lg font-semibold text-primary">Localizações Únicas</h3>
-        <p className="text-3xl font-bold text-primary">{uniqueLocations}</p>
+        <h3 className="text-lg font-semibold text-primary">Média de Avaliações</h3>
+        <p className="text-3xl font-bold text-primary">{averageRating}/5</p>
       </div>
       <div className="rounded-lg border bg-white p-4 text-center shadow-sm hover:shadow-md transition-shadow">
-        <h3 className="text-lg font-semibold text-primary">Indústrias Únicas</h3>
-        <p className="text-3xl font-bold text-primary">{uniqueIndustries}</p>
+        <h3 className="text-lg font-semibold text-primary">Com Website</h3>
+        <p className="text-3xl font-bold text-primary">{companiesWithWebsite}</p>
       </div>
     </div>
   );

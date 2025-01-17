@@ -54,11 +54,8 @@ export function AuthPage() {
           </Card>
 
           <div className="mt-4 text-center text-sm text-gray-500 animate-fadeIn mb-4">
-            <p>Versão gratuita inclui:</p>
+            <p>Versão gratuita limitada</p>
             <ul className="mt-1">
-              <li>• Até 50 leads por mês</li>
-              <li>• Busca básica no Google Places</li>
-              <li>• Exportação limitada</li>
             </ul>
           </div>
         </div>

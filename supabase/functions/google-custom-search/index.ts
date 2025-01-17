@@ -23,8 +23,8 @@ serve(async (req) => {
       )
     }
 
-    // ID do mecanismo de pesquisa personalizado do Google (Search Engine ID)
-    const searchEngineId = "017576662512468239146:omuauf_lfve";
+    // Usando o ID do seu Custom Search Engine
+    const searchEngineId = "YOUR_SEARCH_ENGINE_ID"; // Você precisa substituir por seu ID real
     
     const searchUrl = `https://www.googleapis.com/customsearch/v1?q=${encodeURIComponent(query)}&key=${apiKey}&cx=${searchEngineId}`;
     
@@ -36,10 +36,10 @@ serve(async (req) => {
     console.log('Resposta da API do Google:', data);
 
     // Tratamento específico para erro de API bloqueada
-    if (data.error?.message?.includes('blocked')) {
+    if (data.error?.code === 403) {
       return new Response(
         JSON.stringify({ 
-          error: 'A API do Google Custom Search não está ativada. Por favor, ative o serviço no Console do Google Cloud e certifique-se de que sua chave de API tem as permissões necessárias.',
+          error: 'Erro de autenticação com a API do Google Custom Search. Verifique sua chave de API e as permissões.',
           details: data.error
         }),
         { 

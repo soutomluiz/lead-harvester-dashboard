@@ -3,9 +3,10 @@ import { LeadForm } from "@/components/LeadForm";
 import { ProspectingForm } from "@/components/ProspectingForm";
 import { ConfigPanel } from "@/components/ConfigPanel";
 import { SubscriptionPanel } from "@/components/SubscriptionPanel";
-import { SearchResult } from "@/types/search";
 import { Search, MapPin, Globe, UserPlus } from "lucide-react";
 import { Card } from "@/components/ui/card";
+import { useEffect } from "react";
+import { SearchResult } from "@/types/search";
 
 interface Lead {
   id: number;
@@ -86,6 +87,24 @@ export function Dashboard({ activeTab, leads, onSubmit, onAddLeads }: DashboardP
     ? "websites" 
     : undefined;
 
+  useEffect(() => {
+    const handleSetActiveTab = (event: CustomEvent<string>) => {
+      const newTab = event.detail;
+      const customEvent = new CustomEvent('setActiveTab', { detail: newTab });
+      window.dispatchEvent(customEvent);
+    };
+
+    window.addEventListener('setActiveTab', handleSetActiveTab as EventListener);
+    return () => {
+      window.removeEventListener('setActiveTab', handleSetActiveTab as EventListener);
+    };
+  }, []);
+
+  const handleCardClick = (tab: string) => {
+    const event = new CustomEvent('setActiveTab', { detail: tab });
+    window.dispatchEvent(event);
+  };
+
   const renderProspectingWelcome = () => (
     <div className="space-y-6 animate-fadeIn">
       <h2 className="text-2xl font-semibold text-center text-gray-800">
@@ -97,10 +116,7 @@ export function Dashboard({ activeTab, leads, onSubmit, onAddLeads }: DashboardP
       <div className="grid md:grid-cols-3 gap-6 max-w-6xl mx-auto mt-8">
         <Card 
           className="p-6 hover:shadow-lg transition-shadow cursor-pointer hover:scale-105 transition-transform"
-          onClick={() => {
-            const event = new CustomEvent('setActiveTab', { detail: 'prospect-form' });
-            window.dispatchEvent(event);
-          }}
+          onClick={() => handleCardClick('prospect-form')}
         >
           <div className="flex flex-col items-center text-center space-y-4">
             <UserPlus className="h-12 w-12 text-primary" />
@@ -112,10 +128,7 @@ export function Dashboard({ activeTab, leads, onSubmit, onAddLeads }: DashboardP
         </Card>
         <Card 
           className="p-6 hover:shadow-lg transition-shadow cursor-pointer hover:scale-105 transition-transform"
-          onClick={() => {
-            const event = new CustomEvent('setActiveTab', { detail: 'prospect-places' });
-            window.dispatchEvent(event);
-          }}
+          onClick={() => handleCardClick('prospect-places')}
         >
           <div className="flex flex-col items-center text-center space-y-4">
             <MapPin className="h-12 w-12 text-primary" />
@@ -127,10 +140,7 @@ export function Dashboard({ activeTab, leads, onSubmit, onAddLeads }: DashboardP
         </Card>
         <Card 
           className="p-6 hover:shadow-lg transition-shadow cursor-pointer hover:scale-105 transition-transform"
-          onClick={() => {
-            const event = new CustomEvent('setActiveTab', { detail: 'prospect-websites' });
-            window.dispatchEvent(event);
-          }}
+          onClick={() => handleCardClick('prospect-websites')}
         >
           <div className="flex flex-col items-center text-center space-y-4">
             <Globe className="h-12 w-12 text-primary" />

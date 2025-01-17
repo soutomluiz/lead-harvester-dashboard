@@ -1,22 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-
-export interface SearchResult {
-  title?: string;
-  link: string;
-  description?: string;
-  companyName: string;
-  address?: string;
-  phone?: string;
-  email?: string;
-  keyword: string;
-  city: string;
-  extractionDate: string;
-  rating: number;
-  user_ratings_total: number;
-  opening_date?: string;
-  website?: string;
-}
+import { SearchResult } from "@/types/search";
 
 interface SearchResultsProps {
   results: SearchResult[];

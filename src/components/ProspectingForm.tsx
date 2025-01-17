@@ -3,8 +3,9 @@ import { Card } from "@/components/ui/card";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { SearchForm } from "./SearchForm";
-import { SearchResults, SearchResult } from "./SearchResults";
+import { SearchResults } from "./SearchResults";
 import { DashboardStats } from "./Dashboard";
+import { SearchResult } from "@/types/search";
 
 export const ProspectingForm = ({
   onAddLeads,

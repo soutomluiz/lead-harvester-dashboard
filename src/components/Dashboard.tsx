@@ -3,6 +3,7 @@ import { LeadForm } from "@/components/LeadForm";
 import { ProspectingForm } from "@/components/ProspectingForm";
 import { ConfigPanel } from "@/components/ConfigPanel";
 import { SubscriptionPanel } from "@/components/SubscriptionPanel";
+import { SearchResult } from "@/types/search";
 
 interface Lead {
   id: number;
@@ -19,11 +20,6 @@ interface DashboardProps {
   leads: Lead[];
   onSubmit: (data: any) => void;
   onAddLeads: (leads: any[]) => void;
-}
-
-interface SearchResult {
-  rating: number;
-  website?: string;
 }
 
 interface DashboardStatsProps {

@@ -22,20 +22,23 @@ export function AuthPage() {
         setError(null);
       } else if (event === "USER_UPDATED") {
         console.log("User updated");
+      } else if (event === "USER_DELETED") {
+        setError(null);
       }
     });
 
-    return () => subscription.unsubscribe();
-  }, [navigate]);
+    // Listen for auth errors
+    const authListener = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'PASSWORD_RECOVERY') {
+        setError(null);
+      }
+    });
 
-  const handleError = (error: AuthError) => {
-    console.error("Auth error:", error);
-    const errorMessage = error.message === "Invalid login credentials"
-      ? "Email ou senha inválidos"
-      : error.message;
-    setError(errorMessage);
-    toast.error(errorMessage);
-  };
+    return () => {
+      subscription.unsubscribe();
+      authListener.data.subscription.unsubscribe();
+    };
+  }, [navigate]);
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
@@ -92,7 +95,6 @@ export function AuthPage() {
               }}
               theme="light"
               providers={[]}
-              onError={handleError}
             />
           </Card>
         </div>

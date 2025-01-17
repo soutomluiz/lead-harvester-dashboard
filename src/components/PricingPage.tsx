@@ -90,7 +90,7 @@ export function PricingPage() {
               <ul className="space-y-3">
                 <li className="flex items-center gap-2">
                   <Check className="h-5 w-5 text-primary" />
-                  <span>Leads ilimitados</span>
+                  <span>Até 100 leads por mês</span>
                 </li>
                 <li className="flex items-center gap-2">
                   <Check className="h-5 w-5 text-primary" />
@@ -102,7 +102,7 @@ export function PricingPage() {
                 </li>
                 <li className="flex items-center gap-2">
                   <Check className="h-5 w-5 text-primary" />
-                  <span>Suporte prioritário</span>
+                  <span>Suporte em horário comercial</span>
                 </li>
               </ul>
             </CardContent>

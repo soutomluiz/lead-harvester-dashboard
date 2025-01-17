@@ -31,7 +31,7 @@ serve(async (req) => {
 
     // Para cada lugar encontrado, buscamos os detalhes adicionais usando place/details
     const detailedResults = await Promise.all(
-      searchData.results.slice(0, 10).map(async (place: any) => {
+      searchData.results.map(async (place: any) => {
         const detailsUrl = `https://maps.googleapis.com/maps/api/place/details/json?place_id=${place.place_id}&fields=name,formatted_phone_number,formatted_address,website,rating,user_ratings_total,opening_hours&key=${apiKey}`
         const detailsResponse = await fetch(detailsUrl)
         const detailsData = await detailsResponse.json()

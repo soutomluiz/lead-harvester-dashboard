@@ -1,4 +1,4 @@
-import { Home, UserPlus, Search, Settings, CreditCard, Globe, MapPin, List } from "lucide-react";
+import { Database, PlusCircle, MapPin, Globe, Users, Settings, CreditCard } from "lucide-react";
 import {
   SidebarMenu,
   SidebarMenuItem,
@@ -17,13 +17,23 @@ export function SidebarMenuItems({ activeTab, setActiveTab }: SidebarMenuItemsPr
   const menuItems = [
     {
       id: "prospect",
-      icon: Search,
-      label: "Prospectar",
+      icon: Database,
+      label: "Extração",
       subItems: [
-        { id: "leads", icon: List, label: "Leads" },
-        { id: "form", icon: UserPlus, label: "Adicionar Lead" },
+        { id: "form", icon: PlusCircle, label: "Adicionar Lead" },
         { id: "places", icon: MapPin, label: "Google Places" },
         { id: "websites", icon: Globe, label: "Websites" },
+      ],
+    },
+    { 
+      id: "leads", 
+      icon: Users, 
+      label: "Leads",
+      subItems: [
+        { id: "all", icon: Users, label: "Todos os Leads" },
+        { id: "manual", icon: Users, label: "Leads Manuais" },
+        { id: "places", icon: MapPin, label: "Leads do Places" },
+        { id: "websites", icon: Globe, label: "Leads de Websites" },
       ],
     },
     { id: "subscription", icon: CreditCard, label: "Assinatura" },

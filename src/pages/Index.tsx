@@ -66,7 +66,7 @@ const Index = () => {
             />
           </div>
         </main>
-        <AppFooter whitelabelName="Sua Empresa" />
+        <AppFooter />
         <WelcomeTour />
       </div>
     </SidebarProvider>

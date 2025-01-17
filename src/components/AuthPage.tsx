@@ -1,22 +1,25 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Auth } from "@supabase/auth-ui-react";
 import { ThemeSupa } from "@supabase/auth-ui-shared";
 import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
-import { useNavigate } from "react-router-dom";
-import { AuthError } from "@supabase/supabase-js";
-import { toast } from "sonner";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { useToast } from "@/components/ui/use-toast";
 
 export function AuthPage() {
-  const navigate = useNavigate();
   const [error, setError] = useState<string | null>(null);
+  const navigate = useNavigate();
+  const { toast } = useToast();
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      console.log("Auth event:", event);
-      if (event === "SIGNED_IN" && session) {
-        console.log("User signed in successfully");
+      console.log("Auth state changed:", event);
+      
+      if (event === "SIGNED_IN") {
+        console.log("User signed in");
         navigate("/");
+        setError(null);
       } else if (event === "SIGNED_OUT") {
         console.log("User signed out");
         setError(null);
@@ -26,78 +29,53 @@ export function AuthPage() {
       }
     });
 
-    // Listen for auth errors
-    const authListener = supabase.auth.onAuthStateChange((event, session) => {
-      if (event === 'PASSWORD_RECOVERY') {
-        setError(null);
-      }
-    });
-
     return () => {
       subscription.unsubscribe();
-      authListener.data.subscription.unsubscribe();
     };
   }, [navigate]);
 
   return (
-    <div className="min-h-screen flex flex-col bg-gray-50">
-      <div className="w-full max-w-[972px] mx-auto flex flex-col">
-        <div className="text-center mt-1">
-          <img 
-            src="/logo.svg" 
-            alt="Logo" 
-            className="mx-auto w-[486px] h-[120px] object-contain animate-fadeIn"
-          />
-          <h1 className="text-3xl font-bold text-primary animate-slideUp mt-[30px]">Lead Management Pro</h1>
-          <p className="text-gray-600 mt-1 animate-slideUp">
-            Comece gratuitamente e desbloqueie recursos premium quando precisar
-          </p>
+    <div className="container max-w-lg mx-auto py-8">
+      <Card className="p-6">
+        <div className="mb-6">
+          <img src="/logo.svg" alt="Logo" className="h-8 mx-auto" />
         </div>
 
-        <div className="flex-1 flex flex-col items-center justify-center mt-4">
-          <Card className="w-full max-w-md p-6 animate-fadeIn">
-            {error && (
-              <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
-                {error}
-              </div>
-            )}
-            <Auth
-              supabaseClient={supabase}
-              appearance={{ 
-                theme: ThemeSupa,
-                variables: {
-                  default: {
-                    colors: {
-                      brand: '#3080a3',
-                      brandAccent: '#2b7291',
-                    }
-                  }
+        {error && (
+          <Alert variant="destructive" className="mb-4">
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
+        )}
+
+        <Auth
+          supabaseClient={supabase}
+          appearance={{
+            theme: ThemeSupa,
+            variables: {
+              default: {
+                colors: {
+                  brand: '#3080a3',
+                  brandAccent: '#2c7492',
                 },
-                className: {
-                  button: 'supabase-auth-button',
-                  anchor: 'supabase-auth-link',
-                },
-              }}
-              localization={{
-                variables: {
-                  sign_in: {
-                    email_label: 'Email',
-                    password_label: 'Senha',
-                    button_label: 'Login',
-                  },
-                  sign_up: {
-                    email_label: 'Email',
-                    password_label: 'Senha',
-                    button_label: 'Inscrever-se',
-                  },
-                }
-              }}
-              theme="light"
-              providers={[]}
-            />
-          </Card>
-        </div>
-      </div>
+              },
+            },
+          }}
+          localization={{
+            variables: {
+              sign_in: {
+                email_label: 'Email',
+                password_label: 'Senha',
+                button_label: 'Entrar',
+              },
+              sign_up: {
+                email_label: 'Email',
+                password_label: 'Senha',
+                button_label: 'Cadastrar',
+              },
+            },
+          }}
+        />
+      </Card>
     </div>
   );
 }

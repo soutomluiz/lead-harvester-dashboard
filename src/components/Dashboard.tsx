@@ -92,7 +92,13 @@ export function Dashboard({ activeTab, onSubmit, onAddLeads, setActiveTab }: Das
 
         if (error) throw error;
 
-        setLeads(data || []);
+        // Ensure the type field is properly typed
+        const typedLeads = (data || []).map(lead => ({
+          ...lead,
+          type: lead.type as 'website' | 'place' | 'manual'
+        }));
+
+        setLeads(typedLeads);
       } catch (error) {
         console.error("Error fetching leads:", error);
         toast({

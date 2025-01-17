@@ -43,11 +43,13 @@
 
 /* Custom styles for auth buttons */
 .supabase-auth-button {
-  width: 100%;
+  width: 50% !important;
   padding: 8px 16px;
   border-radius: 4px;
   font-weight: 500;
   transition: all 0.2s;
+  display: inline-block !important;
+  margin: 0 4px !important;
 }
 
 .supabase-auth-link {
@@ -59,4 +61,11 @@
 
 .supabase-auth-link:hover {
   color: #2b7291;
+}
+
+/* Add styles for the auth buttons container */
+.sbui-auth-container > div > form > div:last-child {
+  display: flex !important;
+  gap: 8px;
+  margin-top: 16px;
 }

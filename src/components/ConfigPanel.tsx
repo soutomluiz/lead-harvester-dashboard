@@ -1,13 +1,14 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 import { Search, Key } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 
 export const ConfigPanel = () => {
   const [apiKey, setApiKey] = useState(() => localStorage.getItem("searchApiKey") || "");
-  const [searchEndpoint, setSearchEndpoint] = useState(() => localStorage.getItem("searchEndpoint") || "https://maps.googleapis.com/maps/api/place/textsearch/json");
+  const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
 
   const handleSave = () => {
@@ -21,11 +22,10 @@ export const ConfigPanel = () => {
     }
 
     localStorage.setItem("searchApiKey", apiKey.trim());
-    localStorage.setItem("searchEndpoint", searchEndpoint.trim());
     
     toast({
       title: "Configurações salvas",
-      description: "Suas configurações da API do Google Maps foram salvas com sucesso.",
+      description: "Sua chave de API do Google Maps foi salva com sucesso.",
     });
   };
 
@@ -39,32 +39,39 @@ export const ConfigPanel = () => {
       return;
     }
 
+    setIsLoading(true);
     toast({
       title: "Testando conexão",
       description: "Aguarde enquanto testamos sua configuração...",
     });
 
     try {
-      // Montando a URL de teste com um query simples
-      const testUrl = `${searchEndpoint}?query=restaurants+in+São+Paulo&key=${apiKey}`;
-      
-      const response = await fetch(testUrl);
-      const data = await response.json();
+      const { data, error } = await supabase.functions.invoke('google-places-search', {
+        body: {
+          query: 'restaurants in São Paulo',
+          apiKey: apiKey
+        }
+      });
 
-      if (response.ok && data.status !== "REQUEST_DENIED") {
-        toast({
-          title: "Conexão bem-sucedida",
-          description: "Sua configuração da API do Google Maps está funcionando corretamente.",
-        });
-      } else {
-        throw new Error(data.error_message || "Erro na autenticação com o Google Maps");
+      if (error) throw error;
+
+      if (data.status === "REQUEST_DENIED") {
+        throw new Error("Chave de API inválida ou sem permissões necessárias");
       }
+
+      toast({
+        title: "Conexão bem-sucedida",
+        description: "Sua configuração da API do Google Maps está funcionando corretamente.",
+      });
     } catch (error) {
+      console.error('Erro ao testar conexão:', error);
       toast({
         title: "Erro na conexão",
         description: error instanceof Error ? error.message : "Verifique sua chave de API do Google Maps.",
         variant: "destructive",
       });
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -87,27 +94,17 @@ export const ConfigPanel = () => {
           />
         </div>
 
-        <div className="space-y-2">
-          <label htmlFor="endpoint" className="text-sm font-medium flex items-center gap-2">
-            <Search className="h-4 w-4" />
-            Endpoint do Google Maps Places API
-          </label>
-          <Input
-            id="endpoint"
-            value={searchEndpoint}
-            onChange={(e) => setSearchEndpoint(e.target.value)}
-            placeholder="https://maps.googleapis.com/maps/api/place/textsearch/json"
-            className="font-mono"
-            readOnly
-          />
-        </div>
-
         <div className="flex gap-4">
-          <Button onClick={handleSave} className="flex-1">
+          <Button onClick={handleSave} className="flex-1" disabled={isLoading}>
             Salvar Configurações
           </Button>
-          <Button onClick={handleTestConnection} variant="secondary" className="flex-1">
-            Testar Conexão
+          <Button 
+            onClick={handleTestConnection} 
+            variant="secondary" 
+            className="flex-1"
+            disabled={isLoading}
+          >
+            {isLoading ? "Testando..." : "Testar Conexão"}
           </Button>
         </div>
       </div>

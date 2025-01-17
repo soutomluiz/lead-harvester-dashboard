@@ -62,12 +62,12 @@ export const ProspectingForm = ({
             companyName: result.name,
             address: result.formatted_address || "",
             phone: result.formatted_phone_number || "",
-            email: result.website || "",
+            email: "",
             keyword: industry,
             city: location,
             extractionDate: new Date().toISOString(),
-            rating: result.rating || 0,
-            user_ratings_total: result.user_ratings_total || 0,
+            rating: result.rating,
+            user_ratings_total: result.user_ratings_total,
             opening_date: result.opening_hours?.weekday_text?.[0] || "",
             website: result.website || ""
           }));
@@ -89,11 +89,14 @@ export const ProspectingForm = ({
 
         if (data.results) {
           const formattedResults: SearchResult[] = data.results.map((result: any) => ({
-            ...result,
+            title: result.title,
+            link: result.link || "",
+            description: result.snippet || "",
+            companyName: result.title || "",
             keyword: industry,
             city: location,
-            link: result.link || "",
-            companyName: result.title || "",
+            extractionDate: new Date().toISOString(),
+            website: result.link || ""
           }));
           setResults(formattedResults);
         }
@@ -129,8 +132,8 @@ export const ProspectingForm = ({
       email: result.email || "",
       phone: result.phone || "",
       extractionDate: result.extractionDate,
-      rating: result.rating || 0,
-      user_ratings_total: result.user_ratings_total || 0,
+      rating: result.rating,
+      user_ratings_total: result.user_ratings_total,
       opening_date: result.opening_date || "",
       website: result.website || ""
     }));

@@ -7,11 +7,14 @@ import { WelcomeTour } from "@/components/WelcomeTour";
 import { Lead } from "@/types/lead";
 import { supabase } from "@/integrations/supabase/client";
 import { SidebarUserSection } from "@/components/SidebarUserSection";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { UserRound } from "lucide-react";
 
 const Index = () => {
   const [leads, setLeads] = useState<Lead[]>([]);
   const [activeTab, setActiveTab] = useState("dashboard");
   const [userName, setUserName] = useState<string>("");
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchUserProfile = async () => {
@@ -19,12 +22,13 @@ const Index = () => {
       if (user) {
         const { data: profile } = await supabase
           .from('profiles')
-          .select('full_name')
+          .select('full_name, avatar_url')
           .eq('id', user.id)
           .single();
         
-        if (profile?.full_name) {
-          setUserName(profile.full_name);
+        if (profile) {
+          setUserName(profile.full_name || '');
+          setAvatarUrl(profile.avatar_url);
         }
       }
     };
@@ -51,9 +55,19 @@ const Index = () => {
         <main className="flex-1 p-6 pb-16">
           <div className="flex justify-between items-center mb-8 animate-fadeIn">
             <h1 className="text-2xl font-bold">
-              Olá {userName ? userName + "," : ""}
+              Dashboard
             </h1>
-            <SidebarUserSection className="static" />
+            <div className="flex items-center gap-3">
+              <span className="text-sm font-medium">
+                {userName}
+              </span>
+              <Avatar className="h-8 w-8">
+                <AvatarImage src={avatarUrl || ""} />
+                <AvatarFallback>
+                  <UserRound className="h-4 w-4" />
+                </AvatarFallback>
+              </Avatar>
+            </div>
           </div>
 
           <div className="mt-6 animate-fadeIn">
@@ -66,7 +80,7 @@ const Index = () => {
             />
           </div>
         </main>
-        <AppFooter whitelabelName="Sua Empresa" />
+        <AppFooter />
         <WelcomeTour />
       </div>
     </SidebarProvider>

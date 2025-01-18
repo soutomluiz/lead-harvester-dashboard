@@ -9,6 +9,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { SidebarUserSection } from "@/components/SidebarUserSection";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { UserRound } from "lucide-react";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { UserProfilePanel } from "@/components/UserProfilePanel";
 
 const Index = () => {
   const [leads, setLeads] = useState<Lead[]>([]);
@@ -61,12 +63,22 @@ const Index = () => {
               <span className="text-sm font-medium">
                 {userName}
               </span>
-              <Avatar className="h-8 w-8">
-                <AvatarImage src={avatarUrl || ""} />
-                <AvatarFallback>
-                  <UserRound className="h-4 w-4" />
-                </AvatarFallback>
-              </Avatar>
+              <Sheet>
+                <SheetTrigger asChild>
+                  <Avatar className="h-8 w-8 cursor-pointer hover:opacity-80 transition-opacity">
+                    <AvatarImage src={avatarUrl || ""} />
+                    <AvatarFallback>
+                      <UserRound className="h-4 w-4" />
+                    </AvatarFallback>
+                  </Avatar>
+                </SheetTrigger>
+                <SheetContent className="w-[400px] sm:w-[540px]">
+                  <SheetHeader>
+                    <SheetTitle>Editar Perfil</SheetTitle>
+                  </SheetHeader>
+                  <UserProfilePanel />
+                </SheetContent>
+              </Sheet>
             </div>
           </div>
 

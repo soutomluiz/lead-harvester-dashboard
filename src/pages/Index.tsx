@@ -61,14 +61,14 @@ const Index = () => {
             </h1>
             <div className="flex items-center gap-3">
               <span className="text-sm font-medium">
-                {userName}
+                Olá, {userName}
               </span>
               <Sheet>
                 <SheetTrigger asChild>
-                  <Avatar className="h-8 w-8 cursor-pointer hover:opacity-80 transition-opacity">
+                  <Avatar className="h-16 w-16 cursor-pointer hover:opacity-80 transition-opacity">
                     <AvatarImage src={avatarUrl || ""} />
                     <AvatarFallback>
-                      <UserRound className="h-4 w-4" />
+                      <UserRound className="h-8 w-8" />
                     </AvatarFallback>
                   </Avatar>
                 </SheetTrigger>

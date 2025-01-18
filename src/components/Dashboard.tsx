@@ -46,8 +46,8 @@ export function Dashboard({ activeTab, leads, onSubmit, onAddLeads, setActiveTab
       } catch (error) {
         console.error("Error fetching leads:", error);
         toast({
-          title: "Error fetching leads",
-          description: "Could not load your leads. Please try again.",
+          title: "Erro ao carregar leads",
+          description: "Não foi possível carregar seus leads. Por favor, tente novamente.",
           variant: "destructive",
         });
       }
@@ -55,7 +55,6 @@ export function Dashboard({ activeTab, leads, onSubmit, onAddLeads, setActiveTab
 
     fetchLeads();
 
-    // Subscribe to real-time changes
     const channel = supabase
       .channel('public:leads')
       .on(
@@ -66,20 +65,19 @@ export function Dashboard({ activeTab, leads, onSubmit, onAddLeads, setActiveTab
           table: 'leads'
         },
         (payload) => {
-          console.log('Real-time update:', payload);
-          fetchLeads(); // Refresh the leads data
+          console.log('Atualização em tempo real:', payload);
+          fetchLeads();
         }
       )
       .subscribe();
 
-    // Cleanup subscription
     return () => {
       supabase.removeChannel(channel);
     };
   }, [toast]);
 
   return (
-    <div className="flex-1 overflow-auto bg-gray-50 p-6 rounded-lg">
+    <div className="w-full bg-background">
       {activeTab === "dashboard" && (
         <DashboardStats leads={dbLeads} />
       )}

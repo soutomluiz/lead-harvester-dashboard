@@ -33,14 +33,14 @@ export function UserProfilePanel() {
       if (error) throw error;
 
       toast({
-        title: "Profile updated",
-        description: "Your profile has been updated successfully.",
+        title: "Perfil atualizado",
+        description: "Seu perfil foi atualizado com sucesso.",
       });
     } catch (error) {
       toast({
         variant: "destructive",
-        title: "Error",
-        description: "Failed to update profile. Please try again.",
+        title: "Erro",
+        description: "Falha ao atualizar o perfil. Por favor, tente novamente.",
       });
     } finally {
       setIsLoading(false);
@@ -74,14 +74,14 @@ export function UserProfilePanel() {
       setAvatarUrl(publicUrl);
 
       toast({
-        title: "Avatar updated",
-        description: "Your avatar has been updated successfully.",
+        title: "Avatar atualizado",
+        description: "Seu avatar foi atualizado com sucesso.",
       });
     } catch (error) {
       toast({
         variant: "destructive",
-        title: "Error",
-        description: "Failed to upload avatar. Please try again.",
+        title: "Erro",
+        description: "Falha ao fazer upload do avatar. Por favor, tente novamente.",
       });
     } finally {
       setIsLoading(false);
@@ -98,7 +98,7 @@ export function UserProfilePanel() {
         <div>
           <Label htmlFor="avatar" className="cursor-pointer">
             <div className="bg-primary text-white px-4 py-2 rounded-md hover:bg-primary/90 transition-colors">
-              Upload Avatar
+              Alterar Avatar
             </div>
             <Input
               id="avatar"
@@ -114,7 +114,7 @@ export function UserProfilePanel() {
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         <div>
-          <Label htmlFor="full_name">Full Name</Label>
+          <Label htmlFor="full_name">Nome Completo</Label>
           <Input
             id="full_name"
             {...register("full_name")}
@@ -123,7 +123,7 @@ export function UserProfilePanel() {
         </div>
 
         <div>
-          <Label htmlFor="phone">Phone</Label>
+          <Label htmlFor="phone">Telefone</Label>
           <Input
             id="phone"
             {...register("phone")}
@@ -132,7 +132,7 @@ export function UserProfilePanel() {
         </div>
 
         <div>
-          <Label htmlFor="location">Location</Label>
+          <Label htmlFor="location">Localização</Label>
           <Input
             id="location"
             {...register("location")}
@@ -141,7 +141,7 @@ export function UserProfilePanel() {
         </div>
 
         <div>
-          <Label htmlFor="bio">Bio</Label>
+          <Label htmlFor="bio">Biografia</Label>
           <Textarea
             id="bio"
             {...register("bio")}
@@ -153,10 +153,10 @@ export function UserProfilePanel() {
           {isLoading ? (
             <>
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              Saving...
+              Salvando...
             </>
           ) : (
-            "Save Changes"
+            "Salvar Alterações"
           )}
         </Button>
       </form>

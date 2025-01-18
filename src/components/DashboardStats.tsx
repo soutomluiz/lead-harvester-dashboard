@@ -11,6 +11,27 @@ interface DashboardStatsProps {
   searchType?: "places" | "websites";
 }
 
+const chartConfig = {
+  leads: {
+    theme: {
+      light: "#4F46E5",
+      dark: "#818CF8",
+    },
+  },
+  places: {
+    theme: {
+      light: "#10B981",
+      dark: "#34D399",
+    },
+  },
+  websites: {
+    theme: {
+      light: "#8B5CF6",
+      dark: "#A78BFA",
+    },
+  },
+};
+
 export function DashboardStats({ leads, results, searchType }: DashboardStatsProps) {
   if (leads) {
     const totalLeads = leads.length;
@@ -112,7 +133,7 @@ export function DashboardStats({ leads, results, searchType }: DashboardStatsPro
           <Card className="p-6">
             <h3 className="text-lg font-semibold mb-4">Leads por Origem</h3>
             <div className="h-[250px]">
-              <ChartContainer>
+              <ChartContainer config={chartConfig}>
                 <PieChart>
                   <Pie
                     data={chartData}
@@ -137,7 +158,7 @@ export function DashboardStats({ leads, results, searchType }: DashboardStatsPro
           <Card className="p-6">
             <h3 className="text-lg font-semibold mb-4">Top 5 Indústrias</h3>
             <div className="h-[250px]">
-              <ChartContainer>
+              <ChartContainer config={chartConfig}>
                 <BarChart data={industryChartData} layout="vertical">
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis type="number" />

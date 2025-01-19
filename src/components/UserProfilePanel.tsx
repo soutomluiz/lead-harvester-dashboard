@@ -14,6 +14,7 @@ interface ProfileFormData {
   phone: string;
   location: string;
   bio: string;
+  avatar_url: string | null;
 }
 
 interface UserProfilePanelProps {

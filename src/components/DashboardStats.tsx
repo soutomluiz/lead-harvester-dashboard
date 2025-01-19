@@ -131,17 +131,17 @@ export function DashboardStats({ leads, results, searchType }: DashboardStatsPro
 
         <div className="grid gap-4 md:grid-cols-2">
           <Card className="p-6">
-            <h3 className="text-lg font-semibold mb-4">Leads por Origem</h3>
-            <div className="h-[250px]">
+            <h3 className="text-lg font-semibold mb-4 text-center">Leads por Origem</h3>
+            <div className="h-[300px] flex items-center justify-center">
               <ChartContainer config={chartConfig}>
-                <PieChart>
+                <PieChart width={280} height={280}>
                   <Pie
                     data={chartData}
                     cx="50%"
                     cy="50%"
                     labelLine={false}
                     label={({ name, percent }) => `${name} (${(percent * 100).toFixed(0)}%)`}
-                    outerRadius={80}
+                    outerRadius={100}
                     fill="#8884d8"
                     dataKey="value"
                   >
@@ -156,13 +156,13 @@ export function DashboardStats({ leads, results, searchType }: DashboardStatsPro
           </Card>
 
           <Card className="p-6">
-            <h3 className="text-lg font-semibold mb-4">Top 5 Indústrias</h3>
-            <div className="h-[250px]">
+            <h3 className="text-lg font-semibold mb-4 text-center">Top 5 Indústrias</h3>
+            <div className="h-[300px] flex items-center justify-center">
               <ChartContainer config={chartConfig}>
-                <BarChart data={industryChartData} layout="vertical">
+                <BarChart width={280} height={280} data={industryChartData} layout="vertical">
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis type="number" />
-                  <YAxis dataKey="name" type="category" width={100} />
+                  <YAxis dataKey="name" type="category" width={120} />
                   <Tooltip />
                   <Bar dataKey="value" fill="#4F46E5" />
                 </BarChart>

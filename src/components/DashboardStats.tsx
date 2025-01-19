@@ -131,8 +131,8 @@ export function DashboardStats({ leads, results, searchType }: DashboardStatsPro
 
         <div className="grid gap-4 md:grid-cols-2">
           <Card className="p-6">
-            <h3 className="text-lg font-semibold mb-4 text-center">Leads por Origem</h3>
-            <div className="h-[300px] flex items-center justify-center">
+            <h3 className="text-lg font-semibold mb-8 text-center">Leads por Origem</h3>
+            <div className="h-[350px] flex items-center justify-center mb-4">
               <ChartContainer config={chartConfig}>
                 <PieChart width={280} height={280}>
                   <Pie
@@ -156,8 +156,8 @@ export function DashboardStats({ leads, results, searchType }: DashboardStatsPro
           </Card>
 
           <Card className="p-6">
-            <h3 className="text-lg font-semibold mb-4 text-center">Top 5 Indústrias</h3>
-            <div className="h-[300px] flex items-center justify-center">
+            <h3 className="text-lg font-semibold mb-8 text-center">Top 5 Indústrias</h3>
+            <div className="h-[350px] flex items-center justify-center mb-4">
               <ChartContainer config={chartConfig}>
                 <BarChart width={280} height={280} data={industryChartData} layout="vertical">
                   <CartesianGrid strokeDasharray="3 3" />

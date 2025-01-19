@@ -13,33 +13,32 @@ export function AuthPage() {
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  const handleError = (error: AuthError) => {
-    console.error("Auth error:", error);
-    let message = "Ocorreu um erro durante a autenticação.";
-    
-    if (error.message.includes("missing email")) {
-      message = "Por favor, preencha o campo de email.";
-    } else if (error.message.includes("invalid credentials")) {
-      message = "Email ou senha inválidos.";
-    }
-    
-    setError(message);
-  };
-
   useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       console.log("Auth state changed:", event);
       
-      if (event === "SIGNED_IN") {
+      if (event === 'SIGNED_IN') {
         console.log("User signed in");
         navigate("/");
         setError(null);
-      } else if (event === "SIGNED_OUT") {
+      } else if (event === 'SIGNED_OUT') {
         console.log("User signed out");
         setError(null);
-      } else if (event === "USER_UPDATED") {
+      } else if (event === 'USER_UPDATED') {
         console.log("User updated");
-        setError(null);
+        const { error } = await supabase.auth.getSession();
+        if (error) {
+          console.error("Auth error:", error);
+          let message = "Ocorreu um erro durante a autenticação.";
+          
+          if (error.message.includes("missing email")) {
+            message = "Por favor, preencha o campo de email.";
+          } else if (error.message.includes("invalid credentials")) {
+            message = "Email ou senha inválidos.";
+          }
+          
+          setError(message);
+        }
       }
     });
 
@@ -98,7 +97,6 @@ export function AuthPage() {
               },
             },
           }}
-          onError={handleError}
         />
       </Card>
     </div>

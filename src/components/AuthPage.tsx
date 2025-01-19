@@ -6,11 +6,25 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useToast } from "@/components/ui/use-toast";
+import { AuthError } from "@supabase/supabase-js";
 
 export function AuthPage() {
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
   const { toast } = useToast();
+
+  const handleError = (error: AuthError) => {
+    console.error("Auth error:", error);
+    let message = "Ocorreu um erro durante a autenticação.";
+    
+    if (error.message.includes("missing email")) {
+      message = "Por favor, preencha o campo de email.";
+    } else if (error.message.includes("invalid credentials")) {
+      message = "Email ou senha inválidos.";
+    }
+    
+    setError(message);
+  };
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
@@ -70,14 +84,21 @@ export function AuthPage() {
                 email_label: 'Email',
                 password_label: 'Senha',
                 button_label: 'Entrar',
+                loading_button_label: 'Entrando...',
+                email_input_placeholder: 'Seu email',
+                password_input_placeholder: 'Sua senha',
               },
               sign_up: {
                 email_label: 'Email',
                 password_label: 'Senha',
                 button_label: 'Cadastrar',
+                loading_button_label: 'Cadastrando...',
+                email_input_placeholder: 'Seu email',
+                password_input_placeholder: 'Sua senha',
               },
             },
           }}
+          onError={handleError}
         />
       </Card>
     </div>

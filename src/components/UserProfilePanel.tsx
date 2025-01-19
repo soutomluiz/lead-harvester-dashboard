@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useToast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
@@ -16,11 +16,22 @@ interface ProfileFormData {
   bio: string;
 }
 
-export function UserProfilePanel() {
+interface UserProfilePanelProps {
+  initialData?: ProfileFormData | null;
+}
+
+export function UserProfilePanel({ initialData }: UserProfilePanelProps) {
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
-  const { register, handleSubmit, formState: { errors } } = useForm<ProfileFormData>();
+  const { register, handleSubmit, formState: { errors }, reset } = useForm<ProfileFormData>();
+
+  useEffect(() => {
+    if (initialData) {
+      reset(initialData);
+      setAvatarUrl(initialData.avatar_url);
+    }
+  }, [initialData, reset]);
 
   const onSubmit = async (data: ProfileFormData) => {
     try {

@@ -8,15 +8,21 @@ import { Lead } from "@/types/lead";
 import { supabase } from "@/integrations/supabase/client";
 import { SidebarUserSection } from "@/components/SidebarUserSection";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { UserRound } from "lucide-react";
+import { UserRound, LogOut } from "lucide-react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { UserProfilePanel } from "@/components/UserProfilePanel";
+import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router-dom";
+import { useToast } from "@/components/ui/use-toast";
 
 const Index = () => {
   const [leads, setLeads] = useState<Lead[]>([]);
   const [activeTab, setActiveTab] = useState("dashboard");
   const [userName, setUserName] = useState<string>("");
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+  const [userProfile, setUserProfile] = useState<any>(null);
+  const navigate = useNavigate();
+  const { toast } = useToast();
 
   useEffect(() => {
     const fetchUserProfile = async () => {
@@ -24,19 +30,37 @@ const Index = () => {
       if (user) {
         const { data: profile } = await supabase
           .from('profiles')
-          .select('full_name, avatar_url')
+          .select('*')
           .eq('id', user.id)
           .single();
         
         if (profile) {
           setUserName(profile.full_name || '');
           setAvatarUrl(profile.avatar_url);
+          setUserProfile(profile);
         }
       }
     };
 
     fetchUserProfile();
   }, []);
+
+  const handleSignOut = async () => {
+    try {
+      await supabase.auth.signOut();
+      navigate('/login');
+      toast({
+        title: "Logout realizado",
+        description: "Você foi desconectado com sucesso.",
+      });
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Erro ao sair",
+        description: "Não foi possível realizar o logout. Tente novamente.",
+      });
+    }
+  };
 
   const handleAddLead = (data: Omit<Lead, "id">) => {
     const newLead = {
@@ -59,7 +83,7 @@ const Index = () => {
             <h1 className="text-2xl font-bold">
               Painel de Controle
             </h1>
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-4">
               <span className="text-sm font-medium">
                 Olá, {userName}
               </span>
@@ -74,11 +98,19 @@ const Index = () => {
                 </SheetTrigger>
                 <SheetContent className="w-[400px] sm:w-[540px]">
                   <SheetHeader>
-                    <SheetTitle>Editar Perfil</SheetTitle>
+                    <SheetTitle>Perfil do Usuário</SheetTitle>
                   </SheetHeader>
-                  <UserProfilePanel />
+                  <UserProfilePanel initialData={userProfile} />
                 </SheetContent>
               </Sheet>
+              <Button 
+                variant="outline" 
+                size="icon"
+                onClick={handleSignOut}
+                className="hover:bg-destructive hover:text-destructive-foreground"
+              >
+                <LogOut className="h-5 w-5" />
+              </Button>
             </div>
           </div>
 

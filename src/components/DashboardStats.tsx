@@ -131,17 +131,17 @@ export function DashboardStats({ leads, results, searchType }: DashboardStatsPro
 
         <div className="grid gap-4 md:grid-cols-2">
           <Card className="p-6">
-            <h3 className="text-lg font-semibold mb-8 text-center">Leads por Origem</h3>
-            <div className="h-[350px] flex items-center justify-center mb-4">
+            <h3 className="text-lg font-semibold mb-4 text-center">Leads por Origem</h3>
+            <div className="w-full h-[400px] flex items-center justify-center">
               <ChartContainer config={chartConfig}>
-                <PieChart width={280} height={280}>
+                <PieChart width={350} height={350}>
                   <Pie
                     data={chartData}
                     cx="50%"
                     cy="50%"
                     labelLine={false}
                     label={({ name, percent }) => `${name} (${(percent * 100).toFixed(0)}%)`}
-                    outerRadius={100}
+                    outerRadius={130}
                     fill="#8884d8"
                     dataKey="value"
                   >
@@ -156,10 +156,10 @@ export function DashboardStats({ leads, results, searchType }: DashboardStatsPro
           </Card>
 
           <Card className="p-6">
-            <h3 className="text-lg font-semibold mb-8 text-center">Top 5 Indústrias</h3>
-            <div className="h-[350px] flex items-center justify-center mb-4">
+            <h3 className="text-lg font-semibold mb-4 text-center">Top 5 Indústrias</h3>
+            <div className="w-full h-[400px] flex items-center justify-center">
               <ChartContainer config={chartConfig}>
-                <BarChart width={280} height={280} data={industryChartData} layout="vertical">
+                <BarChart width={350} height={350} data={industryChartData} layout="vertical">
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis type="number" />
                   <YAxis dataKey="name" type="category" width={120} />

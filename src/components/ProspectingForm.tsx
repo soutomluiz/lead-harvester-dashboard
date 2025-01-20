@@ -76,6 +76,12 @@ export const ProspectingForm = ({
           }));
 
           setResults(formattedResults);
+          
+          // Update the toast to show the correct count
+          toast({
+            title: "Busca realizada com sucesso",
+            description: `Encontrados ${formattedResults.length} resultados`,
+          });
         }
       } else {
         const { data, error } = await supabase.functions.invoke(
@@ -91,13 +97,13 @@ export const ProspectingForm = ({
 
         if (data.results) {
           setResults(data.results);
+          // Update the toast to show the correct count for website results
+          toast({
+            title: "Busca realizada com sucesso",
+            description: `Encontrados ${data.results.length} resultados`,
+          });
         }
       }
-
-      toast({
-        title: "Busca realizada com sucesso",
-        description: `Encontrados ${results.length} resultados`,
-      });
     } catch (error) {
       console.error("Erro na busca:", error);
       toast({

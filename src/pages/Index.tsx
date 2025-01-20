@@ -81,7 +81,7 @@ const Index = () => {
         <main className="flex-1 p-6 pb-16">
           <div className="flex justify-between items-center mb-8 animate-fadeIn">
             <h1 className="text-2xl font-bold">
-              Painel de Controle
+              Dashboard
             </h1>
             <div className="flex items-center gap-4">
               <span className="text-sm font-medium">

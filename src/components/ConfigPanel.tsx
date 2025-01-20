@@ -3,71 +3,48 @@ import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
-import { Search, Key } from "lucide-react";
+import { User, Mail, Building } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
 export const ConfigPanel = () => {
-  const [apiKey, setApiKey] = useState(() => localStorage.getItem("searchApiKey") || "");
+  const [companyName, setCompanyName] = useState("");
+  const [email, setEmail] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
 
-  const handleSave = () => {
-    if (!apiKey.trim()) {
-      toast({
-        title: "Campo obrigatório",
-        description: "Por favor, insira sua chave de API do Google Maps.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    localStorage.setItem("searchApiKey", apiKey.trim());
-    
-    toast({
-      title: "Configurações salvas",
-      description: "Sua chave de API do Google Maps foi salva com sucesso.",
-    });
-  };
-
-  const handleTestConnection = async () => {
-    if (!apiKey) {
-      toast({
-        title: "Configuração necessária",
-        description: "Por favor, configure sua chave de API do Google Maps antes de testar.",
-        variant: "destructive",
-      });
-      return;
-    }
-
+  const handleSave = async () => {
     setIsLoading(true);
-    toast({
-      title: "Testando conexão",
-      description: "Aguarde enquanto testamos sua configuração...",
-    });
-
     try {
-      const { data, error } = await supabase.functions.invoke('google-places-search', {
-        body: {
-          query: 'restaurants in São Paulo',
-          apiKey: apiKey
-        }
-      });
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) {
+        toast({
+          title: "Erro",
+          description: "Você precisa estar logado para salvar as configurações.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      const { error } = await supabase
+        .from('profiles')
+        .update({
+          company_name: companyName,
+          email: email,
+        })
+        .eq('id', user.id);
 
       if (error) throw error;
 
-      if (data.status === "REQUEST_DENIED") {
-        throw new Error("Chave de API inválida ou sem permissões necessárias");
-      }
-
       toast({
-        title: "Conexão bem-sucedida",
-        description: "Sua configuração da API do Google Maps está funcionando corretamente.",
+        title: "Configurações salvas",
+        description: "Suas configurações foram atualizadas com sucesso.",
       });
     } catch (error) {
-      console.error('Erro ao testar conexão:', error);
+      console.error('Erro ao salvar configurações:', error);
       toast({
-        title: "Erro na conexão",
-        description: error instanceof Error ? error.message : "Verifique sua chave de API do Google Maps.",
+        title: "Erro",
+        description: "Não foi possível salvar suas configurações.",
         variant: "destructive",
       });
     } finally {
@@ -77,36 +54,42 @@ export const ConfigPanel = () => {
 
   return (
     <Card className="w-full p-6 animate-fadeIn">
-      <h2 className="text-2xl font-bold mb-6">Configurações da API do Google Maps</h2>
+      <h2 className="text-2xl font-bold mb-6">Configurações da Empresa</h2>
       <div className="space-y-6">
         <div className="space-y-2">
-          <label htmlFor="apiKey" className="text-sm font-medium flex items-center gap-2">
-            <Key className="h-4 w-4" />
-            Chave da API do Google Maps
+          <label htmlFor="companyName" className="text-sm font-medium flex items-center gap-2">
+            <Building className="h-4 w-4" />
+            Nome da Empresa
           </label>
           <Input
-            id="apiKey"
-            type="password"
-            value={apiKey}
-            onChange={(e) => setApiKey(e.target.value)}
-            placeholder="Insira sua chave de API do Google Maps"
-            className="font-mono"
+            id="companyName"
+            value={companyName}
+            onChange={(e) => setCompanyName(e.target.value)}
+            placeholder="Nome da sua empresa"
           />
         </div>
 
-        <div className="flex gap-4">
-          <Button onClick={handleSave} className="flex-1" disabled={isLoading}>
-            Salvar Configurações
-          </Button>
-          <Button 
-            onClick={handleTestConnection} 
-            variant="secondary" 
-            className="flex-1"
-            disabled={isLoading}
-          >
-            {isLoading ? "Testando..." : "Testar Conexão"}
-          </Button>
+        <div className="space-y-2">
+          <label htmlFor="email" className="text-sm font-medium flex items-center gap-2">
+            <Mail className="h-4 w-4" />
+            Email de Contato
+          </label>
+          <Input
+            id="email"
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="Email para contato"
+          />
         </div>
+
+        <Button 
+          onClick={handleSave} 
+          className="w-full"
+          disabled={isLoading}
+        >
+          {isLoading ? "Salvando..." : "Salvar Configurações"}
+        </Button>
       </div>
     </Card>
   );

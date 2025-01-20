@@ -41,24 +41,11 @@ export const ProspectingForm = ({
       }
 
       if (searchType === "places") {
-        const apiKey = localStorage.getItem("searchApiKey");
-        if (!apiKey) {
-          toast({
-            title: "Configuração necessária",
-            description:
-              "Por favor, configure a API do Google Maps nas configurações antes de realizar buscas.",
-            variant: "destructive",
-          });
-          setIsLoading(false);
-          return;
-        }
-
         const { data, error } = await supabase.functions.invoke(
           "google-places-search",
           {
             body: {
-              query: searchQuery,
-              apiKey: apiKey,
+              query: searchQuery
             },
           }
         );
@@ -66,7 +53,7 @@ export const ProspectingForm = ({
         if (error) throw error;
 
         if (data.status === "REQUEST_DENIED") {
-          throw new Error("Chave de API inválida ou sem permissões necessárias");
+          throw new Error("Erro na configuração da API do Google Maps");
         }
 
         if (data.results && Array.isArray(data.results)) {
@@ -118,7 +105,7 @@ export const ProspectingForm = ({
         description:
           error instanceof Error
             ? error.message
-            : "Não foi possível realizar a busca. Verifique suas configurações e tente novamente.",
+            : "Não foi possível realizar a busca. Tente novamente.",
         variant: "destructive",
       });
     } finally {

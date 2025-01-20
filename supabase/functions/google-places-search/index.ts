@@ -2,17 +2,17 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { corsHeaders } from "../_shared/cors.ts"
 
 serve(async (req) => {
-  // Handle CORS
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders })
   }
 
   try {
-    const { query, apiKey } = await req.json()
+    const { query } = await req.json()
+    const apiKey = Deno.env.get('GOOGLE_MAPS_API_KEY')
     
-    if (!query || !apiKey) {
+    if (!query) {
       return new Response(
-        JSON.stringify({ error: 'Query and API key are required' }),
+        JSON.stringify({ error: 'Query is required' }),
         { 
           status: 400,
           headers: { ...corsHeaders, 'Content-Type': 'application/json' }
@@ -20,24 +20,22 @@ serve(async (req) => {
       )
     }
 
-    // Primeiro, fazemos a busca por texto para obter os lugares
+    // First, search for places
     const searchUrl = `https://maps.googleapis.com/maps/api/place/textsearch/json?query=${encodeURIComponent(query)}&key=${apiKey}`
     const searchResponse = await fetch(searchUrl)
     const searchData = await searchResponse.json()
 
     if (searchData.status === "REQUEST_DENIED") {
-      throw new Error("Chave de API inválida ou sem permissões necessárias")
+      throw new Error("Erro na configuração da API do Google Maps")
     }
 
-    // Para cada lugar encontrado, buscamos os detalhes adicionais usando place/details
+    // For each place found, get additional details
     const detailedResults = await Promise.all(
       searchData.results.map(async (place: any) => {
         const detailsUrl = `https://maps.googleapis.com/maps/api/place/details/json?place_id=${place.place_id}&fields=name,formatted_phone_number,formatted_address,website,rating,user_ratings_total,opening_hours&key=${apiKey}`
         const detailsResponse = await fetch(detailsUrl)
         const detailsData = await detailsResponse.json()
         
-        console.log("Place details:", detailsData.result)
-
         return {
           ...place,
           formatted_phone_number: detailsData.result?.formatted_phone_number || '',

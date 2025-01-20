@@ -1,11 +1,28 @@
-- name: Deploy via FTP
-  env:
-    FTP_HOST: ${{ secrets.FTP_HOST }}
-    FTP_USER: ${{ secrets.FTP_USER }}
-    FTP_PASS: ${{ secrets.FTP_PASS }}
-  run: |
-    lftp -c "
-    open ftp://$FTP_USER:$FTP_PASS@$FTP_HOST;
-    mirror -R ./dist /public_html;
-    quit;
-    "
+name: Deploy to Hosting
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Install FTP deployment tool
+        run: sudo apt-get install lftp
+
+      - name: Deploy via FTP
+        env:
+          FTP_HOST: ${{ secrets.FTP_HOST }}
+          FTP_USER: ${{ secrets.FTP_USER }}
+          FTP_PASS: ${{ secrets.FTP_PASS }}
+        run: |
+          lftp -c "
+          open ftp://$FTP_USER:$FTP_PASS@$FTP_HOST;
+          mirror -R ./dist /public_html;
+          quit;
+          "

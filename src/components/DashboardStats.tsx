@@ -1,9 +1,10 @@
 import { Lead } from "@/types/lead";
 import { SearchResult } from "@/types/search";
+import { Mail, Phone, Users, Target, Building2, MapPin } from "lucide-react";
 import { Card } from "@/components/ui/card";
-import { Mail, Phone, Users, Target, Calendar, Star, Building2, MapPin } from "lucide-react";
-import { ChartContainer } from "@/components/ui/chart";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, PieChart, Pie, Cell } from 'recharts';
+import { StatCard } from "./stats/StatCard";
+import { LeadsOriginChart } from "./stats/LeadsOriginChart";
+import { IndustriesChart } from "./stats/IndustriesChart";
 
 interface DashboardStatsProps {
   leads?: Lead[];
@@ -86,89 +87,17 @@ export function DashboardStats({ leads, results, searchType }: DashboardStatsPro
       },
     ];
 
-    const chartData = [
-      { name: 'Manual', value: leads.filter(lead => lead.type === 'manual').length },
-      { name: 'Google Maps', value: leads.filter(lead => lead.type === 'place').length },
-      { name: 'Websites', value: leads.filter(lead => lead.type === 'website').length },
-    ];
-
-    const COLORS = ['#4F46E5', '#10B981', '#8B5CF6'];
-
-    // Dados por indústria
-    const industryData = leads.reduce((acc, lead) => {
-      if (lead.industry) {
-        acc[lead.industry] = (acc[lead.industry] || 0) + 1;
-      }
-      return acc;
-    }, {} as Record<string, number>);
-
-    const industryChartData = Object.entries(industryData)
-      .map(([name, value]) => ({ name, value }))
-      .sort((a, b) => b.value - a.value)
-      .slice(0, 5);
-
     return (
       <div className="space-y-6 p-6">
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {stats.map((stat) => {
-            const Icon = stat.icon;
-            return (
-              <Card key={stat.title} className="p-6 hover:shadow-lg transition-shadow">
-                <div className="flex items-center space-x-4">
-                  <div className={`p-3 rounded-full bg-opacity-10 ${stat.color.replace('text-', 'bg-')}`}>
-                    <Icon className={`h-6 w-6 ${stat.color}`} />
-                  </div>
-                  <div>
-                    <p className="text-sm text-muted-foreground">{stat.title}</p>
-                    <h3 className="text-2xl font-bold">{stat.value}</h3>
-                    <p className="text-xs text-muted-foreground mt-1">{stat.description}</p>
-                  </div>
-                </div>
-              </Card>
-            );
-          })}
+          {stats.map((stat) => (
+            <StatCard key={stat.title} {...stat} />
+          ))}
         </div>
 
         <div className="grid gap-4 md:grid-cols-2">
-          <Card className="p-6">
-            <h3 className="text-lg font-semibold mb-8 text-center">Leads por Origem</h3>
-            <div className="h-[350px] flex items-center justify-center mb-4">
-              <ChartContainer config={chartConfig}>
-                <PieChart width={280} height={280}>
-                  <Pie
-                    data={chartData}
-                    cx="50%"
-                    cy="50%"
-                    labelLine={false}
-                    label={({ name, percent }) => `${name} (${(percent * 100).toFixed(0)}%)`}
-                    outerRadius={100}
-                    fill="#8884d8"
-                    dataKey="value"
-                  >
-                    {chartData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                    ))}
-                  </Pie>
-                  <Tooltip />
-                </PieChart>
-              </ChartContainer>
-            </div>
-          </Card>
-
-          <Card className="p-6">
-            <h3 className="text-lg font-semibold mb-8 text-center">Top 5 Indústrias</h3>
-            <div className="h-[350px] flex items-center justify-center mb-4">
-              <ChartContainer config={chartConfig}>
-                <BarChart width={280} height={280} data={industryChartData} layout="vertical">
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis type="number" />
-                  <YAxis dataKey="name" type="category" width={120} />
-                  <Tooltip />
-                  <Bar dataKey="value" fill="#4F46E5" />
-                </BarChart>
-              </ChartContainer>
-            </div>
-          </Card>
+          <LeadsOriginChart leads={leads} chartConfig={chartConfig} />
+          <IndustriesChart leads={leads} chartConfig={chartConfig} />
         </div>
       </div>
     );

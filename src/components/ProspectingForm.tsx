@@ -41,24 +41,11 @@ export const ProspectingForm = ({
       }
 
       if (searchType === "places") {
-        const apiKey = localStorage.getItem("searchApiKey");
-        if (!apiKey) {
-          toast({
-            title: "Configuração necessária",
-            description:
-              "Por favor, configure a API do Google Maps nas configurações antes de realizar buscas.",
-            variant: "destructive",
-          });
-          setIsLoading(false);
-          return;
-        }
-
         const { data, error } = await supabase.functions.invoke(
           "google-places-search",
           {
             body: {
-              query: searchQuery,
-              apiKey: apiKey,
+              query: searchQuery
             },
           }
         );
@@ -66,7 +53,7 @@ export const ProspectingForm = ({
         if (error) throw error;
 
         if (data.status === "REQUEST_DENIED") {
-          throw new Error("Chave de API inválida ou sem permissões necessárias");
+          throw new Error("Erro na configuração da API do Google Maps");
         }
 
         if (data.results && Array.isArray(data.results)) {
@@ -89,6 +76,12 @@ export const ProspectingForm = ({
           }));
 
           setResults(formattedResults);
+          
+          // Update the toast to show the correct count
+          toast({
+            title: "Busca realizada com sucesso",
+            description: `Encontrados ${formattedResults.length} resultados`,
+          });
         }
       } else {
         const { data, error } = await supabase.functions.invoke(
@@ -104,13 +97,13 @@ export const ProspectingForm = ({
 
         if (data.results) {
           setResults(data.results);
+          // Update the toast to show the correct count for website results
+          toast({
+            title: "Busca realizada com sucesso",
+            description: `Encontrados ${data.results.length} resultados`,
+          });
         }
       }
-
-      toast({
-        title: "Busca realizada com sucesso",
-        description: `Encontrados ${results.length} resultados`,
-      });
     } catch (error) {
       console.error("Erro na busca:", error);
       toast({
@@ -118,7 +111,7 @@ export const ProspectingForm = ({
         description:
           error instanceof Error
             ? error.message
-            : "Não foi possível realizar a busca. Verifique suas configurações e tente novamente.",
+            : "Não foi possível realizar a busca. Tente novamente.",
         variant: "destructive",
       });
     } finally {

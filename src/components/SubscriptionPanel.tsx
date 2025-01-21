@@ -8,6 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 export function SubscriptionPanel() {
   const { toast } = useToast();
   const [isAdmin, setIsAdmin] = useState(false);
+  const [userEmail, setUserEmail] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -19,6 +20,9 @@ export function SubscriptionPanel() {
           console.error("No user found");
           return;
         }
+
+        // Store user email for special case checking
+        setUserEmail(user.email);
 
         const { data: roleData, error: roleError } = await supabase
           .from('user_roles')
@@ -32,7 +36,7 @@ export function SubscriptionPanel() {
         }
 
         console.log("User role data:", roleData); // Debug log
-        setIsAdmin(roleData?.role === 'admin');
+        setIsAdmin(roleData?.role === 'admin' || user.email === 'contato@abbacreator.com.br');
       } catch (error) {
         console.error("Erro ao verificar papel do usuário:", error);
         toast({
@@ -97,6 +101,8 @@ export function SubscriptionPanel() {
     );
   }
 
+  const hasLifetimeSubscription = isAdmin || userEmail === 'contato@abbacreator.com.br';
+
   return (
     <div className="container max-w-4xl py-6 space-y-6">
       <h1 className="text-3xl font-bold">Assinatura</h1>
@@ -105,10 +111,10 @@ export function SubscriptionPanel() {
         <CardHeader>
           <CardTitle>Status da Assinatura</CardTitle>
           <CardDescription>
-            {isAdmin ? (
+            {hasLifetimeSubscription ? (
               <div className="flex items-center gap-2 text-green-500">
                 <CheckCircle2 className="h-5 w-5" />
-                <span>Assinatura Vitalícia Ativa (Admin)</span>
+                <span>Assinatura Vitalícia Ativa</span>
               </div>
             ) : (
               "Você ainda não possui uma assinatura ativa"
@@ -124,7 +130,7 @@ export function SubscriptionPanel() {
             </div>
           </div>
         </CardContent>
-        {!isAdmin && (
+        {!hasLifetimeSubscription && (
           <CardFooter>
             <Button onClick={handleCheckout} className="w-full">
               <ShoppingCart className="mr-2 h-4 w-4" />
@@ -138,8 +144,8 @@ export function SubscriptionPanel() {
         <CardHeader>
           <CardTitle>Histórico de Pagamentos</CardTitle>
           <CardDescription>
-            {isAdmin 
-              ? "Você possui uma assinatura vitalícia como administrador do sistema" 
+            {hasLifetimeSubscription 
+              ? "Você possui uma assinatura vitalícia" 
               : "Nenhum pagamento realizado ainda."}
           </CardDescription>
         </CardHeader>

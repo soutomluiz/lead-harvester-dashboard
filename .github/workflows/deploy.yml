@@ -32,8 +32,8 @@ jobs:
           FTP_USER: ${{ secrets.FTP_USER }}
           FTP_PASS: ${{ secrets.FTP_PASS }}
         run: |
-          lftp -c "
-          open -u $FTP_USER,$FTP_PASS $FTP_HOST;
-          mirror -R ./dist /public_html;
-          quit;
-          "
+          lftp -e "
+          set ssl:verify-certificate no; 
+          open -u $FTP_USER,$FTP_PASS $FTP_HOST; 
+          mirror -R ./dist /public_html; 
+          bye"

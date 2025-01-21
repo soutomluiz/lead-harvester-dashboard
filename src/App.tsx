@@ -7,18 +7,33 @@ import { SubscriptionSuccess } from "@/components/SubscriptionSuccess";
 import Index from "@/pages/Index";
 import { supabase } from "@/integrations/supabase/client";
 import { Loader2 } from "lucide-react";
+import { useToast } from "@/components/ui/use-toast";
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const { toast } = useToast();
 
   useEffect(() => {
     const checkSession = async () => {
       try {
-        const { data: { session } } = await supabase.auth.getSession();
+        const { data: { session }, error } = await supabase.auth.getSession();
+        
+        if (error) {
+          console.error("Erro ao verificar sessão:", error);
+          toast({
+            title: "Erro de autenticação",
+            description: "Por favor, faça login novamente.",
+            variant: "destructive",
+          });
+          await supabase.auth.signOut();
+          setIsAuthenticated(false);
+          return;
+        }
+
         setIsAuthenticated(!!session);
       } catch (error) {
-        console.error("Error checking session:", error);
+        console.error("Erro ao verificar sessão:", error);
         setIsAuthenticated(false);
       } finally {
         setIsLoading(false);
@@ -27,16 +42,22 @@ function App() {
 
     checkSession();
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       console.log("Auth state changed:", event);
-      setIsAuthenticated(!!session);
+      
+      if (event === 'SIGNED_OUT') {
+        setIsAuthenticated(false);
+      } else if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
+        setIsAuthenticated(true);
+      }
+      
       setIsLoading(false);
     });
 
     return () => {
       subscription.unsubscribe();
     };
-  }, []);
+  }, [toast]);
 
   if (isLoading) {
     return (

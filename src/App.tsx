@@ -17,7 +17,6 @@ function App() {
   useEffect(() => {
     const initializeAuth = async () => {
       try {
-        // Primeiro, tenta recuperar a sessão existente
         const { data: { session }, error: sessionError } = await supabase.auth.getSession();
         
         if (sessionError) {
@@ -32,20 +31,36 @@ function App() {
           return;
         }
 
-        // Atualiza o estado com base na sessão atual
         setIsAuthenticated(!!session);
 
-        // Configura o listener para mudanças de autenticação
         const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
           console.log("Auth state changed:", event, session?.user?.id);
           
-          if (event === 'SIGNED_OUT' || event === 'USER_DELETED') {
+          if (event === 'SIGNED_OUT') {
             setIsAuthenticated(false);
             toast({
               title: "Sessão encerrada",
               description: "Você foi desconectado.",
             });
           } else if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED' || event === 'USER_UPDATED') {
+            if (!session) {
+              console.error("Session is null after auth event:", event);
+              setIsAuthenticated(false);
+              return;
+            }
+            
+            const { data: currentSession, error: refreshError } = await supabase.auth.getSession();
+            if (refreshError || !currentSession.session) {
+              console.error("Error refreshing session:", refreshError);
+              setIsAuthenticated(false);
+              toast({
+                title: "Erro de sessão",
+                description: "Houve um problema com sua sessão. Por favor, faça login novamente.",
+                variant: "destructive",
+              });
+              return;
+            }
+
             setIsAuthenticated(true);
             if (event === 'SIGNED_IN') {
               toast({

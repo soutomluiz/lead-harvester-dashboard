@@ -15,7 +15,10 @@ export function SubscriptionPanel() {
       try {
         setIsLoading(true);
         const { data: { user } } = await supabase.auth.getUser();
-        if (!user) return;
+        if (!user) {
+          console.error("No user found");
+          return;
+        }
 
         const { data: roleData, error: roleError } = await supabase
           .from('user_roles')
@@ -23,7 +26,12 @@ export function SubscriptionPanel() {
           .eq('user_id', user.id)
           .single();
 
-        if (roleError) throw roleError;
+        if (roleError) {
+          console.error("Error fetching user role:", roleError);
+          throw roleError;
+        }
+
+        console.log("User role data:", roleData); // Debug log
         setIsAdmin(roleData?.role === 'admin');
       } catch (error) {
         console.error("Erro ao verificar papel do usuário:", error);

@@ -62,6 +62,8 @@ export function AuthPage() {
             message = "Por favor, preencha o campo de email.";
           } else if (error.message.includes("invalid credentials")) {
             message = "Email ou senha inválidos.";
+          } else if (error.message.includes("Email not confirmed")) {
+            message = "Por favor, confirme seu email antes de fazer login. Verifique sua caixa de entrada.";
           }
           
           setError(message);
@@ -177,6 +179,7 @@ export function AuthPage() {
                     loading_button_label: 'Entrando...',
                     email_input_placeholder: 'Seu email',
                     password_input_placeholder: 'Sua senha',
+                    email_not_confirmed: 'Por favor, confirme seu email antes de fazer login. Verifique sua caixa de entrada.',
                   },
                 },
               }}

@@ -179,7 +179,13 @@ export function AuthPage() {
                     loading_button_label: 'Entrando...',
                     email_input_placeholder: 'Seu email',
                     password_input_placeholder: 'Sua senha',
-                    email_not_confirmed: 'Por favor, confirme seu email antes de fazer login. Verifique sua caixa de entrada.',
+                  },
+                  forgotten_password: {
+                    link_text: 'Esqueceu sua senha?',
+                    email_label: 'Email',
+                    password_label: 'Nova senha',
+                    button_label: 'Enviar instruções',
+                    confirmation_text: 'Verifique seu email para redefinir sua senha',
                   },
                 },
               }}

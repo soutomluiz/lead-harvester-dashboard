@@ -4,9 +4,47 @@ import { Check } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { useEffect, useState } from "react";
 
 export function PricingPage() {
   const navigate = useNavigate();
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [userEmail, setUserEmail] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const checkUserRole = async () => {
+      try {
+        setIsLoading(true);
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) {
+          console.error("No user found");
+          return;
+        }
+
+        setUserEmail(user.email);
+
+        const { data: roleData, error: roleError } = await supabase
+          .from('user_roles')
+          .select('role')
+          .eq('user_id', user.id)
+          .maybeSingle();
+
+        if (roleError) {
+          console.error("Error fetching user role:", roleError);
+          return;
+        }
+
+        setIsAdmin(roleData?.role === 'admin' || user.email === 'contato@abbacreator.com.br');
+      } catch (error) {
+        console.error("Error checking user role:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    checkUserRole();
+  }, []);
 
   const handleSubscribe = async () => {
     const { data: { session } } = await supabase.auth.getSession();
@@ -18,7 +56,7 @@ export function PricingPage() {
 
     try {
       const { data, error } = await supabase.functions.invoke('create-checkout', {
-        body: { price: 4990 }, // Pass the price in cents
+        body: { price: 4990 },
         headers: {
           Authorization: `Bearer ${session.access_token}`
         }
@@ -29,11 +67,9 @@ export function PricingPage() {
         let errorMessage;
         
         try {
-          // Try to parse the error message from the response body
           const errorBody = JSON.parse(error.message);
           errorMessage = errorBody.error || "Erro ao processar pagamento. Tente novamente.";
         } catch {
-          // If parsing fails, use a default message
           errorMessage = "Erro ao processar pagamento. Tente novamente.";
         }
         
@@ -49,6 +85,20 @@ export function PricingPage() {
       toast.error("Erro ao processar pagamento. Tente novamente.");
     }
   };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 py-12">
+        <div className="container max-w-6xl mx-auto px-4">
+          <div className="flex items-center justify-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  const hasSubscription = isAdmin || userEmail === 'contato@abbacreator.com.br';
 
   return (
     <div className="min-h-screen bg-gray-50 py-12">
@@ -127,9 +177,15 @@ export function PricingPage() {
               </ul>
             </CardContent>
             <CardFooter>
-              <Button onClick={handleSubscribe} className="w-full">
-                Assinar Agora
-              </Button>
+              {!hasSubscription ? (
+                <Button onClick={handleSubscribe} className="w-full">
+                  Assinar Agora
+                </Button>
+              ) : (
+                <div className="w-full text-center text-green-600 font-medium">
+                  Você já possui uma assinatura ativa
+                </div>
+              )}
             </CardFooter>
           </Card>
         </div>

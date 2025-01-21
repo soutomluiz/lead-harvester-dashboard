@@ -79,7 +79,7 @@ export function ExtractionCards({ setActiveTab }: ExtractionCardsProps) {
         title: "Recurso Premium",
         description: "Assine para ter acesso a esta funcionalidade.",
       });
-      navigate("/subscription");
+      navigate("/pricing");
       return;
     }
     setActiveTab(card.id);
@@ -98,20 +98,36 @@ export function ExtractionCards({ setActiveTab }: ExtractionCardsProps) {
           return (
             <Card
               key={card.id}
-              className={`p-6 transition-all cursor-pointer ${
-                isLocked ? 'opacity-75' : 'hover:shadow-lg hover:scale-105'
+              className={`p-6 transition-all ${
+                isLocked 
+                  ? 'opacity-50 cursor-not-allowed' 
+                  : 'hover:shadow-lg hover:scale-105 cursor-pointer'
               }`}
               onClick={() => handleCardClick(card)}
             >
               <div className="flex flex-col items-center text-center space-y-4">
                 <div className="relative">
-                  <Icon className="h-12 w-12 text-primary" />
+                  <Icon className={`h-12 w-12 ${isLocked ? 'text-gray-400' : 'text-primary'}`} />
                   {card.requiresSubscription && (
                     <Crown className="h-5 w-5 text-yellow-500 absolute -top-2 -right-2" />
                   )}
                 </div>
                 <h3 className="text-xl font-medium">{card.title}</h3>
-                <p className="text-gray-600">{card.description}</p>
+                <p className={`${isLocked ? 'text-gray-400' : 'text-gray-600'}`}>
+                  {card.description}
+                </p>
+                {isLocked && (
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      navigate("/pricing");
+                    }}
+                  >
+                    Assinar agora
+                  </Button>
+                )}
               </div>
             </Card>
           );

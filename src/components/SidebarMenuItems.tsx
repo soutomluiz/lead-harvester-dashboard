@@ -6,6 +6,8 @@ import {
 } from "@/components/ui/sidebar";
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { useNavigate } from "react-router-dom";
+import { useToast } from "@/components/ui/use-toast";
 
 interface SidebarMenuItemsProps {
   activeTab: string;
@@ -17,6 +19,8 @@ export function SidebarMenuItems({ activeTab, setActiveTab }: SidebarMenuItemsPr
   const [userEmail, setUserEmail] = useState<string | null>(null);
   const [expandedMenus, setExpandedMenus] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const navigate = useNavigate();
+  const { toast } = useToast();
 
   useEffect(() => {
     const checkUserRole = async () => {
@@ -34,7 +38,7 @@ export function SidebarMenuItems({ activeTab, setActiveTab }: SidebarMenuItemsPr
           .from('user_roles')
           .select('role')
           .eq('user_id', user.id)
-          .maybeSingle(); // Changed from .single() to .maybeSingle()
+          .maybeSingle();
 
         if (roleError) {
           console.error("Error fetching user role:", roleError);
@@ -61,6 +65,14 @@ export function SidebarMenuItems({ activeTab, setActiveTab }: SidebarMenuItemsPr
   };
 
   const hasSubscription = isAdmin || userEmail === 'contato@abbacreator.com.br';
+
+  const handleSubscriptionRequired = () => {
+    toast({
+      title: "Recurso Premium",
+      description: "Assine para ter acesso a esta funcionalidade.",
+    });
+    navigate("/pricing");
+  };
 
   const menuItems = [
     { id: "dashboard", icon: LayoutDashboard, label: "Dashboard" },
@@ -121,14 +133,22 @@ export function SidebarMenuItems({ activeTab, setActiveTab }: SidebarMenuItemsPr
                       <SidebarMenuButton
                         key={`${item.id}-${subItem.id}`}
                         isActive={activeTab === `${item.id}-${subItem.id}`}
-                        onClick={() => !isSubscriptionRequired && setActiveTab(`${item.id}-${subItem.id}`)}
+                        onClick={() => {
+                          if (isSubscriptionRequired) {
+                            handleSubscriptionRequired();
+                          } else {
+                            setActiveTab(`${item.id}-${subItem.id}`);
+                          }
+                        }}
                         className={`w-full flex justify-between items-center ${
-                          isSubscriptionRequired ? 'opacity-50 cursor-not-allowed' : ''
+                          isSubscriptionRequired ? 'opacity-50' : ''
                         }`}
                       >
                         <div className="flex items-center">
-                          <subItem.icon className="h-4 w-4 mr-2" />
-                          <span>{subItem.label}</span>
+                          <subItem.icon className={`h-4 w-4 mr-2 ${isSubscriptionRequired ? 'text-gray-400' : ''}`} />
+                          <span className={isSubscriptionRequired ? 'text-gray-400' : ''}>
+                            {subItem.label}
+                          </span>
                         </div>
                         {isSubscriptionRequired && (
                           <Crown className="h-4 w-4 text-yellow-500" />

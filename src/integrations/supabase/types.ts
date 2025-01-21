@@ -15,6 +15,7 @@ export type Database = {
           company_name: string
           contact_name: string | null
           created_at: string | null
+          deal_value: number | null
           email: string | null
           extraction_date: string | null
           id: string
@@ -24,6 +25,7 @@ export type Database = {
           opening_date: string | null
           phone: string | null
           rating: number | null
+          status: string | null
           type: string | null
           user_id: string
           user_ratings_total: number | null
@@ -34,6 +36,7 @@ export type Database = {
           company_name: string
           contact_name?: string | null
           created_at?: string | null
+          deal_value?: number | null
           email?: string | null
           extraction_date?: string | null
           id?: string
@@ -43,6 +46,7 @@ export type Database = {
           opening_date?: string | null
           phone?: string | null
           rating?: number | null
+          status?: string | null
           type?: string | null
           user_id: string
           user_ratings_total?: number | null
@@ -53,6 +57,7 @@ export type Database = {
           company_name?: string
           contact_name?: string | null
           created_at?: string | null
+          deal_value?: number | null
           email?: string | null
           extraction_date?: string | null
           id?: string
@@ -62,6 +67,7 @@ export type Database = {
           opening_date?: string | null
           phone?: string | null
           rating?: number | null
+          status?: string | null
           type?: string | null
           user_id?: string
           user_ratings_total?: number | null

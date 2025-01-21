@@ -13,6 +13,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Loader2 } from "lucide-react";
 
 const signUpSchema = z.object({
   full_name: z.string().min(1, "Nome é obrigatório"),
@@ -31,10 +32,11 @@ type SignUpForm = z.infer<typeof signUpSchema>;
 export function AuthPage() {
   const [error, setError] = useState<string | null>(null);
   const [isSignUp, setIsSignUp] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  const { register, handleSubmit, formState: { errors } } = useForm<SignUpForm>({
+  const { register, handleSubmit, formState: { errors }, reset } = useForm<SignUpForm>({
     resolver: zodResolver(signUpSchema)
   });
 
@@ -74,6 +76,9 @@ export function AuthPage() {
 
   const onSignUp = async (data: SignUpForm) => {
     try {
+      setIsSubmitting(true);
+      setError(null);
+
       const { error: signUpError } = await supabase.auth.signUp({
         email: data.email,
         password: data.password,
@@ -84,7 +89,12 @@ export function AuthPage() {
         }
       });
 
-      if (signUpError) throw signUpError;
+      if (signUpError) {
+        if (signUpError.status === 429) {
+          throw new Error("Por favor, aguarde 20 segundos antes de tentar novamente.");
+        }
+        throw signUpError;
+      }
 
       // Update profile with additional information
       const { data: { user } } = await supabase.auth.getUser();
@@ -103,11 +113,21 @@ export function AuthPage() {
 
       toast({
         title: "Conta criada com sucesso!",
-        description: "Você será redirecionado em instantes.",
+        description: "Você receberá um email de confirmação em instantes.",
       });
+      
+      reset(); // Clear form after successful submission
     } catch (error) {
       console.error("Signup error:", error);
-      setError("Erro ao criar conta. Por favor, tente novamente.");
+      const errorMessage = error instanceof Error ? error.message : "Erro ao criar conta. Por favor, tente novamente.";
+      setError(errorMessage);
+      toast({
+        title: "Erro no cadastro",
+        description: errorMessage,
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -171,7 +191,7 @@ export function AuthPage() {
                 <Input
                   id="full_name"
                   {...register("full_name")}
-                  placeholder="Seu nome completo"
+                  disabled={isSubmitting}
                 />
                 {errors.full_name && (
                   <p className="text-sm text-red-500">{errors.full_name.message}</p>
@@ -184,7 +204,7 @@ export function AuthPage() {
                   id="email"
                   type="email"
                   {...register("email")}
-                  placeholder="seu@email.com"
+                  disabled={isSubmitting}
                 />
                 {errors.email && (
                   <p className="text-sm text-red-500">{errors.email.message}</p>
@@ -196,7 +216,7 @@ export function AuthPage() {
                 <Input
                   id="phone"
                   {...register("phone")}
-                  placeholder="Seu telefone"
+                  disabled={isSubmitting}
                 />
                 {errors.phone && (
                   <p className="text-sm text-red-500">{errors.phone.message}</p>
@@ -208,7 +228,7 @@ export function AuthPage() {
                 <Input
                   id="location"
                   {...register("location")}
-                  placeholder="Seu endereço completo"
+                  disabled={isSubmitting}
                 />
                 {errors.location && (
                   <p className="text-sm text-red-500">{errors.location.message}</p>
@@ -221,7 +241,7 @@ export function AuthPage() {
                   id="password"
                   type="password"
                   {...register("password")}
-                  placeholder="Sua senha"
+                  disabled={isSubmitting}
                 />
                 {errors.password && (
                   <p className="text-sm text-red-500">{errors.password.message}</p>
@@ -234,15 +254,22 @@ export function AuthPage() {
                   id="confirmPassword"
                   type="password"
                   {...register("confirmPassword")}
-                  placeholder="Confirme sua senha"
+                  disabled={isSubmitting}
                 />
                 {errors.confirmPassword && (
                   <p className="text-sm text-red-500">{errors.confirmPassword.message}</p>
                 )}
               </div>
 
-              <Button type="submit" className="w-full">
-                Criar Conta
+              <Button type="submit" className="w-full" disabled={isSubmitting}>
+                {isSubmitting ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Criando conta...
+                  </>
+                ) : (
+                  "Criar Conta"
+                )}
               </Button>
             </form>
           </TabsContent>

@@ -1,8 +1,8 @@
-import { Search, Filter, Download } from "lucide-react";
+import { Search, Download } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { FilterPopover } from "./FilterPopover";
+import { Lead } from "@/types/lead";
 
 interface LeadTableHeaderProps {
   searchTerm: string;

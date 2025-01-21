@@ -1,10 +1,13 @@
 import { Lead } from "@/types/lead";
 import { SearchResult } from "@/types/search";
-import { Mail, Phone, Users, Target, Building2, MapPin } from "lucide-react";
+import { Mail, Phone, Users, Target, Building2, MapPin, TrendingUp, DollarSign, LineChart } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { StatCard } from "./stats/StatCard";
 import { LeadsOriginChart } from "./stats/LeadsOriginChart";
 import { IndustriesChart } from "./stats/IndustriesChart";
+import { LeadsTimelineChart } from "./stats/LeadsTimelineChart";
+import { LeadStatusChart } from "./stats/LeadStatusChart";
+import { DealValueChart } from "./stats/DealValueChart";
 
 interface DashboardStatsProps {
   leads?: Lead[];
@@ -41,6 +44,8 @@ export function DashboardStats({ leads, results, searchType }: DashboardStatsPro
     const withLocation = leads.filter(lead => lead.location).length;
     const withWebsite = leads.filter(lead => lead.website).length;
     const withIndustry = leads.filter(lead => lead.industry).length;
+    const totalDealValue = leads.reduce((sum, lead) => sum + (lead.deal_value || 0), 0);
+    const qualifiedLeads = leads.filter(lead => lead.status === 'qualified').length;
 
     const stats = [
       {
@@ -51,39 +56,39 @@ export function DashboardStats({ leads, results, searchType }: DashboardStatsPro
         description: "Leads cadastrados"
       },
       {
-        title: "Emails",
+        title: "Valor Total",
+        value: totalDealValue,
+        icon: DollarSign,
+        color: "text-green-500",
+        description: "Valor total dos deals"
+      },
+      {
+        title: "Leads Qualificados",
+        value: qualifiedLeads,
+        icon: TrendingUp,
+        color: "text-purple-500",
+        description: "Leads qualificados"
+      },
+      {
+        title: "Com Email",
         value: emailsFound,
         icon: Mail,
-        color: "text-green-500",
+        color: "text-orange-500",
         description: "Contatos com email"
       },
       {
-        title: "Telefones",
+        title: "Com Telefone",
         value: phonesFound,
         icon: Phone,
-        color: "text-purple-500",
+        color: "text-pink-500",
         description: "Contatos com telefone"
       },
       {
-        title: "Localização",
-        value: withLocation,
-        icon: MapPin,
-        color: "text-orange-500",
-        description: "Com endereço"
-      },
-      {
-        title: "Websites",
+        title: "Com Website",
         value: withWebsite,
         icon: Building2,
-        color: "text-pink-500",
-        description: "Com site"
-      },
-      {
-        title: "Indústrias",
-        value: withIndustry,
-        icon: Target,
         color: "text-indigo-500",
-        description: "Com setor definido"
+        description: "Com site"
       },
     ];
 
@@ -95,16 +100,40 @@ export function DashboardStats({ leads, results, searchType }: DashboardStatsPro
           ))}
         </div>
 
-        <div className="grid gap-4 md:grid-cols-2 min-h-[400px]">
+        <div className="grid gap-4 md:grid-cols-2">
           <Card className="p-6 flex flex-col">
-            <h3 className="text-lg font-semibold mb-4 text-center">Leads por Origem</h3>
-            <div className="flex-1 w-full min-h-[350px]">
+            <h3 className="text-lg font-semibold mb-4">Leads ao Longo do Tempo</h3>
+            <div className="flex-1 w-full min-h-[300px]">
+              <LeadsTimelineChart leads={leads} chartConfig={chartConfig} />
+            </div>
+          </Card>
+          <Card className="p-6 flex flex-col">
+            <h3 className="text-lg font-semibold mb-4">Status dos Leads</h3>
+            <div className="flex-1 w-full min-h-[300px]">
+              <LeadStatusChart leads={leads} chartConfig={chartConfig} />
+            </div>
+          </Card>
+        </div>
+
+        <div className="grid gap-4 md:grid-cols-2">
+          <Card className="p-6 flex flex-col">
+            <h3 className="text-lg font-semibold mb-4">Origem dos Leads</h3>
+            <div className="flex-1 w-full min-h-[300px]">
               <LeadsOriginChart leads={leads} chartConfig={chartConfig} />
             </div>
           </Card>
           <Card className="p-6 flex flex-col">
-            <h3 className="text-lg font-semibold mb-4 text-center">Top 5 Indústrias</h3>
-            <div className="flex-1 w-full min-h-[350px]">
+            <h3 className="text-lg font-semibold mb-4">Valor dos Deals</h3>
+            <div className="flex-1 w-full min-h-[300px]">
+              <DealValueChart leads={leads} chartConfig={chartConfig} />
+            </div>
+          </Card>
+        </div>
+
+        <div className="grid gap-4 md:grid-cols-2">
+          <Card className="p-6 flex flex-col">
+            <h3 className="text-lg font-semibold mb-4">Top 5 Indústrias</h3>
+            <div className="flex-1 w-full min-h-[300px]">
               <IndustriesChart leads={leads} chartConfig={chartConfig} />
             </div>
           </Card>

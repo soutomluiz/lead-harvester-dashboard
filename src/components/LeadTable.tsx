@@ -16,7 +16,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 
-export const LeadTable = ({ leads }: { leads: Lead[] }) => {
+export const LeadTable = ({ leads: initialLeads }: { leads: Lead[] }) => {
+  const [leads, setLeads] = useState<Lead[]>(initialLeads);
   const [searchTerm, setSearchTerm] = useState("");
   const [editingNoteId, setEditingNoteId] = useState<string | null>(null);
   const [noteContent, setNoteContent] = useState("");
@@ -35,12 +36,19 @@ export const LeadTable = ({ leads }: { leads: Lead[] }) => {
 
   const handleSaveNote = async (leadId: string) => {
     try {
-      const { error } = await supabase
+      const { data, error } = await supabase
         .from('leads')
         .update({ notes: noteContent })
-        .eq('id', leadId);
+        .eq('id', leadId)
+        .select()
+        .single();
 
       if (error) throw error;
+
+      // Atualiza o estado local com a nota atualizada
+      setLeads(leads.map(lead => 
+        lead.id === leadId ? { ...lead, notes: noteContent } : lead
+      ));
 
       toast({
         title: "Nota salva",

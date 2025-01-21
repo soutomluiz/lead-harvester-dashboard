@@ -39,8 +39,8 @@ serve(async (req) => {
       limit: 1
     });
 
-    // Usando o Price ID específico do seu produto
-    const price_id = "price_1Qi0cQGsvmmKmxxImPrcfuqG";
+    // Using a test mode price ID for the Pro plan
+    const price_id = "price_1Qi0cQGsvmmKmxxImPrcfuqG_test"; // This should be replaced with your actual test mode price ID
 
     let customer_id = undefined;
     if (customers.data.length > 0) {

@@ -6,11 +6,37 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useToast } from "@/components/ui/use-toast";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { z } from "zod";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+
+const signUpSchema = z.object({
+  full_name: z.string().min(1, "Nome é obrigatório"),
+  email: z.string().email("Email inválido"),
+  phone: z.string().min(1, "Telefone é obrigatório"),
+  location: z.string().min(1, "Endereço é obrigatório"),
+  password: z.string().min(6, "Senha deve ter no mínimo 6 caracteres"),
+  confirmPassword: z.string()
+}).refine((data) => data.password === data.confirmPassword, {
+  message: "Senhas não conferem",
+  path: ["confirmPassword"],
+});
+
+type SignUpForm = z.infer<typeof signUpSchema>;
 
 export function AuthPage() {
   const [error, setError] = useState<string | null>(null);
+  const [isSignUp, setIsSignUp] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
+
+  const { register, handleSubmit, formState: { errors } } = useForm<SignUpForm>({
+    resolver: zodResolver(signUpSchema)
+  });
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
@@ -46,13 +72,52 @@ export function AuthPage() {
     };
   }, [navigate]);
 
+  const onSignUp = async (data: SignUpForm) => {
+    try {
+      const { error: signUpError } = await supabase.auth.signUp({
+        email: data.email,
+        password: data.password,
+        options: {
+          data: {
+            full_name: data.full_name,
+          }
+        }
+      });
+
+      if (signUpError) throw signUpError;
+
+      // Update profile with additional information
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("No user found after signup");
+
+      const { error: profileError } = await supabase
+        .from('profiles')
+        .update({
+          full_name: data.full_name,
+          phone: data.phone,
+          location: data.location,
+        })
+        .eq('id', user.id);
+
+      if (profileError) throw profileError;
+
+      toast({
+        title: "Conta criada com sucesso!",
+        description: "Você será redirecionado em instantes.",
+      });
+    } catch (error) {
+      console.error("Signup error:", error);
+      setError("Erro ao criar conta. Por favor, tente novamente.");
+    }
+  };
+
   return (
     <div className="container max-w-lg mx-auto py-8">
       <Card className="p-8">
         <div className="mb-8 space-y-4">
           <img src="/logo.svg" alt="Logo" className="h-24 mx-auto" />
           <p className="text-center text-gray-600">
-            Faça login para acessar sua conta
+            {isSignUp ? "Crie sua conta" : "Faça login para acessar sua conta"}
           </p>
         </div>
 
@@ -62,41 +127,126 @@ export function AuthPage() {
           </Alert>
         )}
 
-        <Auth
-          supabaseClient={supabase}
-          appearance={{
-            theme: ThemeSupa,
-            variables: {
-              default: {
-                colors: {
-                  brand: '#3080a3',
-                  brandAccent: '#2c7492',
+        <Tabs defaultValue="login" onValueChange={(value) => setIsSignUp(value === "signup")}>
+          <TabsList className="grid w-full grid-cols-2 mb-8">
+            <TabsTrigger value="login">Login</TabsTrigger>
+            <TabsTrigger value="signup">Cadastro</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="login">
+            <Auth
+              supabaseClient={supabase}
+              appearance={{
+                theme: ThemeSupa,
+                variables: {
+                  default: {
+                    colors: {
+                      brand: '#3080a3',
+                      brandAccent: '#2c7492',
+                    },
+                  },
                 },
-              },
-            },
-          }}
-          providers={['google']}
-          localization={{
-            variables: {
-              sign_in: {
-                email_label: 'Email',
-                password_label: 'Senha',
-                button_label: 'Entrar',
-                loading_button_label: 'Entrando...',
-                email_input_placeholder: 'Seu email',
-                password_input_placeholder: 'Sua senha',
-              },
-              sign_up: {
-                email_label: 'Email',
-                password_label: 'Senha',
-                button_label: 'Cadastrar',
-                loading_button_label: 'Cadastrando...',
-                email_input_placeholder: 'Seu email',
-                password_input_placeholder: 'Sua senha',
-              },
-            },
-          }}
-        />
+              }}
+              providers={['google']}
+              localization={{
+                variables: {
+                  sign_in: {
+                    email_label: 'Email',
+                    password_label: 'Senha',
+                    button_label: 'Entrar',
+                    loading_button_label: 'Entrando...',
+                    email_input_placeholder: 'Seu email',
+                    password_input_placeholder: 'Sua senha',
+                  },
+                },
+              }}
+              view="sign_in"
+            />
+          </TabsContent>
+
+          <TabsContent value="signup">
+            <form onSubmit={handleSubmit(onSignUp)} className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="full_name">Nome Completo</Label>
+                <Input
+                  id="full_name"
+                  {...register("full_name")}
+                  placeholder="Seu nome completo"
+                />
+                {errors.full_name && (
+                  <p className="text-sm text-red-500">{errors.full_name.message}</p>
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="email">Email</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  {...register("email")}
+                  placeholder="seu@email.com"
+                />
+                {errors.email && (
+                  <p className="text-sm text-red-500">{errors.email.message}</p>
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="phone">Telefone</Label>
+                <Input
+                  id="phone"
+                  {...register("phone")}
+                  placeholder="Seu telefone"
+                />
+                {errors.phone && (
+                  <p className="text-sm text-red-500">{errors.phone.message}</p>
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="location">Endereço</Label>
+                <Input
+                  id="location"
+                  {...register("location")}
+                  placeholder="Seu endereço completo"
+                />
+                {errors.location && (
+                  <p className="text-sm text-red-500">{errors.location.message}</p>
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="password">Senha</Label>
+                <Input
+                  id="password"
+                  type="password"
+                  {...register("password")}
+                  placeholder="Sua senha"
+                />
+                {errors.password && (
+                  <p className="text-sm text-red-500">{errors.password.message}</p>
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="confirmPassword">Confirmar Senha</Label>
+                <Input
+                  id="confirmPassword"
+                  type="password"
+                  {...register("confirmPassword")}
+                  placeholder="Confirme sua senha"
+                />
+                {errors.confirmPassword && (
+                  <p className="text-sm text-red-500">{errors.confirmPassword.message}</p>
+                )}
+              </div>
+
+              <Button type="submit" className="w-full">
+                Criar Conta
+              </Button>
+            </form>
+          </TabsContent>
+        </Tabs>
       </Card>
     </div>
   );

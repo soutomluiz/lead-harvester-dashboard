@@ -10,11 +10,19 @@ export function SubscriptionSuccess() {
 
   useEffect(() => {
     toast.success("Parabéns por assinar a ferramenta mais completa do mercado!");
-    const timer = setTimeout(() => {
-      navigate("/login");
-    }, 5000);
+    
+    // If opened from a new tab, notify the parent window
+    if (window.opener) {
+      window.opener.postMessage('checkout_complete', '*');
+      window.close();
+    } else {
+      // If not in a new tab, redirect after a delay
+      const timer = setTimeout(() => {
+        navigate("/");
+      }, 5000);
 
-    return () => clearTimeout(timer);
+      return () => clearTimeout(timer);
+    }
   }, [navigate]);
 
   return (
@@ -28,10 +36,12 @@ export function SubscriptionSuccess() {
         </h1>
         <p className="text-gray-600 mb-6">
           Você agora tem acesso à ferramenta mais completa do mercado. 
-          Você será redirecionado em alguns segundos...
+          {window.opener 
+            ? "Esta janela será fechada automaticamente..." 
+            : "Você será redirecionado em alguns segundos..."}
         </p>
-        <Button onClick={() => navigate("/login")} className="w-full">
-          Ir para Login
+        <Button onClick={() => navigate("/")} className="w-full">
+          Ir para Dashboard
         </Button>
       </Card>
     </div>

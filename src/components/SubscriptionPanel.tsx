@@ -27,7 +27,7 @@ export function SubscriptionPanel() {
           .from('user_roles')
           .select('role')
           .eq('user_id', user.id)
-          .maybeSingle(); // Changed from .single() to .maybeSingle()
+          .maybeSingle();
 
         if (roleError) {
           console.error("Error fetching user role:", roleError);
@@ -48,6 +48,16 @@ export function SubscriptionPanel() {
     };
 
     checkUserRole();
+
+    // Listen for messages from the checkout page
+    const handleMessage = (event: MessageEvent) => {
+      if (event.data === 'checkout_complete') {
+        window.location.reload();
+      }
+    };
+
+    window.addEventListener('message', handleMessage);
+    return () => window.removeEventListener('message', handleMessage);
   }, [toast]);
 
   const handleCheckout = async () => {
@@ -72,7 +82,7 @@ export function SubscriptionPanel() {
       if (error) throw error;
       
       if (data?.url) {
-        window.location.href = data.url;
+        window.open(data.url, '_blank');
       }
     } catch (error) {
       console.error("Erro ao iniciar checkout:", error);

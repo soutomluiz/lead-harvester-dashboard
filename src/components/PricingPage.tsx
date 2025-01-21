@@ -25,18 +25,16 @@ export function PricingPage() {
       });
       
       if (error) {
-        // Parse the error message from the response body if it exists
-        let errorMessage = "Erro ao processar pagamento. Tente novamente.";
+        console.error('Error details:', error);
+        let errorMessage;
+        
         try {
+          // Try to parse the error message from the response body
           const errorBody = JSON.parse(error.message);
-          if (errorBody?.error) {
-            errorMessage = errorBody.error;
-          }
+          errorMessage = errorBody.error || "Erro ao processar pagamento. Tente novamente.";
         } catch {
-          // If parsing fails, use the error message directly
-          if (error.message) {
-            errorMessage = error.message;
-          }
+          // If parsing fails, use a default message
+          errorMessage = "Erro ao processar pagamento. Tente novamente.";
         }
         
         toast.error(errorMessage);
@@ -47,7 +45,7 @@ export function PricingPage() {
         window.open(data.url, '_blank');
       }
     } catch (error: any) {
-      console.error('Erro ao processar pagamento:', error);
+      console.error('Unexpected error:', error);
       toast.error("Erro ao processar pagamento. Tente novamente.");
     }
   };

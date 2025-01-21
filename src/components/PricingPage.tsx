@@ -25,8 +25,21 @@ export function PricingPage() {
       });
       
       if (error) {
-        console.error('Erro ao processar pagamento:', error);
-        toast.error(error.message || "Erro ao processar pagamento. Tente novamente.");
+        // Parse the error message from the response body if it exists
+        let errorMessage = "Erro ao processar pagamento. Tente novamente.";
+        try {
+          const errorBody = JSON.parse(error.message);
+          if (errorBody?.error) {
+            errorMessage = errorBody.error;
+          }
+        } catch {
+          // If parsing fails, use the error message directly
+          if (error.message) {
+            errorMessage = error.message;
+          }
+        }
+        
+        toast.error(errorMessage);
         return;
       }
       
@@ -35,11 +48,7 @@ export function PricingPage() {
       }
     } catch (error: any) {
       console.error('Erro ao processar pagamento:', error);
-      // Check if the error is from our API indicating an active subscription
-      const errorMessage = error.message?.includes('active subscription') 
-        ? "Você já possui uma assinatura ativa"
-        : "Erro ao processar pagamento. Tente novamente.";
-      toast.error(errorMessage);
+      toast.error("Erro ao processar pagamento. Tente novamente.");
     }
   };
 

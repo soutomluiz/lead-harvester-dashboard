@@ -16,6 +16,6 @@ export interface Lead {
   created_at?: string;
   user_id?: string;
   notes?: string | null;
-  status?: string;
+  status?: 'new' | 'qualified' | 'unqualified' | 'open';
   deal_value?: number;
 }

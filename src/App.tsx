@@ -12,7 +12,6 @@ function App() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Check initial session
     const checkSession = async () => {
       try {
         const { data: { session } } = await supabase.auth.getSession();
@@ -27,20 +26,9 @@ function App() {
 
     checkSession();
 
-    // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       console.log("Auth state changed:", event);
-
-      if (event === 'SIGNED_IN') {
-        console.log("User signed in");
-        setIsAuthenticated(true);
-      } else if (event === 'SIGNED_OUT') {
-        console.log("User signed out");
-        setIsAuthenticated(false);
-      } else if (event === 'TOKEN_REFRESHED') {
-        console.log("Token refreshed");
-        setIsAuthenticated(true);
-      }
+      setIsAuthenticated(!!session);
       setIsLoading(false);
     });
 

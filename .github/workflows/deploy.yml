@@ -35,5 +35,5 @@ jobs:
           lftp -e "
           set ssl:verify-certificate no; 
           open -u $FTP_USER,$FTP_PASS $FTP_HOST; 
-          mirror -R ./dist /public_html; 
+          mirror -R ./dist /public_html/extractleads; 
           bye"

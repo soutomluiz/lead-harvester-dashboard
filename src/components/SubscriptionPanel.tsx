@@ -20,29 +20,24 @@ export function SubscriptionPanel() {
         return;
       }
 
-      const response = await fetch("/api/create-checkout", {
-        method: "POST",
+      const { data, error } = await supabase.functions.invoke('create-checkout', {
         headers: {
-          'Authorization': `Bearer ${session.access_token}`,
+          Authorization: `Bearer ${session.access_token}`
         }
       });
       
-      if (!response.ok) {
-        throw new Error('Erro ao iniciar checkout');
-      }
-
-      const { url } = await response.json();
+      if (error) throw error;
       
-      if (url) {
-        window.location.href = url;
+      if (data?.url) {
+        window.location.href = data.url;
       }
     } catch (error) {
+      console.error("Erro ao iniciar checkout:", error);
       toast({
         variant: "destructive",
         title: "Erro",
         description: "Não foi possível iniciar o checkout. Tente novamente.",
       });
-      console.error("Erro ao iniciar checkout:", error);
     }
   };
 

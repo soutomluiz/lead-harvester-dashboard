@@ -2,16 +2,35 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { ShoppingCart, AlertCircle } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 export function SubscriptionPanel() {
   const { toast } = useToast();
 
   const handleCheckout = async () => {
     try {
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (!session) {
+        toast({
+          variant: "destructive",
+          title: "Erro",
+          description: "Você precisa estar logado para assinar.",
+        });
+        return;
+      }
+
       const response = await fetch("/api/create-checkout", {
         method: "POST",
+        headers: {
+          'Authorization': `Bearer ${session.access_token}`,
+        }
       });
       
+      if (!response.ok) {
+        throw new Error('Erro ao iniciar checkout');
+      }
+
       const { url } = await response.json();
       
       if (url) {
@@ -40,8 +59,8 @@ export function SubscriptionPanel() {
           <div className="flex items-start gap-2 text-muted-foreground">
             <AlertCircle className="h-5 w-5 mt-0.5" />
             <div className="flex-1">
-              <p className="font-medium text-foreground">Plano Básico</p>
-              <p>R$ 29,90/mês - Acesso a todas as funcionalidades da plataforma</p>
+              <p className="font-medium text-foreground">Plano Pro</p>
+              <p>R$ 49,90/mês - Acesso a todas as funcionalidades da plataforma</p>
             </div>
           </div>
         </CardContent>

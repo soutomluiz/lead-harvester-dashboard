@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-d
 import { Toaster } from "@/components/ui/toaster";
 import { AuthPage } from "@/components/AuthPage";
 import { PricingPage } from "@/components/PricingPage";
+import { SubscriptionSuccess } from "@/components/SubscriptionSuccess";
 import Index from "@/pages/Index";
 import { supabase } from "@/integrations/supabase/client";
 import { Loader2 } from "lucide-react";
@@ -69,6 +70,7 @@ function App() {
           }
         />
         <Route path="/pricing" element={<PricingPage />} />
+        <Route path="/subscription/success" element={<SubscriptionSuccess />} />
       </Routes>
       <Toaster />
     </Router>

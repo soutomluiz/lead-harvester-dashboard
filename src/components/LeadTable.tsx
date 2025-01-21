@@ -32,10 +32,10 @@ interface Filters {
 }
 
 interface LeadTableProps {
-  initialLeads: Lead[];
+  leads: Lead[];
 }
 
-export const LeadTable = ({ initialLeads }: LeadTableProps) => {
+export const LeadTable = ({ leads: initialLeads }: LeadTableProps) => {
   const [leads, setLeads] = useState<Lead[]>(initialLeads);
   const [searchTerm, setSearchTerm] = useState("");
   const [editingNoteId, setEditingNoteId] = useState<string | null>(null);
@@ -154,9 +154,9 @@ export const LeadTable = ({ initialLeads }: LeadTableProps) => {
             <Button variant="outline" className="gap-2">
               <Filter className="h-4 w-4" />
               Filters
-              {activeFiltersCount > 0 && (
+              {Object.values(filters).filter(Boolean).length > 0 && (
                 <Badge variant="secondary" className="ml-1">
-                  {activeFiltersCount}
+                  {Object.values(filters).filter(Boolean).length}
                 </Badge>
               )}
             </Button>

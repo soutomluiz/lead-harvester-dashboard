@@ -37,9 +37,11 @@ export function Dashboard({ activeTab, leads, onSubmit, onAddLeads, setActiveTab
 
         if (error) throw error;
 
-        const typedLeads = (data || []).map(lead => ({
+        const typedLeads: Lead[] = (data || []).map(lead => ({
           ...lead,
-          type: lead.type as 'website' | 'place' | 'manual'
+          type: lead.type as 'website' | 'place' | 'manual',
+          status: (lead.status || 'new') as 'new' | 'qualified' | 'unqualified' | 'open',
+          deal_value: lead.deal_value || 0
         }));
 
         setDbLeads(typedLeads);

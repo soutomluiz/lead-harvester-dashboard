@@ -35,7 +35,7 @@ const statusColors = {
   qualified: "bg-green-100 text-green-800",
   unqualified: "bg-red-100 text-red-800",
   open: "bg-blue-100 text-blue-800",
-};
+} as const;
 
 interface LeadTableProps {
   leads: Lead[];
@@ -46,10 +46,12 @@ export const LeadTable = ({ leads: initialLeads }: LeadTableProps) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [editingNoteId, setEditingNoteId] = useState<string | null>(null);
   const [noteContent, setNoteContent] = useState("");
-  const [filters, setFilters] = useState<any>({});
+  const [filters, setFilters] = useState<Partial<Lead>>({});
   const { toast } = useToast();
 
-  const handleStatusChange = async (leadId: string, newStatus: string) => {
+  const handleStatusChange = async (leadId: string, newStatus: Lead['status']) => {
+    if (!newStatus) return;
+    
     try {
       const { data, error } = await supabase
         .from("leads")
@@ -125,6 +127,8 @@ export const LeadTable = ({ leads: initialLeads }: LeadTableProps) => {
       "Email",
       "Phone",
       "Notes",
+      "Status",
+      "Deal Value"
     ];
 
     const csvContent = [
@@ -138,6 +142,8 @@ export const LeadTable = ({ leads: initialLeads }: LeadTableProps) => {
           lead.email,
           lead.phone,
           lead.notes,
+          lead.status,
+          lead.deal_value
         ]
           .map((field) => `"${field || ""}"`)
           .join(",")
@@ -162,11 +168,15 @@ export const LeadTable = ({ leads: initialLeads }: LeadTableProps) => {
     const matchesFilters = Object.entries(filters).every(([key, value]) => {
       if (!value) return true;
       const leadValue = lead[key as keyof Lead];
-      return leadValue?.toString().toLowerCase().includes(value.toLowerCase());
+      return typeof leadValue === 'string' ? 
+        leadValue.toLowerCase().includes(value.toString().toLowerCase()) : 
+        leadValue === value;
     });
 
     return matchesSearch && matchesFilters;
   });
+
+  // ... keep existing code (render JSX)
 
   return (
     <Card className="w-full">
@@ -208,7 +218,7 @@ export const LeadTable = ({ leads: initialLeads }: LeadTableProps) => {
                   <Select
                     value={filters.status || ""}
                     onValueChange={(value) =>
-                      setFilters({ ...filters, status: value })
+                      setFilters({ ...filters, status: value as Lead['status'] })
                     }
                   >
                     <SelectTrigger>
@@ -296,7 +306,7 @@ export const LeadTable = ({ leads: initialLeads }: LeadTableProps) => {
               <TableCell>
                 <Select
                   value={lead.status || "new"}
-                  onValueChange={(value) => handleStatusChange(lead.id, value)}
+                  onValueChange={(value) => handleStatusChange(lead.id, value as Lead['status'])}
                 >
                   <SelectTrigger className={`w-32 ${statusColors[lead.status as keyof typeof statusColors] || statusColors.new}`}>
                     <SelectValue />

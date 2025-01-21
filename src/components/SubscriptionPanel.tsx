@@ -21,24 +21,22 @@ export function SubscriptionPanel() {
           return;
         }
 
-        // Store user email for special case checking
         setUserEmail(user.email);
 
         const { data: roleData, error: roleError } = await supabase
           .from('user_roles')
           .select('role')
           .eq('user_id', user.id)
-          .single();
+          .maybeSingle(); // Changed from .single() to .maybeSingle()
 
         if (roleError) {
           console.error("Error fetching user role:", roleError);
-          throw roleError;
+          return;
         }
 
-        console.log("User role data:", roleData); // Debug log
         setIsAdmin(roleData?.role === 'admin' || user.email === 'contato@abbacreator.com.br');
       } catch (error) {
-        console.error("Erro ao verificar papel do usuário:", error);
+        console.error("Error checking user role:", error);
         toast({
           variant: "destructive",
           title: "Erro",

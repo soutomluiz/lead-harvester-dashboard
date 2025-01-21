@@ -20,6 +20,7 @@ export type Database = {
           id: string
           industry: string | null
           location: string | null
+          notes: string | null
           opening_date: string | null
           phone: string | null
           rating: number | null
@@ -38,6 +39,7 @@ export type Database = {
           id?: string
           industry?: string | null
           location?: string | null
+          notes?: string | null
           opening_date?: string | null
           phone?: string | null
           rating?: number | null
@@ -56,6 +58,7 @@ export type Database = {
           id?: string
           industry?: string | null
           location?: string | null
+          notes?: string | null
           opening_date?: string | null
           phone?: string | null
           rating?: number | null

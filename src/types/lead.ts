@@ -15,4 +15,5 @@ export interface Lead {
   address?: string;
   created_at?: string;
   user_id?: string;
+  notes?: string | null;
 }

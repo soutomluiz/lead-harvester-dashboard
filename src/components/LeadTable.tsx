@@ -16,6 +16,13 @@ import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
   Popover,
   PopoverContent,
   PopoverTrigger,
@@ -23,13 +30,12 @@ import {
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 
-interface Filters {
-  industry?: string;
-  location?: string;
-  phone?: string;
-  email?: string;
-  date?: string;
-}
+const statusColors = {
+  new: "bg-gray-100 text-gray-800",
+  qualified: "bg-green-100 text-green-800",
+  unqualified: "bg-red-100 text-red-800",
+  open: "bg-blue-100 text-blue-800",
+};
 
 interface LeadTableProps {
   leads: Lead[];
@@ -40,10 +46,37 @@ export const LeadTable = ({ leads: initialLeads }: LeadTableProps) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [editingNoteId, setEditingNoteId] = useState<string | null>(null);
   const [noteContent, setNoteContent] = useState("");
-  const [filters, setFilters] = useState<Filters>({});
+  const [filters, setFilters] = useState<any>({});
   const { toast } = useToast();
 
-  const activeFiltersCount = Object.values(filters).filter(Boolean).length;
+  const handleStatusChange = async (leadId: string, newStatus: string) => {
+    try {
+      const { data, error } = await supabase
+        .from("leads")
+        .update({ status: newStatus })
+        .eq("id", leadId)
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      setLeads(leads.map(lead => 
+        lead.id === leadId ? { ...lead, status: newStatus } : lead
+      ));
+
+      toast({
+        title: "Status atualizado",
+        description: "O status do lead foi atualizado com sucesso.",
+      });
+    } catch (error) {
+      console.error("Error updating status:", error);
+      toast({
+        title: "Erro ao atualizar status",
+        description: "Não foi possível atualizar o status do lead.",
+        variant: "destructive",
+      });
+    }
+  };
 
   const handleSaveNote = async (leadId: string) => {
     try {
@@ -171,6 +204,25 @@ export const LeadTable = ({ leads: initialLeads }: LeadTableProps) => {
               </div>
               <div className="grid gap-2">
                 <div className="grid gap-1">
+                  <Label htmlFor="status">Status</Label>
+                  <Select
+                    value={filters.status || ""}
+                    onValueChange={(value) =>
+                      setFilters({ ...filters, status: value })
+                    }
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Filter by status" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="new">New</SelectItem>
+                      <SelectItem value="qualified">Qualified</SelectItem>
+                      <SelectItem value="unqualified">Unqualified</SelectItem>
+                      <SelectItem value="open">Open</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="grid gap-1">
                   <Label htmlFor="industry">Industry</Label>
                   <Input
                     id="industry"
@@ -226,6 +278,8 @@ export const LeadTable = ({ leads: initialLeads }: LeadTableProps) => {
         <TableHeader>
           <TableRow>
             <TableHead>Company Name</TableHead>
+            <TableHead>Status</TableHead>
+            <TableHead>Deal Value</TableHead>
             <TableHead>Industry</TableHead>
             <TableHead>Location</TableHead>
             <TableHead>Contact Name</TableHead>
@@ -239,6 +293,51 @@ export const LeadTable = ({ leads: initialLeads }: LeadTableProps) => {
           {filteredLeads.map((lead) => (
             <TableRow key={lead.id}>
               <TableCell>{lead.company_name}</TableCell>
+              <TableCell>
+                <Select
+                  value={lead.status || "new"}
+                  onValueChange={(value) => handleStatusChange(lead.id, value)}
+                >
+                  <SelectTrigger className={`w-32 ${statusColors[lead.status as keyof typeof statusColors] || statusColors.new}`}>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="new">New</SelectItem>
+                    <SelectItem value="qualified">Qualified</SelectItem>
+                    <SelectItem value="unqualified">Unqualified</SelectItem>
+                    <SelectItem value="open">Open</SelectItem>
+                  </SelectContent>
+                </Select>
+              </TableCell>
+              <TableCell>
+                <Input
+                  type="number"
+                  value={lead.deal_value || 0}
+                  onChange={async (e) => {
+                    const newValue = parseFloat(e.target.value);
+                    try {
+                      const { error } = await supabase
+                        .from("leads")
+                        .update({ deal_value: newValue })
+                        .eq("id", lead.id);
+                      
+                      if (error) throw error;
+                      
+                      setLeads(leads.map(l => 
+                        l.id === lead.id ? { ...l, deal_value: newValue } : l
+                      ));
+                    } catch (error) {
+                      console.error("Error updating deal value:", error);
+                      toast({
+                        title: "Error",
+                        description: "Failed to update deal value",
+                        variant: "destructive",
+                      });
+                    }
+                  }}
+                  className="w-24"
+                />
+              </TableCell>
               <TableCell>{lead.industry}</TableCell>
               <TableCell>{lead.location}</TableCell>
               <TableCell>{lead.contact_name}</TableCell>

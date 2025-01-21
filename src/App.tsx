@@ -15,48 +15,64 @@ function App() {
   const { toast } = useToast();
 
   useEffect(() => {
-    const checkSession = async () => {
+    const initializeAuth = async () => {
       try {
-        const { data: { session }, error } = await supabase.auth.getSession();
+        // Primeiro, tenta recuperar a sessão existente
+        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
         
-        if (error) {
-          console.error("Erro ao verificar sessão:", error);
+        if (sessionError) {
+          console.error("Erro ao verificar sessão:", sessionError);
+          await supabase.auth.signOut();
+          setIsAuthenticated(false);
           toast({
             title: "Erro de autenticação",
             description: "Por favor, faça login novamente.",
             variant: "destructive",
           });
-          await supabase.auth.signOut();
-          setIsAuthenticated(false);
           return;
         }
 
+        // Atualiza o estado com base na sessão atual
         setIsAuthenticated(!!session);
+
+        // Configura o listener para mudanças de autenticação
+        const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+          console.log("Auth state changed:", event, session?.user?.id);
+          
+          if (event === 'SIGNED_OUT' || event === 'USER_DELETED') {
+            setIsAuthenticated(false);
+            toast({
+              title: "Sessão encerrada",
+              description: "Você foi desconectado.",
+            });
+          } else if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED' || event === 'USER_UPDATED') {
+            setIsAuthenticated(true);
+            if (event === 'SIGNED_IN') {
+              toast({
+                title: "Login realizado",
+                description: "Bem-vindo de volta!",
+              });
+            }
+          }
+        });
+
+        return () => {
+          subscription.unsubscribe();
+        };
       } catch (error) {
-        console.error("Erro ao verificar sessão:", error);
+        console.error("Erro na inicialização da autenticação:", error);
         setIsAuthenticated(false);
+        toast({
+          title: "Erro de inicialização",
+          description: "Houve um problema ao inicializar a autenticação.",
+          variant: "destructive",
+        });
       } finally {
         setIsLoading(false);
       }
     };
 
-    checkSession();
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      console.log("Auth state changed:", event);
-      
-      if (event === 'SIGNED_OUT') {
-        setIsAuthenticated(false);
-      } else if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
-        setIsAuthenticated(true);
-      }
-      
-      setIsLoading(false);
-    });
-
-    return () => {
-      subscription.unsubscribe();
-    };
+    initializeAuth();
   }, [toast]);
 
   if (isLoading) {

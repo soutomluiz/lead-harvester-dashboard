@@ -18,6 +18,7 @@ export function PricingPage() {
 
     try {
       const { data, error } = await supabase.functions.invoke('create-checkout', {
+        body: { price: 4990 }, // Pass the price in cents
         headers: {
           Authorization: `Bearer ${session.access_token}`
         }
@@ -26,7 +27,7 @@ export function PricingPage() {
       if (error) throw error;
       
       if (data?.url) {
-        window.location.href = data.url;
+        window.open(data.url, '_blank');
       }
     } catch (error) {
       console.error('Erro ao processar pagamento:', error);
@@ -44,7 +45,7 @@ export function PricingPage() {
           </p>
         </div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid md:grid-cols-2 gap-8 max-w-3xl mx-auto">
           {/* Plano Gratuito */}
           <Card className="relative">
             <CardHeader>
@@ -82,19 +83,19 @@ export function PricingPage() {
             </div>
             <CardHeader>
               <CardTitle>Pro</CardTitle>
-              <CardDescription>Para profissionais</CardDescription>
-              <div className="text-3xl font-bold mt-4">R$ 29,90</div>
+              <CardDescription>Acesso completo e ilimitado</CardDescription>
+              <div className="text-3xl font-bold mt-4">R$ 49,90</div>
               <div className="text-sm text-gray-500">por mês</div>
             </CardHeader>
             <CardContent>
               <ul className="space-y-3">
                 <li className="flex items-center gap-2">
                   <Check className="h-5 w-5 text-primary" />
-                  <span>Até 100 leads por mês</span>
+                  <span>Leads ilimitados</span>
                 </li>
                 <li className="flex items-center gap-2">
                   <Check className="h-5 w-5 text-primary" />
-                  <span>Busca avançada</span>
+                  <span>Busca avançada ilimitada</span>
                 </li>
                 <li className="flex items-center gap-2">
                   <Check className="h-5 w-5 text-primary" />
@@ -102,47 +103,17 @@ export function PricingPage() {
                 </li>
                 <li className="flex items-center gap-2">
                   <Check className="h-5 w-5 text-primary" />
-                  <span>Suporte em horário comercial</span>
+                  <span>Suporte prioritário</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <Check className="h-5 w-5 text-primary" />
+                  <span>Acesso a todas as funcionalidades</span>
                 </li>
               </ul>
             </CardContent>
             <CardFooter>
               <Button className="w-full" onClick={handleSubscribe}>
                 Assinar Agora
-              </Button>
-            </CardFooter>
-          </Card>
-
-          {/* Plano Gold */}
-          <Card className="relative">
-            <CardHeader>
-              <CardTitle>Gold</CardTitle>
-              <CardDescription>Para grandes equipes</CardDescription>
-              <div className="text-3xl font-bold mt-4">Personalizado</div>
-            </CardHeader>
-            <CardContent>
-              <ul className="space-y-3">
-                <li className="flex items-center gap-2">
-                  <Check className="h-5 w-5 text-primary" />
-                  <span>Tudo do plano Pro</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <Check className="h-5 w-5 text-primary" />
-                  <span>API dedicada</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <Check className="h-5 w-5 text-primary" />
-                  <span>Gerenciamento de equipe</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <Check className="h-5 w-5 text-primary" />
-                  <span>SLA garantido</span>
-                </li>
-              </ul>
-            </CardContent>
-            <CardFooter>
-              <Button variant="outline" className="w-full" onClick={() => window.location.href = "mailto:contato@leadmanagementpro.com"}>
-                Fale Conosco
               </Button>
             </CardFooter>
           </Card>

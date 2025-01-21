@@ -8,10 +8,12 @@ import { supabase } from "@/integrations/supabase/client";
 export function SubscriptionPanel() {
   const { toast } = useToast();
   const [isAdmin, setIsAdmin] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const checkUserRole = async () => {
       try {
+        setIsLoading(true);
         const { data: { user } } = await supabase.auth.getUser();
         if (!user) return;
 
@@ -25,11 +27,18 @@ export function SubscriptionPanel() {
         setIsAdmin(roleData?.role === 'admin');
       } catch (error) {
         console.error("Erro ao verificar papel do usuário:", error);
+        toast({
+          variant: "destructive",
+          title: "Erro",
+          description: "Não foi possível verificar seu status de assinatura.",
+        });
+      } finally {
+        setIsLoading(false);
       }
     };
 
     checkUserRole();
-  }, []);
+  }, [toast]);
 
   const handleCheckout = async () => {
     try {
@@ -65,6 +74,21 @@ export function SubscriptionPanel() {
     }
   };
 
+  if (isLoading) {
+    return (
+      <div className="container max-w-4xl py-6 space-y-6">
+        <h1 className="text-3xl font-bold">Assinatura</h1>
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center justify-center">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
   return (
     <div className="container max-w-4xl py-6 space-y-6">
       <h1 className="text-3xl font-bold">Assinatura</h1>
@@ -76,7 +100,7 @@ export function SubscriptionPanel() {
             {isAdmin ? (
               <div className="flex items-center gap-2 text-green-500">
                 <CheckCircle2 className="h-5 w-5" />
-                <span>Assinatura Ativa (Admin)</span>
+                <span>Assinatura Vitalícia Ativa (Admin)</span>
               </div>
             ) : (
               "Você ainda não possui uma assinatura ativa"
@@ -105,13 +129,12 @@ export function SubscriptionPanel() {
       <Card>
         <CardHeader>
           <CardTitle>Histórico de Pagamentos</CardTitle>
-          <CardDescription>Aqui você encontra todos os seus pagamentos realizados</CardDescription>
+          <CardDescription>
+            {isAdmin 
+              ? "Você possui uma assinatura vitalícia como administrador do sistema" 
+              : "Nenhum pagamento realizado ainda."}
+          </CardDescription>
         </CardHeader>
-        <CardContent>
-          <p className="text-sm text-muted-foreground">
-            {isAdmin ? "Assinatura ativa como administrador" : "Nenhum pagamento realizado ainda."}
-          </p>
-        </CardContent>
       </Card>
     </div>
   );

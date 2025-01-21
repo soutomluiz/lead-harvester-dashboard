@@ -1,11 +1,35 @@
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { ShoppingCart, AlertCircle } from "lucide-react";
+import { ShoppingCart, AlertCircle, CheckCircle2 } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 
 export function SubscriptionPanel() {
   const { toast } = useToast();
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  useEffect(() => {
+    const checkUserRole = async () => {
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) return;
+
+        const { data: roleData, error: roleError } = await supabase
+          .from('user_roles')
+          .select('role')
+          .eq('user_id', user.id)
+          .single();
+
+        if (roleError) throw roleError;
+        setIsAdmin(roleData?.role === 'admin');
+      } catch (error) {
+        console.error("Erro ao verificar papel do usuário:", error);
+      }
+    };
+
+    checkUserRole();
+  }, []);
 
   const handleCheckout = async () => {
     try {
@@ -48,7 +72,16 @@ export function SubscriptionPanel() {
       <Card>
         <CardHeader>
           <CardTitle>Status da Assinatura</CardTitle>
-          <CardDescription>Você ainda não possui uma assinatura ativa</CardDescription>
+          <CardDescription>
+            {isAdmin ? (
+              <div className="flex items-center gap-2 text-green-500">
+                <CheckCircle2 className="h-5 w-5" />
+                <span>Assinatura Ativa (Admin)</span>
+              </div>
+            ) : (
+              "Você ainda não possui uma assinatura ativa"
+            )}
+          </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="flex items-start gap-2 text-muted-foreground">
@@ -59,12 +92,14 @@ export function SubscriptionPanel() {
             </div>
           </div>
         </CardContent>
-        <CardFooter>
-          <Button onClick={handleCheckout} className="w-full">
-            <ShoppingCart className="mr-2 h-4 w-4" />
-            Assinar Agora
-          </Button>
-        </CardFooter>
+        {!isAdmin && (
+          <CardFooter>
+            <Button onClick={handleCheckout} className="w-full">
+              <ShoppingCart className="mr-2 h-4 w-4" />
+              Assinar Agora
+            </Button>
+          </CardFooter>
+        )}
       </Card>
 
       <Card>
@@ -73,7 +108,9 @@ export function SubscriptionPanel() {
           <CardDescription>Aqui você encontra todos os seus pagamentos realizados</CardDescription>
         </CardHeader>
         <CardContent>
-          <p className="text-sm text-muted-foreground">Nenhum pagamento realizado ainda.</p>
+          <p className="text-sm text-muted-foreground">
+            {isAdmin ? "Assinatura ativa como administrador" : "Nenhum pagamento realizado ainda."}
+          </p>
         </CardContent>
       </Card>
     </div>

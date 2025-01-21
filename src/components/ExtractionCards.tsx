@@ -45,6 +45,17 @@ export function ExtractionCards({ setActiveTab }: ExtractionCardsProps) {
     };
 
     checkUserRole();
+
+    // Listen for subscription success message
+    const handleMessage = (event: MessageEvent) => {
+      if (event.data === 'checkout_complete') {
+        checkUserRole(); // Recheck user role after subscription
+        window.location.reload(); // Refresh the page to update UI
+      }
+    };
+
+    window.addEventListener('message', handleMessage);
+    return () => window.removeEventListener('message', handleMessage);
   }, []);
 
   const hasSubscription = isAdmin || userEmail === 'contato@abbacreator.com.br';

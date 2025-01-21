@@ -54,6 +54,16 @@ export function SidebarMenuItems({ activeTab, setActiveTab }: SidebarMenuItemsPr
     };
 
     checkUserRole();
+
+    // Listen for subscription success message
+    const handleMessage = (event: MessageEvent) => {
+      if (event.data === 'checkout_complete') {
+        checkUserRole(); // Recheck user role after subscription
+      }
+    };
+
+    window.addEventListener('message', handleMessage);
+    return () => window.removeEventListener('message', handleMessage);
   }, []);
 
   const toggleMenu = (menuId: string) => {

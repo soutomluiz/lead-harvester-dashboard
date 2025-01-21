@@ -44,6 +44,7 @@ function App() {
           switch (event) {
             case 'SIGNED_OUT':
               setIsAuthenticated(false);
+              setIsLoading(false);
               toast({
                 title: "Sessão encerrada",
                 description: "Você foi desconectado.",
@@ -55,6 +56,7 @@ function App() {
               if (!session) {
                 console.error("Session is null after auth event:", event);
                 setIsAuthenticated(false);
+                setIsLoading(false);
                 return;
               }
 
@@ -68,6 +70,7 @@ function App() {
                 }
 
                 setIsAuthenticated(true);
+                setIsLoading(false);
                 
                 if (event === 'SIGNED_IN') {
                   toast({
@@ -79,6 +82,7 @@ function App() {
                 console.error("Session validation error:", error);
                 await supabase.auth.signOut();
                 setIsAuthenticated(false);
+                setIsLoading(false);
                 toast({
                   title: "Erro de sessão",
                   description: "Houve um problema com sua sessão. Por favor, faça login novamente.",

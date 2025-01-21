@@ -41,8 +41,8 @@ function App() {
       if (event === 'SIGNED_IN') {
         console.log("User signed in");
         setIsAuthenticated(true);
-      } else if (event === 'SIGNED_OUT' || event === 'USER_DELETED') {
-        console.log("User signed out or deleted");
+      } else if (event === 'SIGNED_OUT') {
+        console.log("User signed out");
         setIsAuthenticated(false);
       } else if (event === 'TOKEN_REFRESHED') {
         console.log("Token refreshed");

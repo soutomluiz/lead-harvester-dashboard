@@ -2,33 +2,16 @@ import { useState } from "react";
 import {
   Table,
   TableBody,
-  TableCell,
   TableHead,
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Download, Search, Edit2, Save, Filter } from "lucide-react";
 import { Lead } from "@/types/lead";
-import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { Label } from "@/components/ui/label";
-import { Badge } from "@/components/ui/badge";
+import { LeadTableHeader } from "./leads/LeadTableHeader";
+import { LeadTableRow } from "./leads/LeadTableRow";
 
 const statusColors = {
   new: "bg-gray-100 text-gray-800",
@@ -49,7 +32,7 @@ export const LeadTable = ({ leads: initialLeads }: LeadTableProps) => {
   const [filters, setFilters] = useState<Partial<Lead>>({});
   const { toast } = useToast();
 
-  const handleStatusChange = async (leadId: string, newStatus: Lead['status']) => {
+  const handleStatusChange = async (leadId: string, newStatus: Lead["status"]) => {
     if (!newStatus) return;
     
     try {
@@ -80,6 +63,28 @@ export const LeadTable = ({ leads: initialLeads }: LeadTableProps) => {
     }
   };
 
+  const handleDealValueChange = async (leadId: string, newValue: number) => {
+    try {
+      const { error } = await supabase
+        .from("leads")
+        .update({ deal_value: newValue })
+        .eq("id", leadId);
+      
+      if (error) throw error;
+      
+      setLeads(leads.map(l => 
+        l.id === leadId ? { ...l, deal_value: newValue } : l
+      ));
+    } catch (error) {
+      console.error("Error updating deal value:", error);
+      toast({
+        title: "Error",
+        description: "Failed to update deal value",
+        variant: "destructive",
+      });
+    }
+  };
+
   const handleSaveNote = async (leadId: string) => {
     try {
       const { data, error } = await supabase
@@ -91,7 +96,6 @@ export const LeadTable = ({ leads: initialLeads }: LeadTableProps) => {
 
       if (error) throw error;
 
-      // Update local state with the new note
       setLeads(leads.map(lead => 
         lead.id === leadId ? { ...lead, notes: noteContent } : lead
       ));
@@ -176,114 +180,15 @@ export const LeadTable = ({ leads: initialLeads }: LeadTableProps) => {
     return matchesSearch && matchesFilters;
   });
 
-  // ... keep existing code (render JSX)
-
   return (
     <Card className="w-full">
-      <div className="p-4 flex items-center gap-4">
-        <div className="flex-1">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500" />
-            <Input
-              placeholder="Search leads..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10"
-            />
-          </div>
-        </div>
-        <Popover>
-          <PopoverTrigger asChild>
-            <Button variant="outline" className="gap-2">
-              <Filter className="h-4 w-4" />
-              Filters
-              {Object.values(filters).filter(Boolean).length > 0 && (
-                <Badge variant="secondary" className="ml-1">
-                  {Object.values(filters).filter(Boolean).length}
-                </Badge>
-              )}
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent className="w-80">
-            <div className="grid gap-4">
-              <div className="space-y-2">
-                <h4 className="font-medium leading-none">Filter Leads</h4>
-                <p className="text-sm text-muted-foreground">
-                  Filter leads by different criteria
-                </p>
-              </div>
-              <div className="grid gap-2">
-                <div className="grid gap-1">
-                  <Label htmlFor="status">Status</Label>
-                  <Select
-                    value={filters.status || ""}
-                    onValueChange={(value) =>
-                      setFilters({ ...filters, status: value as Lead['status'] })
-                    }
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Filter by status" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="new">New</SelectItem>
-                      <SelectItem value="qualified">Qualified</SelectItem>
-                      <SelectItem value="unqualified">Unqualified</SelectItem>
-                      <SelectItem value="open">Open</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="grid gap-1">
-                  <Label htmlFor="industry">Industry</Label>
-                  <Input
-                    id="industry"
-                    placeholder="Filter by industry..."
-                    value={filters.industry || ""}
-                    onChange={(e) =>
-                      setFilters({ ...filters, industry: e.target.value })
-                    }
-                  />
-                </div>
-                <div className="grid gap-1">
-                  <Label htmlFor="location">Location</Label>
-                  <Input
-                    id="location"
-                    placeholder="Filter by location..."
-                    value={filters.location || ""}
-                    onChange={(e) =>
-                      setFilters({ ...filters, location: e.target.value })
-                    }
-                  />
-                </div>
-                <div className="grid gap-1">
-                  <Label htmlFor="phone">Phone</Label>
-                  <Input
-                    id="phone"
-                    placeholder="Filter by phone..."
-                    value={filters.phone || ""}
-                    onChange={(e) =>
-                      setFilters({ ...filters, phone: e.target.value })
-                    }
-                  />
-                </div>
-                <div className="grid gap-1">
-                  <Label htmlFor="email">Email</Label>
-                  <Input
-                    id="email"
-                    placeholder="Filter by email..."
-                    value={filters.email || ""}
-                    onChange={(e) =>
-                      setFilters({ ...filters, email: e.target.value })
-                    }
-                  />
-                </div>
-              </div>
-            </div>
-          </PopoverContent>
-        </Popover>
-        <Button onClick={handleExportCSV} variant="outline">
-          <Download className="mr-2 h-4 w-4" /> Export CSV
-        </Button>
-      </div>
+      <LeadTableHeader
+        searchTerm={searchTerm}
+        onSearchChange={setSearchTerm}
+        filters={filters}
+        onFiltersChange={setFilters}
+        onExportCSV={handleExportCSV}
+      />
       <Table>
         <TableHeader>
           <TableRow>
@@ -301,89 +206,18 @@ export const LeadTable = ({ leads: initialLeads }: LeadTableProps) => {
         </TableHeader>
         <TableBody>
           {filteredLeads.map((lead) => (
-            <TableRow key={lead.id}>
-              <TableCell>{lead.company_name}</TableCell>
-              <TableCell>
-                <Select
-                  value={lead.status || "new"}
-                  onValueChange={(value) => handleStatusChange(lead.id, value as Lead['status'])}
-                >
-                  <SelectTrigger className={`w-32 ${statusColors[lead.status as keyof typeof statusColors] || statusColors.new}`}>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="new">New</SelectItem>
-                    <SelectItem value="qualified">Qualified</SelectItem>
-                    <SelectItem value="unqualified">Unqualified</SelectItem>
-                    <SelectItem value="open">Open</SelectItem>
-                  </SelectContent>
-                </Select>
-              </TableCell>
-              <TableCell>
-                <Input
-                  type="number"
-                  value={lead.deal_value || 0}
-                  onChange={async (e) => {
-                    const newValue = parseFloat(e.target.value);
-                    try {
-                      const { error } = await supabase
-                        .from("leads")
-                        .update({ deal_value: newValue })
-                        .eq("id", lead.id);
-                      
-                      if (error) throw error;
-                      
-                      setLeads(leads.map(l => 
-                        l.id === lead.id ? { ...l, deal_value: newValue } : l
-                      ));
-                    } catch (error) {
-                      console.error("Error updating deal value:", error);
-                      toast({
-                        title: "Error",
-                        description: "Failed to update deal value",
-                        variant: "destructive",
-                      });
-                    }
-                  }}
-                  className="w-24"
-                />
-              </TableCell>
-              <TableCell>{lead.industry}</TableCell>
-              <TableCell>{lead.location}</TableCell>
-              <TableCell>{lead.contact_name}</TableCell>
-              <TableCell>{lead.email}</TableCell>
-              <TableCell>{lead.phone}</TableCell>
-              <TableCell>
-                {editingNoteId === lead.id ? (
-                  <Textarea
-                    value={noteContent}
-                    onChange={(e) => setNoteContent(e.target.value)}
-                    className="min-h-[100px]"
-                  />
-                ) : (
-                  <div className="max-w-[200px] truncate">{lead.notes}</div>
-                )}
-              </TableCell>
-              <TableCell>
-                {editingNoteId === lead.id ? (
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handleSaveNote(lead.id)}
-                  >
-                    <Save className="h-4 w-4" />
-                  </Button>
-                ) : (
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handleEditNote(lead)}
-                  >
-                    <Edit2 className="h-4 w-4" />
-                  </Button>
-                )}
-              </TableCell>
-            </TableRow>
+            <LeadTableRow
+              key={lead.id}
+              lead={lead}
+              editingNoteId={editingNoteId}
+              noteContent={noteContent}
+              statusColors={statusColors}
+              onStatusChange={handleStatusChange}
+              onDealValueChange={handleDealValueChange}
+              onEditNote={handleEditNote}
+              onSaveNote={handleSaveNote}
+              onNoteContentChange={setNoteContent}
+            />
           ))}
         </TableBody>
       </Table>

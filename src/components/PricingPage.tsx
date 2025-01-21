@@ -24,14 +24,22 @@ export function PricingPage() {
         }
       });
       
-      if (error) throw error;
+      if (error) {
+        console.error('Erro ao processar pagamento:', error);
+        toast.error(error.message || "Erro ao processar pagamento. Tente novamente.");
+        return;
+      }
       
       if (data?.url) {
         window.open(data.url, '_blank');
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Erro ao processar pagamento:', error);
-      toast.error("Erro ao processar pagamento. Tente novamente.");
+      // Check if the error is from our API indicating an active subscription
+      const errorMessage = error.message?.includes('active subscription') 
+        ? "Você já possui uma assinatura ativa"
+        : "Erro ao processar pagamento. Tente novamente.";
+      toast.error(errorMessage);
     }
   };
 
@@ -112,7 +120,7 @@ export function PricingPage() {
               </ul>
             </CardContent>
             <CardFooter>
-              <Button className="w-full" onClick={handleSubscribe}>
+              <Button onClick={handleSubscribe} className="w-full">
                 Assinar Agora
               </Button>
             </CardFooter>

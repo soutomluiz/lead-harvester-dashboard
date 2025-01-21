@@ -53,7 +53,15 @@ serve(async (req) => {
       });
 
       if (subscriptions.data.length > 0) {
-        throw new Error("Cliente já possui uma assinatura ativa");
+        return new Response(
+          JSON.stringify({ 
+            error: "Você já possui uma assinatura ativa. Se precisar de ajuda, entre em contato com o suporte." 
+          }),
+          { 
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+            status: 400 // Changed to 400 to indicate client error instead of server error
+          }
+        );
       }
     }
 

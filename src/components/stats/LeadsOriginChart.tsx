@@ -1,5 +1,4 @@
-import { PieChart, Pie, Cell, Tooltip } from 'recharts';
-import { Card } from "@/components/ui/card";
+import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts';
 import { ChartContainer } from "@/components/ui/chart";
 import { Lead } from "@/types/lead";
 
@@ -13,23 +12,26 @@ export function LeadsOriginChart({ leads, chartConfig }: LeadsOriginChartProps) 
     { name: 'Manual', value: leads.filter(lead => lead.type === 'manual').length },
     { name: 'Google Maps', value: leads.filter(lead => lead.type === 'place').length },
     { name: 'Websites', value: leads.filter(lead => lead.type === 'website').length },
-  ];
+  ].filter(item => item.value > 0);
 
   const COLORS = ['#4F46E5', '#10B981', '#8B5CF6'];
 
+  if (chartData.length === 0) {
+    return <div className="flex items-center justify-center h-full">Nenhum dado disponível</div>;
+  }
+
   return (
-    <Card className="p-6">
-      <h3 className="text-lg font-semibold mb-4 text-center">Leads por Origem</h3>
-      <div className="w-full h-[400px] flex items-center justify-center">
-        <ChartContainer config={chartConfig}>
-          <PieChart width={350} height={350}>
+    <div className="w-full h-full">
+      <ChartContainer config={chartConfig}>
+        <ResponsiveContainer width="100%" height="100%">
+          <PieChart>
             <Pie
               data={chartData}
               cx="50%"
               cy="50%"
               labelLine={false}
               label={({ name, percent }) => `${name} (${(percent * 100).toFixed(0)}%)`}
-              outerRadius={130}
+              outerRadius={100}
               fill="#8884d8"
               dataKey="value"
             >
@@ -39,8 +41,8 @@ export function LeadsOriginChart({ leads, chartConfig }: LeadsOriginChartProps) 
             </Pie>
             <Tooltip />
           </PieChart>
-        </ChartContainer>
-      </div>
-    </Card>
+        </ResponsiveContainer>
+      </ChartContainer>
+    </div>
   );
 }

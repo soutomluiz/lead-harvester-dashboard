@@ -95,9 +95,19 @@ export function DashboardStats({ leads, results, searchType }: DashboardStatsPro
           ))}
         </div>
 
-        <div className="grid gap-4 md:grid-cols-2">
-          <LeadsOriginChart leads={leads} chartConfig={chartConfig} />
-          <IndustriesChart leads={leads} chartConfig={chartConfig} />
+        <div className="grid gap-4 md:grid-cols-2 min-h-[400px]">
+          <Card className="p-6 flex flex-col">
+            <h3 className="text-lg font-semibold mb-4 text-center">Leads por Origem</h3>
+            <div className="flex-1 w-full min-h-[350px]">
+              <LeadsOriginChart leads={leads} chartConfig={chartConfig} />
+            </div>
+          </Card>
+          <Card className="p-6 flex flex-col">
+            <h3 className="text-lg font-semibold mb-4 text-center">Top 5 Indústrias</h3>
+            <div className="flex-1 w-full min-h-[350px]">
+              <IndustriesChart leads={leads} chartConfig={chartConfig} />
+            </div>
+          </Card>
         </div>
       </div>
     );

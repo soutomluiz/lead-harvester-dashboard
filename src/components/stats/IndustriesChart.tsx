@@ -1,5 +1,4 @@
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts';
-import { Card } from "@/components/ui/card";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { ChartContainer } from "@/components/ui/chart";
 import { Lead } from "@/types/lead";
 
@@ -21,20 +20,23 @@ export function IndustriesChart({ leads, chartConfig }: IndustriesChartProps) {
     .sort((a, b) => b.value - a.value)
     .slice(0, 5);
 
+  if (industryChartData.length === 0) {
+    return <div className="flex items-center justify-center h-full">Nenhum dado disponível</div>;
+  }
+
   return (
-    <Card className="p-6">
-      <h3 className="text-lg font-semibold mb-4 text-center">Top 5 Indústrias</h3>
-      <div className="w-full h-[400px] flex items-center justify-center">
-        <ChartContainer config={chartConfig}>
-          <BarChart width={350} height={350} data={industryChartData} layout="vertical">
+    <div className="w-full h-full">
+      <ChartContainer config={chartConfig}>
+        <ResponsiveContainer width="100%" height="100%">
+          <BarChart data={industryChartData} layout="vertical">
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis type="number" />
             <YAxis dataKey="name" type="category" width={120} />
             <Tooltip />
             <Bar dataKey="value" fill="#4F46E5" />
           </BarChart>
-        </ChartContainer>
-      </div>
-    </Card>
+        </ResponsiveContainer>
+      </ChartContainer>
+    </div>
   );
 }

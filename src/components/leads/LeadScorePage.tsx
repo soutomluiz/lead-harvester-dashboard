@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Lead } from "@/types/lead";
 import { Card } from "@/components/ui/card";
 import { LeadScore } from "@/components/leads/LeadScore";
-import { Award, Loader2 } from "lucide-react";
+import { Award, Loader2, Building2, Mail, Phone, Globe } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 
 const fetchLeads = async () => {
@@ -70,8 +70,28 @@ export function LeadScorePage() {
               <h3 className="font-medium">{lead.company_name}</h3>
               <p className="text-sm text-muted-foreground">{lead.industry || 'Indústria não especificada'}</p>
             </div>
+            <LeadScore lead={lead} />
           </div>
-          <LeadScore lead={lead} />
+          <div className="space-y-2">
+            {lead.email && (
+              <div className="flex items-center text-sm text-muted-foreground">
+                <Mail className="h-4 w-4 mr-2" />
+                {lead.email}
+              </div>
+            )}
+            {lead.phone && (
+              <div className="flex items-center text-sm text-muted-foreground">
+                <Phone className="h-4 w-4 mr-2" />
+                {lead.phone}
+              </div>
+            )}
+            {lead.website && (
+              <div className="flex items-center text-sm text-muted-foreground">
+                <Globe className="h-4 w-4 mr-2" />
+                {lead.website}
+              </div>
+            )}
+          </div>
         </Card>
       ))}
     </div>

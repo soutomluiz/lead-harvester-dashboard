@@ -4,7 +4,7 @@ import { Lead } from "@/types/lead";
 import { Card } from "@/components/ui/card";
 import { Timer, Loader2, Building2, Mail, Phone, Globe } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
-import { format } from "date-fns";
+import { format, parseISO } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
 const fetchLeads = async () => {

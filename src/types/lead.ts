@@ -19,4 +19,7 @@ export interface Lead {
   status: 'new' | 'qualified' | 'unqualified' | 'open';
   deal_value: number;
   tags: string[];
+  last_interaction_at?: string;
+  stage?: string;
+  kanban_order?: number;
 }

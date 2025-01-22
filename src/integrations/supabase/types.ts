@@ -81,48 +81,54 @@ export type Database = {
         }
         Relationships: []
       }
-      profiles: {
-        Row: {
-          avatar_url: string | null
-          bio: string | null
-          company_name: string | null
-          email: string | null
-          full_name: string | null
-          id: string
-          industry: string | null
-          location: string | null
-          phone: string | null
-          updated_at: string | null
-          website: string | null
-        }
-        Insert: {
-          avatar_url?: string | null
-          bio?: string | null
-          company_name?: string | null
-          email?: string | null
-          full_name?: string | null
-          id: string
-          industry?: string | null
-          location?: string | null
-          phone?: string | null
-          updated_at?: string | null
-          website?: string | null
-        }
-        Update: {
-          avatar_url?: string | null
-          bio?: string | null
-          company_name?: string | null
-          email?: string | null
-          full_name?: string | null
-          id?: string
-          industry?: string | null
-          location?: string | null
-          phone?: string | null
-          updated_at?: string | null
-          website?: string | null
-        }
-        Relationships: []
-      }
+profiles: {
+  Row: {
+    avatar_url: string | null
+    bio: string | null
+    company_name: string | null
+    crm_type: string | null
+    email: string | null
+    full_name: string | null
+    id: string
+    industry: string | null
+    location: string | null
+    phone: string | null
+    updated_at: string | null
+    webhook_url: string | null
+    website: string | null
+  }
+  Insert: {
+    avatar_url?: string | null
+    bio?: string | null
+    company_name?: string | null
+    crm_type?: string | null
+    email?: string | null
+    full_name?: string | null
+    id: string
+    industry?: string | null
+    location?: string | null
+    phone?: string | null
+    updated_at?: string | null
+    webhook_url?: string | null
+    website?: string | null
+  }
+  Update: {
+    avatar_url?: string | null
+    bio?: string | null
+    company_name?: string | null
+    crm_type?: string | null
+    email?: string | null
+    full_name?: string | null
+    id?: string
+    industry?: string | null
+    location?: string | null
+    phone?: string | null
+    updated_at?: string | null
+    webhook_url?: string | null
+    website?: string | null
+  }
+  Relationships: []
+}
       user_roles: {
         Row: {
           created_at: string
@@ -256,3 +262,4 @@ export type CompositeTypes<
   : PublicCompositeTypeNameOrOptions extends keyof PublicSchema["CompositeTypes"]
     ? PublicSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
     : never
+

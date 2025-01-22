@@ -14,6 +14,8 @@ import { UserProfilePanel } from "@/components/UserProfilePanel";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/components/ui/use-toast";
+import { NotificationBell } from "@/components/NotificationBell";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 const Index = () => {
   const [leads, setLeads] = useState<Lead[]>([]);
@@ -87,6 +89,8 @@ const Index = () => {
               <span className="text-sm font-medium">
                 Olá, {userName}
               </span>
+              <NotificationBell />
+              <ThemeToggle />
               <Sheet>
                 <SheetTrigger asChild>
                   <Avatar className="h-16 w-16 cursor-pointer hover:opacity-80 transition-opacity">

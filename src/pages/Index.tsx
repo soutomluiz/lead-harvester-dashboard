@@ -30,8 +30,6 @@ const Index = () => {
     switch (tab) {
       case "dashboard":
         return "Dashboard";
-      case "pipeline":
-        return "Pipeline";
       case "prospect-form":
         return "Inserir Lead Manualmente";
       case "prospect-places":

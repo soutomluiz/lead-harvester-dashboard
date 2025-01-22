@@ -1,4 +1,4 @@
-import { Database, Users, MapPin, Globe, Settings, CreditCard, PlusCircle, LayoutDashboard, KanbanSquare, Timer, ListChecks, Award, ChevronDown } from "lucide-react";
+import { Database, Users, MapPin, Globe, Settings, CreditCard, PlusCircle, LayoutDashboard, Timer, ListChecks, Award, ChevronDown } from "lucide-react";
 import {
   SidebarMenu,
   SidebarMenuItem,
@@ -52,7 +52,6 @@ export function SidebarMenuItems({ activeTab, setActiveTab }: SidebarMenuItemsPr
 
   const menuItems = [
     { id: "dashboard", icon: LayoutDashboard, label: "Dashboard" },
-    { id: "pipeline", icon: KanbanSquare, label: "Pipeline", requiresAdmin: false },
     {
       id: "prospect",
       icon: Database,
@@ -79,7 +78,7 @@ export function SidebarMenuItems({ activeTab, setActiveTab }: SidebarMenuItemsPr
 
   const handleMenuClick = (menuId: string, subItemId?: string) => {
     const targetId = subItemId || menuId;
-    console.log("Menu clicked:", targetId); // Debug log
+    console.log("Menu clicked:", targetId);
     setActiveTab(targetId);
     if (!subItemId) {
       toggleMenu(menuId);

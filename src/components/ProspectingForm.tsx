@@ -77,7 +77,6 @@ export const ProspectingForm = ({
 
           setResults(formattedResults);
           
-          // Update the toast to show the correct count
           toast({
             title: "Busca realizada com sucesso",
             description: `Encontrados ${formattedResults.length} resultados`,
@@ -97,7 +96,6 @@ export const ProspectingForm = ({
 
         if (data.results) {
           setResults(data.results);
-          // Update the toast to show the correct count for website results
           toast({
             title: "Busca realizada com sucesso",
             description: `Encontrados ${data.results.length} resultados`,
@@ -119,7 +117,7 @@ export const ProspectingForm = ({
     }
   };
 
-  const handleAddToLeads = async () => {
+  const handleAddToLeads = async (selectedResults: SearchResult[]) => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
@@ -132,7 +130,7 @@ export const ProspectingForm = ({
         return;
       }
 
-      const newLeads = results.map((result) => ({
+      const newLeads = selectedResults.map((result) => ({
         company_name: result.companyName,
         industry: result.keyword,
         location: result.city,

@@ -192,7 +192,7 @@ export function AuthPage() {
               }}
               view="sign_in"
               showLinks={false}
-              onError={(error) => {
+              onAuthError={(error) => {
                 console.error("Auth error:", error);
                 let message = "Ocorreu um erro durante a autenticação.";
                 

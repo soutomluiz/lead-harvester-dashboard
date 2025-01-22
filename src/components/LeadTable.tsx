@@ -43,12 +43,10 @@ export const LeadTable = ({ leads: initialLeads }: LeadTableProps) => {
     if (!newStatus) return;
     
     try {
-      const { data, error } = await supabase
+      const { error } = await supabase
         .from("leads")
         .update({ status: newStatus })
-        .eq("id", leadId)
-        .select()
-        .single();
+        .eq("id", leadId);
 
       if (error) throw error;
 
@@ -65,6 +63,33 @@ export const LeadTable = ({ leads: initialLeads }: LeadTableProps) => {
       toast({
         title: "Erro ao atualizar status",
         description: "Não foi possível atualizar o status do lead.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleTagsChange = async (leadId: string, newTags: string[]) => {
+    try {
+      const { error } = await supabase
+        .from("leads")
+        .update({ tags: newTags })
+        .eq("id", leadId);
+
+      if (error) throw error;
+
+      setLeads(leads.map(lead => 
+        lead.id === leadId ? { ...lead, tags: newTags } : lead
+      ));
+
+      toast({
+        title: "Tags atualizadas",
+        description: "As tags do lead foram atualizadas com sucesso.",
+      });
+    } catch (error) {
+      console.error("Error updating tags:", error);
+      toast({
+        title: "Erro ao atualizar tags",
+        description: "Não foi possível atualizar as tags do lead.",
         variant: "destructive",
       });
     }
@@ -208,6 +233,7 @@ export const LeadTable = ({ leads: initialLeads }: LeadTableProps) => {
               onEditNote={handleEditNote}
               onSaveNote={handleSaveNote}
               onNoteContentChange={setNoteContent}
+              onTagsChange={handleTagsChange}
             />
           ))}
         </TableBody>

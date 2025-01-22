@@ -8,6 +8,9 @@ import { ExtractionCards } from "@/components/ExtractionCards";
 import { LeadCards } from "@/components/LeadCards";
 import { DashboardStats } from "@/components/DashboardStats";
 import { KanbanBoard } from "@/components/KanbanBoard";
+import { LeadsList } from "@/components/leads/LeadsList";
+import { LeadScorePage } from "@/components/leads/LeadScorePage";
+import { LeadTimeline } from "@/components/leads/LeadTimeline";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { Lead } from "@/types/lead";
@@ -92,6 +95,15 @@ export function Dashboard({ activeTab, leads, onSubmit, onAddLeads, setActiveTab
       )}
       {activeTab === "leads" && (
         <LeadCards setActiveTab={setActiveTab} />
+      )}
+      {activeTab === "leads-list" && (
+        <LeadsList />
+      )}
+      {activeTab === "leads-score" && (
+        <LeadScorePage />
+      )}
+      {activeTab === "leads-timeline" && (
+        <LeadTimeline />
       )}
       {(activeTab === "leads-all" || 
         activeTab === "leads-manual" || 

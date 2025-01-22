@@ -1,4 +1,4 @@
-import { Database, Users, MapPin, Globe, Settings, CreditCard, PlusCircle, LayoutDashboard, KanbanSquare, Timer, LineChart, ChevronDown } from "lucide-react";
+import { Database, Users, MapPin, Globe, Settings, CreditCard, PlusCircle, LayoutDashboard, KanbanSquare, Timer, ListChecks, Award, ChevronDown } from "lucide-react";
 import {
   SidebarMenu,
   SidebarMenuItem,
@@ -68,8 +68,8 @@ export function SidebarMenuItems({ activeTab, setActiveTab }: SidebarMenuItemsPr
       icon: Users, 
       label: "Leads",
       subItems: [
-        { id: "list", icon: LineChart, label: "Lista de Leads" },
-        { id: "score", icon: LineChart, label: "Score de Leads", requiresAdmin: false },
+        { id: "list", icon: ListChecks, label: "Lista de Leads" },
+        { id: "score", icon: Award, label: "Score de Leads", requiresAdmin: false },
         { id: "timeline", icon: Timer, label: "Timeline", requiresAdmin: false },
       ],
     },

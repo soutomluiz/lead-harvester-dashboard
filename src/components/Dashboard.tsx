@@ -116,6 +116,9 @@ export function Dashboard({ activeTab, leads, onSubmit, onAddLeads, setActiveTab
           })} 
         />
       )}
+      {activeTab === "prospect" && (
+        <ExtractionCards setActiveTab={setActiveTab} />
+      )}
       {activeTab === "prospect-form" && <LeadForm onSubmit={onSubmit} />}
       {(activeTab === "prospect-places" || activeTab === "prospect-websites") && (
         <ProspectingForm onAddLeads={onAddLeads} searchType={searchType} />

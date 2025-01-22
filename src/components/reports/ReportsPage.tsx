@@ -10,12 +10,27 @@ import { ActivityTimelineChart } from "./ActivityTimelineChart";
 import { ReportsFilters } from "./ReportsFilters";
 import { DealMetricsCard } from "./DealMetricsCard";
 import { TagsDistributionChart } from "./TagsDistributionChart";
-import { startOfDay, subDays, subWeeks, subMonths, parseISO } from 'date-fns';
+import { startOfDay, endOfDay, subWeeks, subMonths, parseISO } from 'date-fns';
+
+interface DateRange {
+  from: Date | undefined;
+  to: Date | undefined;
+}
+
+interface FiltersState {
+  dateRange: "today" | "week" | "month" | "custom";
+  customDateRange: DateRange;
+  leadType: string;
+  leadStatus: string;
+}
 
 export function ReportsPage() {
-  const [filters, setFilters] = useState({
-    dateRange: "month" as "today" | "week" | "month" | "custom",
-    customDate: undefined as Date | undefined,
+  const [filters, setFilters] = useState<FiltersState>({
+    dateRange: "month",
+    customDateRange: {
+      from: undefined,
+      to: undefined
+    },
     leadType: "all",
     leadStatus: "all"
   });
@@ -38,20 +53,28 @@ export function ReportsPage() {
     if (!createdAt) return false;
 
     // Filtro de data
-    let startDate;
+    let startDate, endDate;
+    
     if (filters.dateRange === "today") {
       startDate = startOfDay(new Date());
+      endDate = endOfDay(new Date());
     } else if (filters.dateRange === "week") {
       startDate = subWeeks(new Date(), 1);
+      endDate = new Date();
     } else if (filters.dateRange === "month") {
       startDate = subMonths(new Date(), 1);
-    } else if (filters.dateRange === "custom" && filters.customDate) {
-      startDate = startOfDay(filters.customDate);
+      endDate = new Date();
+    } else if (filters.dateRange === "custom" && filters.customDateRange.from) {
+      startDate = startOfDay(filters.customDateRange.from);
+      endDate = filters.customDateRange.to 
+        ? endOfDay(filters.customDateRange.to)
+        : endOfDay(filters.customDateRange.from);
     } else {
-      startDate = subMonths(new Date(), 1); // Default para último mês
+      startDate = subMonths(new Date(), 1);
+      endDate = new Date();
     }
 
-    const passesDateFilter = createdAt >= startDate;
+    const passesDateFilter = createdAt >= startDate && createdAt <= endDate;
     const passesTypeFilter = filters.leadType === "all" || lead.type === filters.leadType;
     const passesStatusFilter = filters.leadStatus === "all" || lead.status === filters.leadStatus;
 

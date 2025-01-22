@@ -28,20 +28,18 @@ export function LoginForm() {
 
     try {
       setIsLoading(true);
-      console.log("Tentando login com email:", email);
+      console.log("Attempting login for email:", email);
 
       const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
+        email: email.trim(),
+        password: password.trim(),
       });
 
       if (error) {
-        console.error("Erro no login:", error);
-        let message = "Erro ao fazer login. Por favor, tente novamente.";
+        console.error("Login error:", error);
         
-        if (error.message.includes("Invalid login credentials")) {
-          message = "Email ou senha incorretos. Verifique suas credenciais.";
-        } else if (error.message.includes("Email not confirmed")) {
+        let message = "Email ou senha incorretos. Por favor, verifique suas credenciais.";
+        if (error.message.includes("Email not confirmed")) {
           message = "Por favor, confirme seu email antes de fazer login.";
         }
         
@@ -53,16 +51,12 @@ export function LoginForm() {
         return;
       }
 
-      if (data.user) {
-        console.log("Login bem sucedido para usuário:", data.user.id);
-        toast({
-          title: "Login realizado com sucesso",
-          description: "Bem-vindo de volta!",
-        });
+      if (data?.user) {
+        console.log("Login successful for user:", data.user.id);
         navigate("/");
       }
     } catch (error) {
-      console.error("Erro inesperado durante login:", error);
+      console.error("Unexpected login error:", error);
       toast({
         title: "Erro no login",
         description: "Ocorreu um erro inesperado. Por favor, tente novamente.",

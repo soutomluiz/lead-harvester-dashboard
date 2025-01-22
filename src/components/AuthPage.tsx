@@ -15,28 +15,28 @@ export function AuthPage() {
   const { toast } = useToast();
 
   useEffect(() => {
-    // Check for existing session on mount
     const checkSession = async () => {
       const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-      if (session) {
-        navigate("/");
-      }
+      
       if (sessionError) {
-        console.error("Session error:", sessionError);
+        console.error("Session check error:", sessionError);
+        return;
+      }
+      
+      if (session) {
+        console.log("Active session found, redirecting to dashboard");
+        navigate("/");
       }
     };
     
     checkSession();
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      console.log("Auth state changed:", event);
+      console.log("Auth state changed in AuthPage:", event);
       
       if (event === 'SIGNED_IN' && session) {
-        console.log("User signed in:", session.user.id);
+        console.log("User signed in, redirecting to dashboard");
         navigate("/");
-        setError(null);
-      } else if (event === 'SIGNED_OUT') {
-        console.log("User signed out");
         setError(null);
       }
     });

@@ -4,11 +4,19 @@ import { Lead } from "@/types/lead";
 import { Card } from "@/components/ui/card";
 import { Timer, Loader2, Building2, Mail, Phone, Globe } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
-import { format } from "date-fns";
+import { format, parseISO } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const fetchLeads = async () => {
   console.log("Fetching leads for LeadTimeline...");
+  
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session) {
+    throw new Error("No active session");
+  }
+
   const { data, error } = await supabase
     .from('leads')
     .select('*')
@@ -31,21 +39,41 @@ const fetchLeads = async () => {
 
 export function LeadTimeline() {
   const { toast } = useToast();
+  const navigate = useNavigate();
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      setIsAuthenticated(!!session);
+      if (!session) {
+        navigate('/login');
+      }
+    };
+    checkAuth();
+  }, [navigate]);
+
   const { data: leads = [], isLoading, error } = useQuery({
     queryKey: ['leads-timeline'],
     queryFn: fetchLeads,
-    retry: 1
+    retry: 1,
+    enabled: isAuthenticated === true
   });
 
-  console.log("LeadTimeline render:", { leads, isLoading, error });
+  console.log("LeadTimeline render:", { leads, isLoading, error, isAuthenticated });
 
   if (error) {
     console.error("Error in LeadTimeline:", error);
+    const errorMessage = error instanceof Error ? error.message : "Erro ao carregar leads";
     toast({
       title: "Erro ao carregar leads",
-      description: "Não foi possível carregar a timeline dos leads.",
+      description: errorMessage,
       variant: "destructive",
     });
+    if (errorMessage.includes("No active session")) {
+      navigate('/login');
+      return null;
+    }
     return (
       <div className="flex flex-col items-center justify-center h-64 text-muted-foreground">
         <Timer className="h-12 w-12 mb-4" />
@@ -54,7 +82,7 @@ export function LeadTimeline() {
     );
   }
 
-  if (isLoading) {
+  if (isLoading || isAuthenticated === null) {
     return (
       <div className="flex items-center justify-center h-64">
         <Loader2 className="h-8 w-8 animate-spin" />

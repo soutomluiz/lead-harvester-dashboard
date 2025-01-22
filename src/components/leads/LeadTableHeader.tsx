@@ -2,7 +2,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Lead } from "@/types/lead";
 import { FilterPopover } from "./FilterPopover";
-import { ListChecks, Award, Download } from "lucide-react";
+import { ListChecks, Download, ArrowUpDown } from "lucide-react";
 
 interface LeadTableHeaderProps {
   searchTerm: string;
@@ -10,6 +10,11 @@ interface LeadTableHeaderProps {
   filters: Partial<Lead>;
   onFiltersChange: (filters: Partial<Lead>) => void;
   onExportCSV: () => void;
+  sortConfig: {
+    key: keyof Lead | null;
+    direction: 'asc' | 'desc' | null;
+  };
+  onSort: (key: keyof Lead) => void;
 }
 
 export function LeadTableHeader({
@@ -18,6 +23,8 @@ export function LeadTableHeader({
   filters,
   onFiltersChange,
   onExportCSV,
+  sortConfig,
+  onSort,
 }: LeadTableHeaderProps) {
   return (
     <div className="p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">

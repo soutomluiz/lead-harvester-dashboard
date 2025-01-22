@@ -12,6 +12,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { LeadTableHeader } from "./leads/LeadTableHeader";
 import { LeadTableRow } from "./leads/LeadTableRow";
+import { ArrowUpDown } from "lucide-react";
+import { Button } from "./ui/button";
 
 const statusColors = {
   new: "bg-gray-100 text-gray-800",
@@ -30,6 +32,13 @@ export const LeadTable = ({ leads: initialLeads }: LeadTableProps) => {
   const [editingNoteId, setEditingNoteId] = useState<string | null>(null);
   const [noteContent, setNoteContent] = useState("");
   const [filters, setFilters] = useState<Partial<Lead>>({});
+  const [sortConfig, setSortConfig] = useState<{
+    key: keyof Lead | null;
+    direction: 'asc' | 'desc' | null;
+  }>({
+    key: null,
+    direction: null
+  });
   const { toast } = useToast();
 
   const capitalizeFirstLetter = (string: string | null) => {
@@ -37,6 +46,23 @@ export const LeadTable = ({ leads: initialLeads }: LeadTableProps) => {
     return string.split(' ').map(word => 
       word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
     ).join(' ');
+  };
+
+  const handleSort = (key: keyof Lead) => {
+    let direction: 'asc' | 'desc' | null = 'asc';
+    
+    if (sortConfig.key === key) {
+      if (sortConfig.direction === 'asc') {
+        direction = 'desc';
+      } else if (sortConfig.direction === 'desc') {
+        direction = null;
+      }
+    }
+
+    setSortConfig({
+      key: direction ? key : null,
+      direction
+    });
   };
 
   const handleStatusChange = async (leadId: string, newStatus: Lead["status"]) => {
@@ -171,7 +197,29 @@ export const LeadTable = ({ leads: initialLeads }: LeadTableProps) => {
     document.body.removeChild(link);
   };
 
-  const filteredLeads = leads.filter((lead) => {
+  const sortLeads = (leadsToSort: Lead[]) => {
+    if (!sortConfig.key || !sortConfig.direction) return leadsToSort;
+
+    return [...leadsToSort].sort((a, b) => {
+      if (a[sortConfig.key!] === null) return 1;
+      if (b[sortConfig.key!] === null) return -1;
+
+      let aValue = a[sortConfig.key!];
+      let bValue = b[sortConfig.key!];
+
+      // Handle special cases for certain columns
+      if (sortConfig.key === 'location') {
+        aValue = capitalizeFirstLetter(aValue as string | null);
+        bValue = capitalizeFirstLetter(bValue as string | null);
+      }
+
+      if (aValue < bValue) return sortConfig.direction === 'asc' ? -1 : 1;
+      if (aValue > bValue) return sortConfig.direction === 'asc' ? 1 : -1;
+      return 0;
+    });
+  };
+
+  const filteredLeads = sortLeads(leads.filter((lead) => {
     const matchesSearch =
       lead.company_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       (lead.contact_name?.toLowerCase() || "").includes(searchTerm.toLowerCase()) ||
@@ -192,10 +240,28 @@ export const LeadTable = ({ leads: initialLeads }: LeadTableProps) => {
     });
 
     return matchesSearch && matchesFilters;
-  }).map(lead => ({
+  })).map(lead => ({
     ...lead,
     location: capitalizeFirstLetter(lead.location)
   }));
+
+  const renderSortIcon = (columnKey: keyof Lead) => {
+    return (
+      <Button
+        variant="ghost"
+        onClick={() => handleSort(columnKey)}
+        className="h-8 w-8 p-0"
+      >
+        <ArrowUpDown className={`h-4 w-4 ${
+          sortConfig.key === columnKey 
+            ? sortConfig.direction === 'asc'
+              ? 'text-primary rotate-180'
+              : 'text-primary'
+            : 'text-muted-foreground'
+        }`} />
+      </Button>
+    );
+  };
 
   return (
     <Card className="w-full">
@@ -205,19 +271,34 @@ export const LeadTable = ({ leads: initialLeads }: LeadTableProps) => {
         filters={filters}
         onFiltersChange={setFilters}
         onExportCSV={handleExportCSV}
+        sortConfig={sortConfig}
+        onSort={handleSort}
       />
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>Company Name</TableHead>
-            <TableHead>Status</TableHead>
-            <TableHead>Industry</TableHead>
-            <TableHead>Location</TableHead>
-            <TableHead>Contact Name</TableHead>
-            <TableHead>Email</TableHead>
-            <TableHead>Phone</TableHead>
+            <TableHead className="flex items-center gap-2">
+              Company Name {renderSortIcon('company_name')}
+            </TableHead>
+            <TableHead className="flex items-center gap-2">
+              Status {renderSortIcon('status')}
+            </TableHead>
+            <TableHead className="flex items-center gap-2">
+              Industry {renderSortIcon('industry')}
+            </TableHead>
+            <TableHead className="flex items-center gap-2">
+              Location {renderSortIcon('location')}
+            </TableHead>
+            <TableHead className="flex items-center gap-2">
+              Contact Name {renderSortIcon('contact_name')}
+            </TableHead>
+            <TableHead className="flex items-center gap-2">
+              Email {renderSortIcon('email')}
+            </TableHead>
+            <TableHead className="flex items-center gap-2">
+              Phone {renderSortIcon('phone')}
+            </TableHead>
             <TableHead>Notes</TableHead>
-            <TableHead>Score</TableHead>
             <TableHead>Tags</TableHead>
           </TableRow>
         </TableHeader>

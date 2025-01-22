@@ -8,6 +8,7 @@ import { IndustriesChart } from "./stats/IndustriesChart";
 import { LeadsTimelineChart } from "./stats/LeadsTimelineChart";
 import { LeadStatusChart } from "./stats/LeadStatusChart";
 import { format, parseISO, differenceInDays } from "date-fns";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface DashboardStatsProps {
   leads?: Lead[];
@@ -37,6 +38,8 @@ const chartConfig = {
 };
 
 export function DashboardStats({ leads, results, searchType }: DashboardStatsProps) {
+  const { t } = useLanguage();
+
   if (leads) {
     const totalLeads = leads.length;
     const emailsFound = leads.filter(lead => lead.email).length;
@@ -46,7 +49,6 @@ export function DashboardStats({ leads, results, searchType }: DashboardStatsPro
     const withIndustry = leads.filter(lead => lead.industry).length;
     const qualifiedLeads = leads.filter(lead => lead.status === 'qualified').length;
     
-    // New metrics
     const leadsWithTags = leads.filter(lead => lead.tags && lead.tags.length > 0).length;
     const recentLeads = leads.filter(lead => {
       if (!lead.created_at) return false;
@@ -56,46 +58,46 @@ export function DashboardStats({ leads, results, searchType }: DashboardStatsPro
 
     const stats = [
       {
-        title: "Total de Leads",
+        title: t("totalLeads"),
         value: totalLeads,
         icon: Users,
         color: "text-blue-500",
-        description: "Leads cadastrados"
+        description: t("leadsRegistered")
       },
       {
-        title: "Leads Recentes",
+        title: t("recentLeads"),
         value: recentLeads,
         icon: Clock,
         color: "text-yellow-500",
-        description: "Últimos 30 dias"
+        description: t("last30Days")
       },
       {
-        title: "Com Tags",
+        title: t("withTags"),
         value: leadsWithTags,
         icon: Target,
         color: "text-pink-500",
-        description: "Leads com tags"
+        description: t("leadsWithTags")
       },
       {
-        title: "Com Email",
+        title: t("withEmail"),
         value: emailsFound,
         icon: Mail,
         color: "text-indigo-500",
-        description: "Contatos com email"
+        description: t("contactsWithEmail")
       },
       {
-        title: "Com Telefone",
+        title: t("withPhone"),
         value: phonesFound,
         icon: Phone,
         color: "text-cyan-500",
-        description: "Contatos com telefone"
+        description: t("contactsWithPhone")
       },
       {
-        title: "Com Website",
+        title: t("withWebsite"),
         value: withWebsite,
         icon: Building2,
         color: "text-teal-500",
-        description: "Com site"
+        description: t("withSite")
       },
     ];
 
@@ -109,13 +111,13 @@ export function DashboardStats({ leads, results, searchType }: DashboardStatsPro
 
         <div className="grid gap-4 md:grid-cols-2">
           <Card className="p-6 flex flex-col">
-            <h3 className="text-lg font-semibold mb-4">Leads ao Longo do Tempo</h3>
+            <h3 className="text-lg font-semibold mb-4">{t("leadsOverTime")}</h3>
             <div className="flex-1 w-full min-h-[300px]">
               <LeadsTimelineChart leads={leads} chartConfig={chartConfig} />
             </div>
           </Card>
           <Card className="p-6 flex flex-col">
-            <h3 className="text-lg font-semibold mb-4">Status dos Leads</h3>
+            <h3 className="text-lg font-semibold mb-4">{t("leadsStatus")}</h3>
             <div className="flex-1 w-full min-h-[300px]">
               <LeadStatusChart leads={leads} chartConfig={chartConfig} />
             </div>
@@ -124,13 +126,13 @@ export function DashboardStats({ leads, results, searchType }: DashboardStatsPro
 
         <div className="grid gap-4 md:grid-cols-2">
           <Card className="p-6 flex flex-col">
-            <h3 className="text-lg font-semibold mb-4">Origem dos Leads</h3>
+            <h3 className="text-lg font-semibold mb-4">{t("leadsOrigin")}</h3>
             <div className="flex-1 w-full min-h-[300px]">
               <LeadsOriginChart leads={leads} chartConfig={chartConfig} />
             </div>
           </Card>
           <Card className="p-6 flex flex-col">
-            <h3 className="text-lg font-semibold mb-4">Top 5 Indústrias</h3>
+            <h3 className="text-lg font-semibold mb-4">{t("topIndustries")}</h3>
             <div className="flex-1 w-full min-h-[300px]">
               <IndustriesChart leads={leads} chartConfig={chartConfig} />
             </div>
@@ -148,15 +150,15 @@ export function DashboardStats({ leads, results, searchType }: DashboardStatsPro
     return (
       <div className="grid gap-4 md:grid-cols-3">
         <Card className="p-4 text-center">
-          <h3 className="text-lg font-semibold text-primary">Websites Encontrados</h3>
+          <h3 className="text-lg font-semibold text-primary">{t("websitesFound")}</h3>
           <p className="text-3xl font-bold text-primary">{totalWebsites}</p>
         </Card>
         <Card className="p-4 text-center">
-          <h3 className="text-lg font-semibold text-primary">Com Informações de Contato</h3>
+          <h3 className="text-lg font-semibold text-primary">{t("withContactInfo")}</h3>
           <p className="text-3xl font-bold text-primary">{websitesWithContact}</p>
         </Card>
         <Card className="p-4 text-center">
-          <h3 className="text-lg font-semibold text-primary">Domínios Únicos</h3>
+          <h3 className="text-lg font-semibold text-primary">{t("uniqueDomains")}</h3>
           <p className="text-3xl font-bold text-primary">{uniqueDomains}</p>
         </Card>
       </div>
@@ -174,15 +176,15 @@ export function DashboardStats({ leads, results, searchType }: DashboardStatsPro
     return (
       <div className="grid gap-4 md:grid-cols-3">
         <Card className="p-4 text-center">
-          <h3 className="text-lg font-semibold text-primary">Empresas Encontradas</h3>
+          <h3 className="text-lg font-semibold text-primary">{t("companiesFound")}</h3>
           <p className="text-3xl font-bold text-primary">{results.length}</p>
         </Card>
         <Card className="p-4 text-center">
-          <h3 className="text-lg font-semibold text-primary">Média de Avaliações</h3>
+          <h3 className="text-lg font-semibold text-primary">{t("averageRating")}</h3>
           <p className="text-3xl font-bold text-primary">{averageRating}/5</p>
         </Card>
         <Card className="p-4 text-center">
-          <h3 className="text-lg font-semibold text-primary">Com Telefone</h3>
+          <h3 className="text-lg font-semibold text-primary">{t("withPhone")}</h3>
           <p className="text-3xl font-bold text-primary">{companiesWithPhone}</p>
         </Card>
       </div>

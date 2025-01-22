@@ -1,6 +1,5 @@
 export const translations = {
   "pt-BR": {
-    // Dashboard
     "dashboard": "Dashboard",
     "totalLeads": "Total de Leads",
     "recentLeads": "Leads Recentes",
@@ -52,9 +51,20 @@ export const translations = {
     "profile": "Perfil do Usuário",
     "support": "Suporte",
     "version": "Versão",
+    
+    // Dashboard Stats
+    "leadsRegistered": "Leads cadastrados",
+    "leadsOverTime": "Leads ao Longo do Tempo",
+    "leadsStatus": "Status dos Leads",
+    "leadsOrigin": "Origem dos Leads",
+    "topIndustries": "Top 5 Indústrias",
+    "websitesFound": "Websites Encontrados",
+    "withContactInfo": "Com Informações de Contato",
+    "uniqueDomains": "Domínios Únicos",
+    "companiesFound": "Empresas Encontradas",
+    "averageRating": "Média de Avaliações",
   },
   "en": {
-    // Dashboard
     "dashboard": "Dashboard",
     "totalLeads": "Total Leads",
     "recentLeads": "Recent Leads",
@@ -106,9 +116,20 @@ export const translations = {
     "profile": "User Profile",
     "support": "Support",
     "version": "Version",
+    
+    // Dashboard Stats
+    "leadsRegistered": "Registered leads",
+    "leadsOverTime": "Leads Over Time",
+    "leadsStatus": "Leads Status",
+    "leadsOrigin": "Leads Origin",
+    "topIndustries": "Top 5 Industries",
+    "websitesFound": "Websites Found",
+    "withContactInfo": "With Contact Info",
+    "uniqueDomains": "Unique Domains",
+    "companiesFound": "Companies Found",
+    "averageRating": "Average Rating",
   },
   "es": {
-    // Dashboard
     "dashboard": "Dashboard",
     "totalLeads": "Total de Leads",
     "recentLeads": "Leads Recientes",
@@ -160,6 +181,18 @@ export const translations = {
     "profile": "Perfil de Usuario",
     "support": "Soporte",
     "version": "Versión",
+    
+    // Dashboard Stats
+    "leadsRegistered": "Leads registrados",
+    "leadsOverTime": "Leads a lo Largo del Tiempo",
+    "leadsStatus": "Estado de los Leads",
+    "leadsOrigin": "Origen de los Leads",
+    "topIndustries": "Top 5 Industrias",
+    "websitesFound": "Sitios Web Encontrados",
+    "withContactInfo": "Con Información de Contacto",
+    "uniqueDomains": "Dominios Únicos",
+    "companiesFound": "Empresas Encontradas",
+    "averageRating": "Calificación Promedio",
   }
 };
 

@@ -4,6 +4,8 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 import { NotificationSettings } from "./config/NotificationSettings";
 import { WebhookSettings } from "./config/WebhookSettings";
+import { ThemeSettings } from "./config/ThemeSettings";
+import { LanguageSettings } from "./config/LanguageSettings";
 import { Loader2 } from "lucide-react";
 
 export function ConfigPanel() {
@@ -38,6 +40,8 @@ export function ConfigPanel() {
         <div className="space-y-8">
           <WebhookSettings />
           <NotificationSettings />
+          <ThemeSettings />
+          <LanguageSettings />
           
           <div className="pt-4 border-t">
             <Button 

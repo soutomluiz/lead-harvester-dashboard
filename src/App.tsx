@@ -17,24 +17,32 @@ function App() {
   useEffect(() => {
     const initializeAuth = async () => {
       try {
-        // First, try to recover any existing session
+        console.log("Initializing auth...");
         const { data: { session }, error: sessionError } = await supabase.auth.getSession();
         
         if (sessionError) {
           console.error("Session error:", sessionError);
-          await supabase.auth.signOut();
-          setIsAuthenticated(false);
-          setIsLoading(false);
-          toast({
-            title: "Erro de sessão",
-            description: "Por favor, faça login novamente.",
-            variant: "destructive",
-          });
+          await handleAuthError();
           return;
         }
 
-        // Update authentication state based on session
-        setIsAuthenticated(!!session);
+        if (!session) {
+          console.log("No session found");
+          await handleAuthError();
+          return;
+        }
+
+        // Validate session is still active
+        const { data: { user }, error: userError } = await supabase.auth.getUser();
+        
+        if (userError || !user) {
+          console.error("User validation error:", userError);
+          await handleAuthError();
+          return;
+        }
+
+        console.log("Session validated successfully");
+        setIsAuthenticated(true);
         setIsLoading(false);
 
         // Set up auth state change listener
@@ -43,32 +51,28 @@ function App() {
           
           switch (event) {
             case 'SIGNED_OUT':
-              setIsAuthenticated(false);
-              setIsLoading(false);
-              toast({
-                title: "Sessão encerrada",
-                description: "Você foi desconectado.",
-              });
+              console.log("User signed out");
+              await handleAuthError();
               break;
 
             case 'SIGNED_IN':
             case 'TOKEN_REFRESHED':
               if (!session) {
                 console.error("Session is null after auth event:", event);
-                setIsAuthenticated(false);
-                setIsLoading(false);
+                await handleAuthError();
                 return;
               }
 
               try {
                 // Validate session is still valid
-                const { data: currentSession, error: refreshError } = await supabase.auth.getSession();
+                const { data: { user }, error: refreshError } = await supabase.auth.getUser();
                 
-                if (refreshError || !currentSession.session) {
-                  console.error("Error validating session:", refreshError);
+                if (refreshError || !user) {
+                  console.error("Session validation error:", refreshError);
                   throw refreshError;
                 }
 
+                console.log("Session validated after state change");
                 setIsAuthenticated(true);
                 setIsLoading(false);
                 
@@ -80,14 +84,7 @@ function App() {
                 }
               } catch (error) {
                 console.error("Session validation error:", error);
-                await supabase.auth.signOut();
-                setIsAuthenticated(false);
-                setIsLoading(false);
-                toast({
-                  title: "Erro de sessão",
-                  description: "Houve um problema com sua sessão. Por favor, faça login novamente.",
-                  variant: "destructive",
-                });
+                await handleAuthError();
               }
               break;
 
@@ -101,14 +98,20 @@ function App() {
         };
       } catch (error) {
         console.error("Auth initialization error:", error);
-        setIsAuthenticated(false);
-        setIsLoading(false);
-        toast({
-          title: "Erro de inicialização",
-          description: "Houve um problema ao inicializar a autenticação.",
-          variant: "destructive",
-        });
+        await handleAuthError();
       }
+    };
+
+    const handleAuthError = async () => {
+      console.log("Handling auth error...");
+      await supabase.auth.signOut();
+      setIsAuthenticated(false);
+      setIsLoading(false);
+      toast({
+        title: "Sessão expirada",
+        description: "Por favor, faça login novamente.",
+        variant: "destructive",
+      });
     };
 
     initializeAuth();

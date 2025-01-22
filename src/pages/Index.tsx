@@ -6,7 +6,6 @@ import { AppFooter } from "@/components/AppFooter";
 import { WelcomeTour } from "@/components/WelcomeTour";
 import { Lead } from "@/types/lead";
 import { supabase } from "@/integrations/supabase/client";
-import { SidebarUserSection } from "@/components/SidebarUserSection";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { UserRound, LogOut } from "lucide-react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";

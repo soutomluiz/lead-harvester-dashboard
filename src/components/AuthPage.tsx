@@ -192,26 +192,6 @@ export function AuthPage() {
               }}
               view="sign_in"
               showLinks={false}
-              onSubmit={async (formData) => {
-                console.log("Auth submit:", formData);
-                const { error } = await supabase.auth.signInWithPassword({
-                  email: formData.email,
-                  password: formData.password,
-                });
-                
-                if (error) {
-                  console.error("Auth error:", error);
-                  let message = "Ocorreu um erro durante a autenticação.";
-                  
-                  if (error.message.includes("missing email")) {
-                    message = "Por favor, preencha o campo de email.";
-                  } else if (error.message.includes("invalid credentials")) {
-                    message = "Email ou senha inválidos.";
-                  }
-                  
-                  setError(message);
-                }
-              }}
             />
           </TabsContent>
 

@@ -60,13 +60,18 @@ export function AuthPage() {
           
           if (error.message.includes("missing email")) {
             message = "Por favor, preencha o campo de email.";
-          } else if (error.message.includes("invalid credentials")) {
+          } else if (error.message.includes("invalid credentials") || error.message.includes("Invalid login credentials")) {
             message = "Email ou senha inválidos.";
           } else if (error.message.includes("Email not confirmed")) {
             message = "Por favor, confirme seu email antes de fazer login. Verifique sua caixa de entrada.";
           }
           
           setError(message);
+          toast({
+            title: "Erro de autenticação",
+            description: message,
+            variant: "destructive",
+          });
         }
       }
     });
@@ -74,7 +79,7 @@ export function AuthPage() {
     return () => {
       subscription.unsubscribe();
     };
-  }, [navigate]);
+  }, [navigate, toast]);
 
   const onSignUp = async (data: SignUpForm) => {
     try {

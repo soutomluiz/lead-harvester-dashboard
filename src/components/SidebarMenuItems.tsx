@@ -1,4 +1,4 @@
-import { Database, Users, MapPin, Globe, Settings, CreditCard, PlusCircle, LayoutDashboard, KanbanSquare, Timer, LineChart } from "lucide-react";
+import { Database, Users, MapPin, Globe, Settings, CreditCard, PlusCircle, LayoutDashboard, KanbanSquare, Timer, LineChart, ChevronDown } from "lucide-react";
 import {
   SidebarMenu,
   SidebarMenuItem,

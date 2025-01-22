@@ -12,7 +12,6 @@ interface LeadTableRowProps {
   noteContent: string;
   statusColors: Record<string, string>;
   onStatusChange: (leadId: string, newStatus: Lead["status"]) => void;
-  onDealValueChange: (leadId: string, newValue: number) => void;
   onEditNote: (lead: Lead) => void;
   onSaveNote: (leadId: string) => void;
   onNoteContentChange: (content: string) => void;
@@ -24,7 +23,6 @@ export function LeadTableRow({
   noteContent,
   statusColors,
   onStatusChange,
-  onDealValueChange,
   onEditNote,
   onSaveNote,
   onNoteContentChange,
@@ -47,14 +45,6 @@ export function LeadTableRow({
             <SelectItem value="open">Em Aberto</SelectItem>
           </SelectContent>
         </Select>
-      </TableCell>
-      <TableCell>
-        <Input
-          type="number"
-          value={lead.deal_value || 0}
-          onChange={(e) => onDealValueChange(lead.id, Number(e.target.value))}
-          className="w-32"
-        />
       </TableCell>
       <TableCell>{lead.industry || "-"}</TableCell>
       <TableCell>{lead.location || "-"}</TableCell>

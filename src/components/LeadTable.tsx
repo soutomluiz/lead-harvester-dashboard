@@ -32,6 +32,13 @@ export const LeadTable = ({ leads: initialLeads }: LeadTableProps) => {
   const [filters, setFilters] = useState<Partial<Lead>>({});
   const { toast } = useToast();
 
+  const capitalizeFirstLetter = (string: string | null) => {
+    if (!string) return "";
+    return string.split(' ').map(word => 
+      word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+    ).join(' ');
+  };
+
   const handleStatusChange = async (leadId: string, newStatus: Lead["status"]) => {
     if (!newStatus) return;
     
@@ -58,28 +65,6 @@ export const LeadTable = ({ leads: initialLeads }: LeadTableProps) => {
       toast({
         title: "Erro ao atualizar status",
         description: "Não foi possível atualizar o status do lead.",
-        variant: "destructive",
-      });
-    }
-  };
-
-  const handleDealValueChange = async (leadId: string, newValue: number) => {
-    try {
-      const { error } = await supabase
-        .from("leads")
-        .update({ deal_value: newValue })
-        .eq("id", leadId);
-      
-      if (error) throw error;
-      
-      setLeads(leads.map(l => 
-        l.id === leadId ? { ...l, deal_value: newValue } : l
-      ));
-    } catch (error) {
-      console.error("Error updating deal value:", error);
-      toast({
-        title: "Error",
-        description: "Failed to update deal value",
         variant: "destructive",
       });
     }
@@ -131,8 +116,7 @@ export const LeadTable = ({ leads: initialLeads }: LeadTableProps) => {
       "Email",
       "Phone",
       "Notes",
-      "Status",
-      "Deal Value"
+      "Status"
     ];
 
     const csvContent = [
@@ -146,8 +130,7 @@ export const LeadTable = ({ leads: initialLeads }: LeadTableProps) => {
           lead.email,
           lead.phone,
           lead.notes,
-          lead.status,
-          lead.deal_value
+          lead.status
         ]
           .map((field) => `"${field || ""}"`)
           .join(",")
@@ -184,7 +167,10 @@ export const LeadTable = ({ leads: initialLeads }: LeadTableProps) => {
     });
 
     return matchesSearch && matchesFilters;
-  });
+  }).map(lead => ({
+    ...lead,
+    location: capitalizeFirstLetter(lead.location)
+  }));
 
   return (
     <Card className="w-full">
@@ -200,7 +186,6 @@ export const LeadTable = ({ leads: initialLeads }: LeadTableProps) => {
           <TableRow>
             <TableHead>Company Name</TableHead>
             <TableHead>Status</TableHead>
-            <TableHead>Deal Value</TableHead>
             <TableHead>Industry</TableHead>
             <TableHead>Location</TableHead>
             <TableHead>Contact Name</TableHead>
@@ -220,7 +205,6 @@ export const LeadTable = ({ leads: initialLeads }: LeadTableProps) => {
               noteContent={noteContent}
               statusColors={statusColors}
               onStatusChange={handleStatusChange}
-              onDealValueChange={handleDealValueChange}
               onEditNote={handleEditNote}
               onSaveNote={handleSaveNote}
               onNoteContentChange={setNoteContent}

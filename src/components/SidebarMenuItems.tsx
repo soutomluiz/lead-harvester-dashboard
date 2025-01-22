@@ -1,4 +1,4 @@
-import { Database, Users, MapPin, Globe, Settings, CreditCard, PlusCircle, LayoutDashboard, Timer, ListChecks, Award, ChevronDown } from "lucide-react";
+import { Database, Users, MapPin, Globe, Settings, CreditCard, PlusCircle, LayoutDashboard, Timer, ListChecks, Award, ChevronDown, BarChart } from "lucide-react";
 import {
   SidebarMenu,
   SidebarMenuItem,
@@ -72,6 +72,7 @@ export function SidebarMenuItems({ activeTab, setActiveTab }: SidebarMenuItemsPr
         { id: "leads-timeline", icon: Timer, label: "Timeline", requiresAdmin: false },
       ],
     },
+    { id: "reports", icon: BarChart, label: "Relatórios" },
     { id: "subscription", icon: CreditCard, label: "Assinatura" },
     { id: "config", icon: Settings, label: "Configurações" },
   ];

@@ -1,4 +1,4 @@
-import { Database, Users, MapPin, Globe, Settings, CreditCard, PlusCircle, LayoutDashboard, Crown, ChevronDown, KanbanSquare, Timer, LineChart } from "lucide-react";
+import { Database, Users, MapPin, Globe, Settings, CreditCard, PlusCircle, LayoutDashboard, KanbanSquare, Timer, LineChart } from "lucide-react";
 import {
   SidebarMenu,
   SidebarMenuItem,
@@ -15,55 +15,8 @@ interface SidebarMenuItemsProps {
 }
 
 export function SidebarMenuItems({ activeTab, setActiveTab }: SidebarMenuItemsProps) {
-  const [isAdmin, setIsAdmin] = useState(false);
-  const [userEmail, setUserEmail] = useState<string | null>(null);
   const [expandedMenus, setExpandedMenus] = useState<string[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
-  const { toast } = useToast();
-
-  useEffect(() => {
-    const checkUserRole = async () => {
-      try {
-        setIsLoading(true);
-        const { data: { user } } = await supabase.auth.getUser();
-        if (!user) {
-          console.error("No user found");
-          return;
-        }
-
-        setUserEmail(user.email);
-
-        const { data: roleData, error: roleError } = await supabase
-          .from('user_roles')
-          .select('role')
-          .eq('user_id', user.id)
-          .maybeSingle();
-
-        if (roleError) {
-          console.error("Error fetching user role:", roleError);
-          return;
-        }
-
-        setIsAdmin(roleData?.role === 'admin' || user.email === 'contato@abbacreator.com.br');
-      } catch (error) {
-        console.error("Error checking user role:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    checkUserRole();
-
-    const handleMessage = (event: MessageEvent) => {
-      if (event.data === 'checkout_complete') {
-        checkUserRole();
-      }
-    };
-
-    window.addEventListener('message', handleMessage);
-    return () => window.removeEventListener('message', handleMessage);
-  }, []);
 
   const toggleMenu = (menuId: string) => {
     setExpandedMenus(prev => 
@@ -73,42 +26,17 @@ export function SidebarMenuItems({ activeTab, setActiveTab }: SidebarMenuItemsPr
     );
   };
 
-  const hasSubscription = isAdmin || userEmail === 'contato@abbacreator.com.br';
-
-  const handleSubscriptionRequired = () => {
-    toast({
-      title: "Recurso Premium",
-      description: "Assine para ter acesso a esta funcionalidade.",
-    });
-    navigate("/pricing");
-  };
-
   const menuItems = [
     { id: "dashboard", icon: LayoutDashboard, label: "Dashboard" },
-    {
-      id: "pipeline",
-      icon: KanbanSquare,
-      label: "Pipeline",
-      requiresSubscription: true,
-    },
+    { id: "pipeline", icon: KanbanSquare, label: "Pipeline" },
     {
       id: "prospect",
       icon: Database,
       label: "Adicionar Leads",
       subItems: [
         { id: "form", icon: PlusCircle, label: "Inserir manualmente" },
-        { 
-          id: "places", 
-          icon: MapPin, 
-          label: "Google Maps",
-          requiresSubscription: true
-        },
-        { 
-          id: "websites", 
-          icon: Globe, 
-          label: "Websites",
-          requiresSubscription: true
-        },
+        { id: "places", icon: MapPin, label: "Google Maps" },
+        { id: "websites", icon: Globe, label: "Websites" },
       ],
     },
     { 
@@ -117,18 +45,8 @@ export function SidebarMenuItems({ activeTab, setActiveTab }: SidebarMenuItemsPr
       label: "Leads",
       subItems: [
         { id: "list", icon: LineChart, label: "Lista de Leads" },
-        { 
-          id: "score", 
-          icon: Crown, 
-          label: "Score de Leads",
-          requiresSubscription: true
-        },
-        { 
-          id: "timeline", 
-          icon: Timer, 
-          label: "Timeline",
-          requiresSubscription: true
-        },
+        { id: "score", icon: LineChart, label: "Score de Leads" },
+        { id: "timeline", icon: Timer, label: "Timeline" },
       ],
     },
     { id: "subscription", icon: CreditCard, label: "Assinatura" },
@@ -165,61 +83,36 @@ export function SidebarMenuItems({ activeTab, setActiveTab }: SidebarMenuItemsPr
               </SidebarMenuButton>
               {expandedMenus.includes(item.id) && (
                 <div className="ml-4 mt-1 space-y-1 animate-slideUp">
-                  {item.subItems.map((subItem) => {
-                    const isSubscriptionRequired = subItem.requiresSubscription && !hasSubscription;
-                    return (
-                      <SidebarMenuButton
-                        key={`${item.id}-${subItem.id}`}
-                        isActive={activeTab === `${item.id}-${subItem.id}`}
-                        onClick={() => {
-                          if (isSubscriptionRequired) {
-                            handleSubscriptionRequired();
-                          } else {
-                            setActiveTab(`${item.id}-${subItem.id}`);
-                          }
-                        }}
-                        className={`w-full flex justify-between items-center p-2 rounded-md transition-colors ${
-                          activeTab === `${item.id}-${subItem.id}`
-                            ? 'bg-primary/10 text-primary'
-                            : 'hover:bg-primary/5'
-                        } ${isSubscriptionRequired ? 'opacity-50' : ''}`}
-                      >
-                        <div className="flex items-center gap-2">
-                          <subItem.icon className={`h-4 w-4 ${isSubscriptionRequired ? 'text-gray-400' : ''}`} />
-                          <span className={`text-sm ${isSubscriptionRequired ? 'text-gray-400' : ''}`}>
-                            {subItem.label}
-                          </span>
-                        </div>
-                        {isSubscriptionRequired && (
-                          <Crown className="h-4 w-4 text-yellow-500" />
-                        )}
-                      </SidebarMenuButton>
-                    );
-                  })}
+                  {item.subItems.map((subItem) => (
+                    <SidebarMenuButton
+                      key={`${item.id}-${subItem.id}`}
+                      isActive={activeTab === `${item.id}-${subItem.id}`}
+                      onClick={() => setActiveTab(`${item.id}-${subItem.id}`)}
+                      className={`w-full flex items-center gap-2 p-2 rounded-md transition-colors ${
+                        activeTab === `${item.id}-${subItem.id}`
+                          ? 'bg-primary/10 text-primary'
+                          : 'hover:bg-primary/5'
+                      }`}
+                    >
+                      <subItem.icon className="h-4 w-4" />
+                      <span className="text-sm">{subItem.label}</span>
+                    </SidebarMenuButton>
+                  ))}
                 </div>
               )}
             </>
           ) : (
             <SidebarMenuButton
               isActive={activeTab === item.id}
-              onClick={() => {
-                if (item.requiresSubscription && !hasSubscription) {
-                  handleSubscriptionRequired();
-                } else {
-                  setActiveTab(item.id);
-                }
-              }}
+              onClick={() => setActiveTab(item.id)}
               className={`w-full flex items-center gap-2 transition-colors ${
                 activeTab === item.id 
                   ? 'bg-primary/10 text-primary'
                   : 'hover:bg-primary/5'
-              } ${item.requiresSubscription && !hasSubscription ? 'opacity-50' : ''}`}
+              }`}
             >
               <item.icon className="h-4 w-4" />
               <span className="font-medium">{item.label}</span>
-              {item.requiresSubscription && !hasSubscription && (
-                <Crown className="h-4 w-4 text-yellow-500 ml-auto" />
-              )}
             </SidebarMenuButton>
           )}
         </SidebarMenuItem>

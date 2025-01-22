@@ -34,7 +34,7 @@ export function SubscriptionPanel() {
           return;
         }
 
-        setIsAdmin(roleData?.role === 'admin' || user.email === 'contato@abbacreator.com.br');
+        setIsAdmin(roleData?.role === 'admin');
       } catch (error) {
         console.error("Error checking user role:", error);
         toast({
@@ -48,51 +48,7 @@ export function SubscriptionPanel() {
     };
 
     checkUserRole();
-
-    // Listen for messages from the checkout page
-    const handleMessage = (event: MessageEvent) => {
-      if (event.data === 'checkout_complete') {
-        window.location.reload();
-      }
-    };
-
-    window.addEventListener('message', handleMessage);
-    return () => window.removeEventListener('message', handleMessage);
   }, [toast]);
-
-  const handleCheckout = async () => {
-    try {
-      const { data: { session } } = await supabase.auth.getSession();
-      
-      if (!session) {
-        toast({
-          variant: "destructive",
-          title: "Erro",
-          description: "Você precisa estar logado para assinar.",
-        });
-        return;
-      }
-
-      const { data, error } = await supabase.functions.invoke('create-checkout', {
-        headers: {
-          Authorization: `Bearer ${session.access_token}`
-        }
-      });
-      
-      if (error) throw error;
-      
-      if (data?.url) {
-        window.open(data.url, '_blank');
-      }
-    } catch (error) {
-      console.error("Erro ao iniciar checkout:", error);
-      toast({
-        variant: "destructive",
-        title: "Erro",
-        description: "Não foi possível iniciar o checkout. Tente novamente.",
-      });
-    }
-  };
 
   if (isLoading) {
     return (
@@ -109,8 +65,6 @@ export function SubscriptionPanel() {
     );
   }
 
-  const hasLifetimeSubscription = isAdmin || userEmail === 'contato@abbacreator.com.br';
-
   return (
     <div className="container max-w-4xl py-6 space-y-6">
       <h1 className="text-3xl font-bold">Assinatura</h1>
@@ -119,42 +73,28 @@ export function SubscriptionPanel() {
         <CardHeader>
           <CardTitle>Status da Assinatura</CardTitle>
           <CardDescription>
-            {hasLifetimeSubscription ? (
-              <div className="flex items-center gap-2 text-green-500">
-                <CheckCircle2 className="h-5 w-5" />
-                <span>Assinatura Vitalícia Ativa</span>
-              </div>
-            ) : (
-              "Você ainda não possui uma assinatura ativa"
-            )}
+            <div className="flex items-center gap-2 text-green-500">
+              <CheckCircle2 className="h-5 w-5" />
+              <span>Assinatura Vitalícia Ativa (Admin)</span>
+            </div>
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="flex items-start gap-2 text-muted-foreground">
             <AlertCircle className="h-5 w-5 mt-0.5" />
             <div className="flex-1">
-              <p className="font-medium text-foreground">Plano Pro</p>
-              <p>R$ 49,90/mês - Acesso a todas as funcionalidades da plataforma</p>
+              <p className="font-medium text-foreground">Plano Admin</p>
+              <p>Acesso vitalício a todas as funcionalidades da plataforma</p>
             </div>
           </div>
         </CardContent>
-        {!hasLifetimeSubscription && (
-          <CardFooter>
-            <Button onClick={handleCheckout} className="w-full">
-              <ShoppingCart className="mr-2 h-4 w-4" />
-              Assinar Agora
-            </Button>
-          </CardFooter>
-        )}
       </Card>
 
       <Card>
         <CardHeader>
           <CardTitle>Histórico de Pagamentos</CardTitle>
           <CardDescription>
-            {hasLifetimeSubscription 
-              ? "Você possui uma assinatura vitalícia" 
-              : "Nenhum pagamento realizado ainda."}
+            Você possui uma assinatura vitalícia como administrador
           </CardDescription>
         </CardHeader>
       </Card>

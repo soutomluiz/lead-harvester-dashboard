@@ -22,6 +22,21 @@ export function NotificationBell() {
       message: "Bem-vindo ao sistema! Explore todas as funcionalidades.",
       read: false,
     },
+    {
+      id: "2",
+      message: "Nova funcionalidade: Modo escuro disponível!",
+      read: false,
+    },
+    {
+      id: "3",
+      message: "Dica: Configure seu webhook para integração com CRM.",
+      read: false,
+    },
+    {
+      id: "4",
+      message: "Atualize seu perfil para uma melhor experiência.",
+      read: false,
+    }
   ]);
 
   const unreadCount = notifications.filter((n) => !n.read).length;

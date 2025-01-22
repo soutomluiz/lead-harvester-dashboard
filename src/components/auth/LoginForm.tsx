@@ -1,45 +1,107 @@
-import { Auth } from "@supabase/auth-ui-react";
-import { ThemeSupa } from "@supabase/auth-ui-shared";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
+import { Loader2 } from "lucide-react";
 
 export function LoginForm() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const { toast } = useToast();
+  const navigate = useNavigate();
+
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    try {
+      setIsLoading(true);
+      console.log("Attempting login with email:", email);
+
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (error) {
+        console.error("Login error:", error);
+        let message = "Erro ao fazer login. Por favor, tente novamente.";
+        
+        if (error.message.includes("Invalid login credentials")) {
+          message = "Email ou senha incorretos.";
+        } else if (error.message.includes("Email not confirmed")) {
+          message = "Por favor, confirme seu email antes de fazer login.";
+        }
+        
+        toast({
+          title: "Erro no login",
+          description: message,
+          variant: "destructive",
+        });
+        return;
+      }
+
+      if (data.user) {
+        console.log("Login successful for user:", data.user.id);
+        toast({
+          title: "Login realizado com sucesso",
+          description: "Bem-vindo de volta!",
+        });
+        navigate("/");
+      }
+    } catch (error) {
+      console.error("Unexpected error during login:", error);
+      toast({
+        title: "Erro no login",
+        description: "Ocorreu um erro inesperado. Por favor, tente novamente.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
-    <Auth
-      supabaseClient={supabase}
-      appearance={{
-        theme: ThemeSupa,
-        variables: {
-          default: {
-            colors: {
-              brand: '#3080a3',
-              brandAccent: '#2c7492',
-            },
-          },
-        },
-      }}
-      providers={['google']}
-      localization={{
-        variables: {
-          sign_in: {
-            email_label: 'Email',
-            password_label: 'Senha',
-            button_label: 'Entrar',
-            loading_button_label: 'Entrando...',
-            email_input_placeholder: 'Seu email',
-            password_input_placeholder: 'Sua senha',
-            social_provider_text: 'Entrar com {{provider}}',
-          },
-          forgotten_password: {
-            link_text: 'Esqueceu sua senha?',
-            email_label: 'Email',
-            password_label: 'Nova senha',
-            button_label: 'Enviar instruções',
-            confirmation_text: 'Verifique seu email para redefinir sua senha',
-          },
-        },
-      }}
-      view="sign_in"
-      showLinks={false}
-    />
+    <form onSubmit={handleLogin} className="space-y-4">
+      <div className="space-y-2">
+        <Label htmlFor="email">Email</Label>
+        <Input
+          id="email"
+          type="email"
+          placeholder="seu@email.com"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          disabled={isLoading}
+          required
+        />
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="password">Senha</Label>
+        <Input
+          id="password"
+          type="password"
+          placeholder="Sua senha"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          disabled={isLoading}
+          required
+        />
+      </div>
+
+      <Button type="submit" className="w-full" disabled={isLoading}>
+        {isLoading ? (
+          <>
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            Entrando...
+          </>
+        ) : (
+          "Entrar"
+        )}
+      </Button>
+    </form>
   );
 }

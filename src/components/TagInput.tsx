@@ -6,9 +6,10 @@ import { Input } from "@/components/ui/input";
 interface TagInputProps {
   tags: string[];
   onChange: (tags: string[]) => void;
+  placeholder?: string;
 }
 
-export const TagInput: React.FC<TagInputProps> = ({ tags, onChange }) => {
+export const TagInput: React.FC<TagInputProps> = ({ tags, onChange, placeholder = "Adicione tags e pressione Enter" }) => {
   const [inputValue, setInputValue] = useState("");
 
   const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
@@ -45,7 +46,7 @@ export const TagInput: React.FC<TagInputProps> = ({ tags, onChange }) => {
         value={inputValue}
         onChange={(e) => setInputValue(e.target.value)}
         onKeyDown={handleKeyDown}
-        placeholder="Adicione tags e pressione Enter"
+        placeholder={placeholder}
         className="w-full"
       />
     </div>

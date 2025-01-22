@@ -33,16 +33,16 @@ export function FilterPopover({ filters, onFiltersChange }: FilterPopoverProps) 
           <div className="space-y-2">
             <h4 className="font-medium leading-none">Status</h4>
             <Select
-              value={filters.status || ""}
+              value={filters.status || "all"}
               onValueChange={(value) =>
-                onFiltersChange({ ...filters, status: value })
+                onFiltersChange({ ...filters, status: value === "all" ? "" : value })
               }
             >
               <SelectTrigger>
                 <SelectValue placeholder="Selecione um status" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Todos</SelectItem>
+                <SelectItem value="all">Todos</SelectItem>
                 <SelectItem value="new">Novo</SelectItem>
                 <SelectItem value="qualified">Qualificado</SelectItem>
                 <SelectItem value="unqualified">Não Qualificado</SelectItem>

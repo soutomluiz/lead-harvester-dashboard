@@ -60,26 +60,18 @@ export function ExtractionCards({ setActiveTab }: ExtractionCardsProps) {
       icon: MapPin,
       title: "Google Maps",
       description: "Extraia leads do Google Maps",
-      requiresSubscription: !isAdmin, // Only require subscription if not admin
+      requiresSubscription: false,
     },
     {
       id: "prospect-websites",
       icon: Globe,
       title: "Websites",
       description: "Extraia leads de websites",
-      requiresSubscription: !isAdmin, // Only require subscription if not admin
+      requiresSubscription: false,
     },
   ];
 
   const handleCardClick = (card: typeof cards[0]) => {
-    if (card.requiresSubscription) {
-      toast({
-        title: "Recurso Premium",
-        description: "Assine para ter acesso a esta funcionalidade.",
-      });
-      navigate("/pricing");
-      return;
-    }
     setActiveTab(card.id);
   };
 
@@ -91,7 +83,7 @@ export function ExtractionCards({ setActiveTab }: ExtractionCardsProps) {
       <div className="grid gap-6 md:grid-cols-3">
         {cards.map((card) => {
           const Icon = card.icon;
-          const isLocked = card.requiresSubscription;
+          const isLocked = false;
           
           return (
             <Card
@@ -106,7 +98,7 @@ export function ExtractionCards({ setActiveTab }: ExtractionCardsProps) {
               <div className="flex flex-col items-center text-center space-y-4">
                 <div className="relative">
                   <Icon className={`h-12 w-12 ${isLocked ? 'text-gray-400' : 'text-primary'}`} />
-                  {card.requiresSubscription && (
+                  {isLocked && (
                     <Crown className="h-5 w-5 text-yellow-500 absolute -top-2 -right-2" />
                   )}
                 </div>

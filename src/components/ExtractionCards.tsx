@@ -72,6 +72,7 @@ export function ExtractionCards({ setActiveTab }: ExtractionCardsProps) {
   ];
 
   const handleCardClick = (card: typeof cards[0]) => {
+    console.log("Card clicked:", card.id);
     setActiveTab(card.id);
   };
 
@@ -93,7 +94,7 @@ export function ExtractionCards({ setActiveTab }: ExtractionCardsProps) {
                   ? 'opacity-50 cursor-not-allowed' 
                   : 'hover:shadow-lg hover:scale-105 cursor-pointer'
               }`}
-              onClick={() => handleCardClick(card)}
+              onClick={() => !isLocked && handleCardClick(card)}
             >
               <div className="flex flex-col items-center text-center space-y-4">
                 <div className="relative">

@@ -7,10 +7,10 @@ import { SubscriptionPanel } from "@/components/SubscriptionPanel";
 import { ExtractionCards } from "@/components/ExtractionCards";
 import { LeadCards } from "@/components/LeadCards";
 import { DashboardStats } from "@/components/DashboardStats";
-import { KanbanBoard } from "@/components/KanbanBoard";
 import { LeadsList } from "@/components/leads/LeadsList";
 import { LeadScorePage } from "@/components/leads/LeadScorePage";
 import { LeadTimeline } from "@/components/leads/LeadTimeline";
+import { ReportsPage } from "@/components/reports/ReportsPage";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { Lead } from "@/types/lead";
@@ -49,7 +49,7 @@ export function Dashboard({ activeTab, leads, onSubmit, onAddLeads, setActiveTab
         }));
 
         setDbLeads(typedLeads);
-        console.log("Fetched leads:", typedLeads); // Debug log
+        console.log("Fetched leads:", typedLeads);
       } catch (error) {
         console.error("Error fetching leads:", error);
         toast({
@@ -88,11 +88,8 @@ export function Dashboard({ activeTab, leads, onSubmit, onAddLeads, setActiveTab
       {activeTab === "dashboard" && (
         <DashboardStats leads={dbLeads} />
       )}
-      {activeTab === "pipeline" && (
-        <KanbanBoard />
-      )}
-      {activeTab === "prospect" && (
-        <ExtractionCards setActiveTab={setActiveTab} />
+      {activeTab === "reports" && (
+        <ReportsPage />
       )}
       {activeTab === "leads" && (
         <LeadCards setActiveTab={setActiveTab} />

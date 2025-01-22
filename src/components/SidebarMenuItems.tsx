@@ -52,15 +52,15 @@ export function SidebarMenuItems({ activeTab, setActiveTab }: SidebarMenuItemsPr
 
   const menuItems = [
     { id: "dashboard", icon: LayoutDashboard, label: "Dashboard" },
-    { id: "pipeline", icon: KanbanSquare, label: "Pipeline", requiresAdmin: true },
+    { id: "pipeline", icon: KanbanSquare, label: "Pipeline", requiresAdmin: !isAdmin },
     {
       id: "prospect",
       icon: Database,
       label: "Adicionar Leads",
       subItems: [
         { id: "form", icon: PlusCircle, label: "Inserir manualmente" },
-        { id: "places", icon: MapPin, label: "Google Maps", requiresAdmin: true },
-        { id: "websites", icon: Globe, label: "Websites", requiresAdmin: true },
+        { id: "places", icon: MapPin, label: "Google Maps", requiresAdmin: !isAdmin },
+        { id: "websites", icon: Globe, label: "Websites", requiresAdmin: !isAdmin },
       ],
     },
     { 
@@ -69,8 +69,8 @@ export function SidebarMenuItems({ activeTab, setActiveTab }: SidebarMenuItemsPr
       label: "Leads",
       subItems: [
         { id: "list", icon: LineChart, label: "Lista de Leads" },
-        { id: "score", icon: LineChart, label: "Score de Leads", requiresAdmin: true },
-        { id: "timeline", icon: Timer, label: "Timeline", requiresAdmin: true },
+        { id: "score", icon: LineChart, label: "Score de Leads", requiresAdmin: !isAdmin },
+        { id: "timeline", icon: Timer, label: "Timeline", requiresAdmin: !isAdmin },
       ],
     },
     { id: "subscription", icon: CreditCard, label: "Assinatura" },
@@ -78,7 +78,7 @@ export function SidebarMenuItems({ activeTab, setActiveTab }: SidebarMenuItemsPr
   ];
 
   const handleMenuClick = (item: any) => {
-    if (item.requiresAdmin && !isAdmin) {
+    if (item.requiresAdmin) {
       toast({
         title: "Recurso Premium",
         description: "Assine para ter acesso a esta funcionalidade.",
@@ -108,7 +108,7 @@ export function SidebarMenuItems({ activeTab, setActiveTab }: SidebarMenuItemsPr
                   activeTab.startsWith(item.id) 
                     ? 'bg-primary/10 text-primary'
                     : 'hover:bg-primary/5'
-                } ${item.requiresAdmin && !isAdmin ? 'opacity-50' : ''}`}
+                } ${item.requiresAdmin ? 'opacity-50' : ''}`}
               >
                 <div className="flex items-center gap-2">
                   <item.icon className="h-4 w-4" />
@@ -131,7 +131,7 @@ export function SidebarMenuItems({ activeTab, setActiveTab }: SidebarMenuItemsPr
                         activeTab === `${item.id}-${subItem.id}`
                           ? 'bg-primary/10 text-primary'
                           : 'hover:bg-primary/5'
-                      } ${subItem.requiresAdmin && !isAdmin ? 'opacity-50' : ''}`}
+                      } ${subItem.requiresAdmin ? 'opacity-50' : ''}`}
                     >
                       <subItem.icon className="h-4 w-4" />
                       <span className="text-sm">{subItem.label}</span>
@@ -148,7 +148,7 @@ export function SidebarMenuItems({ activeTab, setActiveTab }: SidebarMenuItemsPr
                 activeTab === item.id 
                   ? 'bg-primary/10 text-primary'
                   : 'hover:bg-primary/5'
-              } ${item.requiresAdmin && !isAdmin ? 'opacity-50' : ''}`}
+              } ${item.requiresAdmin ? 'opacity-50' : ''}`}
             >
               <item.icon className="h-4 w-4" />
               <span className="font-medium">{item.label}</span>

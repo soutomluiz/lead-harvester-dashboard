@@ -47,8 +47,6 @@ export function ExtractionCards({ setActiveTab }: ExtractionCardsProps) {
     checkUserRole();
   }, []);
 
-  const hasSubscription = isAdmin;
-
   const cards = [
     {
       id: "prospect-form",
@@ -62,19 +60,19 @@ export function ExtractionCards({ setActiveTab }: ExtractionCardsProps) {
       icon: MapPin,
       title: "Google Maps",
       description: "Extraia leads do Google Maps",
-      requiresSubscription: true,
+      requiresSubscription: !isAdmin, // Only require subscription if not admin
     },
     {
       id: "prospect-websites",
       icon: Globe,
       title: "Websites",
       description: "Extraia leads de websites",
-      requiresSubscription: true,
+      requiresSubscription: !isAdmin, // Only require subscription if not admin
     },
   ];
 
   const handleCardClick = (card: typeof cards[0]) => {
-    if (card.requiresSubscription && !hasSubscription) {
+    if (card.requiresSubscription) {
       toast({
         title: "Recurso Premium",
         description: "Assine para ter acesso a esta funcionalidade.",
@@ -93,7 +91,7 @@ export function ExtractionCards({ setActiveTab }: ExtractionCardsProps) {
       <div className="grid gap-6 md:grid-cols-3">
         {cards.map((card) => {
           const Icon = card.icon;
-          const isLocked = card.requiresSubscription && !hasSubscription;
+          const isLocked = card.requiresSubscription;
           
           return (
             <Card

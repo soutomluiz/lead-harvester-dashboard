@@ -17,9 +17,18 @@ export function LoginForm() {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    if (!email || !password) {
+      toast({
+        title: "Campos obrigatórios",
+        description: "Por favor, preencha todos os campos.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     try {
       setIsLoading(true);
-      console.log("Attempting login with email:", email);
+      console.log("Tentando login com email:", email);
 
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
@@ -27,11 +36,11 @@ export function LoginForm() {
       });
 
       if (error) {
-        console.error("Login error:", error);
+        console.error("Erro no login:", error);
         let message = "Erro ao fazer login. Por favor, tente novamente.";
         
         if (error.message.includes("Invalid login credentials")) {
-          message = "Email ou senha incorretos.";
+          message = "Email ou senha incorretos. Verifique suas credenciais.";
         } else if (error.message.includes("Email not confirmed")) {
           message = "Por favor, confirme seu email antes de fazer login.";
         }
@@ -45,7 +54,7 @@ export function LoginForm() {
       }
 
       if (data.user) {
-        console.log("Login successful for user:", data.user.id);
+        console.log("Login bem sucedido para usuário:", data.user.id);
         toast({
           title: "Login realizado com sucesso",
           description: "Bem-vindo de volta!",
@@ -53,7 +62,7 @@ export function LoginForm() {
         navigate("/");
       }
     } catch (error) {
-      console.error("Unexpected error during login:", error);
+      console.error("Erro inesperado durante login:", error);
       toast({
         title: "Erro no login",
         description: "Ocorreu um erro inesperado. Por favor, tente novamente.",

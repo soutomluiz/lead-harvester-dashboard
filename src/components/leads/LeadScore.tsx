@@ -50,7 +50,10 @@ export function LeadScore({ lead }: LeadScoreProps) {
       <Tooltip>
         <TooltipTrigger asChild>
           <div className="flex items-center space-x-2">
-            <Progress value={score} className="w-24" indicatorClassName={getScoreColor(score)} />
+            <Progress 
+              value={score} 
+              className={`w-24 ${getScoreColor(score)}`}
+            />
             <Badge variant={score >= 60 ? "default" : "secondary"}>
               {getScoreLabel(score)}
             </Badge>

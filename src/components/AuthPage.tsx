@@ -118,7 +118,7 @@ export function AuthPage() {
         description: "Você receberá um email de confirmação em instantes.",
       });
       
-      reset(); // Clear form after successful submission
+      reset();
     } catch (error) {
       console.error("Signup error:", error);
       const errorMessage = error instanceof Error ? error.message : "Erro ao criar conta. Por favor, tente novamente.";
@@ -179,6 +179,7 @@ export function AuthPage() {
                     loading_button_label: 'Entrando...',
                     email_input_placeholder: 'Seu email',
                     password_input_placeholder: 'Sua senha',
+                    social_provider_text: 'Entrar com {{provider}}',
                   },
                   forgotten_password: {
                     link_text: 'Esqueceu sua senha?',
@@ -190,6 +191,19 @@ export function AuthPage() {
                 },
               }}
               view="sign_in"
+              showLinks={false}
+              onError={(error) => {
+                console.error("Auth error:", error);
+                let message = "Ocorreu um erro durante a autenticação.";
+                
+                if (error.message.includes("missing email")) {
+                  message = "Por favor, preencha o campo de email.";
+                } else if (error.message.includes("invalid credentials")) {
+                  message = "Email ou senha inválidos.";
+                }
+                
+                setError(message);
+              }}
             />
           </TabsContent>
 

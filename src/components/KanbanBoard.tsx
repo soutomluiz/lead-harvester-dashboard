@@ -5,7 +5,7 @@ import { Lead } from "@/types/lead";
 import { useToast } from "@/components/ui/use-toast";
 import { Loader2 } from "lucide-react";
 
-type PipelineStage = 'novo' | 'contato' | 'proposta' | 'negociacao' | 'fechado' | 'perdido';
+type PipelineStage = 'novo' | 'primeiro_contato' | 'proposta' | 'negociacao' | 'fechado_ganho' | 'fechado_perdido';
 
 interface KanbanColumn {
   id: PipelineStage;
@@ -16,11 +16,11 @@ interface KanbanColumn {
 export function KanbanBoard() {
   const [columns, setColumns] = useState<KanbanColumn[]>([
     { id: 'novo', title: 'Novo', leads: [] },
-    { id: 'contato', title: 'Em Contato', leads: [] },
+    { id: 'primeiro_contato', title: 'Em Contato', leads: [] },
     { id: 'proposta', title: 'Proposta Enviada', leads: [] },
     { id: 'negociacao', title: 'Em Negociação', leads: [] },
-    { id: 'fechado', title: 'Fechado', leads: [] },
-    { id: 'perdido', title: 'Perdido', leads: [] },
+    { id: 'fechado_ganho', title: 'Fechado', leads: [] },
+    { id: 'fechado_perdido', title: 'Perdido', leads: [] },
   ]);
   const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
@@ -39,7 +39,15 @@ export function KanbanBoard() {
         setColumns(prevColumns => 
           prevColumns.map(column => ({
             ...column,
-            leads: leads?.filter(lead => lead.stage === column.id) || []
+            leads: (leads || [])
+              .filter(lead => lead.stage === column.id)
+              .map(lead => ({
+                ...lead,
+                type: lead.type as 'website' | 'place' | 'manual',
+                status: (lead.status || 'new') as 'new' | 'qualified' | 'unqualified' | 'open',
+                deal_value: lead.deal_value || 0,
+                tags: lead.tags || []
+              }))
           }))
         );
       } catch (error) {

@@ -54,6 +54,18 @@ export const SearchResults = ({ results, onAddToLeads }: SearchResultsProps) => 
     setSelectedLeads(new Set());
   };
 
+  const handlePreviousPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(prev => prev - 1);
+    }
+  };
+
+  const handleNextPage = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage(prev => prev + 1);
+    }
+  };
+
   return (
     <div className="mt-6 space-y-4">
       <div className="flex justify-between items-center">
@@ -158,11 +170,16 @@ export const SearchResults = ({ results, onAddToLeads }: SearchResultsProps) => 
         <Pagination className="mt-4">
           <PaginationContent>
             <PaginationItem>
-              <PaginationPrevious 
-                onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
-                className="cursor-pointer"
-                disabled={currentPage === 1}
-              />
+              {currentPage > 1 ? (
+                <PaginationPrevious 
+                  onClick={handlePreviousPage}
+                  className="cursor-pointer"
+                />
+              ) : (
+                <span className="opacity-50">
+                  <PaginationPrevious className="pointer-events-none" />
+                </span>
+              )}
             </PaginationItem>
             {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
               <PaginationItem key={page}>
@@ -176,11 +193,16 @@ export const SearchResults = ({ results, onAddToLeads }: SearchResultsProps) => 
               </PaginationItem>
             ))}
             <PaginationItem>
-              <PaginationNext 
-                onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
-                className="cursor-pointer"
-                disabled={currentPage === totalPages}
-              />
+              {currentPage < totalPages ? (
+                <PaginationNext 
+                  onClick={handleNextPage}
+                  className="cursor-pointer"
+                />
+              ) : (
+                <span className="opacity-50">
+                  <PaginationNext className="pointer-events-none" />
+                </span>
+              )}
             </PaginationItem>
           </PaginationContent>
         </Pagination>

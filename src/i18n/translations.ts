@@ -1,5 +1,8 @@
 export type Language = "pt-BR" | "en" | "es";
 
+// Create a union type of all possible translation keys
+export type TranslationKey = keyof typeof translations["pt-BR"];
+
 export const translations = {
   "pt-BR": {
     "welcomeTour": "Bem-vindo ao nosso sistema! Vamos fazer um tour rápido para você conhecer as principais funcionalidades.",
@@ -11,6 +14,27 @@ export const translations = {
     "profileTour": "Acesse seu perfil, configurações e faça logout do sistema.",
     "tourCompleted": "Tour concluído!",
     "tourCompletedDesc": "Agora você já conhece as principais funcionalidades do sistema. Bom trabalho!",
+    "dashboard": "Dashboard",
+    "manualInput": "Entrada Manual",
+    "googleMaps": "Google Maps",
+    "websites": "Websites",
+    "leadsList": "Lista de Leads",
+    "leadScore": "Pontuação de Leads",
+    "timeline": "Timeline",
+    "reports": "Relatórios",
+    "subscription": "Assinatura",
+    "settings": "Configurações",
+    "language": "Idioma",
+    "selectLanguage": "Selecione o idioma",
+    "hello": "Olá",
+    "profile": "Perfil",
+    "success": "Sucesso",
+    "error": "Erro",
+    "settingsError": "Erro ao atualizar configurações",
+    "addLeads": "Adicionar Leads",
+    "leads": "Leads",
+    "support": "Suporte",
+    "version": "Versão"
   },
   "en": {
     "welcomeTour": "Welcome to our system! Let's take a quick tour to show you the main features.",
@@ -22,6 +46,27 @@ export const translations = {
     "profileTour": "Access your profile, settings and logout from the system.",
     "tourCompleted": "Tour completed!",
     "tourCompletedDesc": "Now you know the main features of the system. Good job!",
+    "dashboard": "Dashboard",
+    "manualInput": "Manual Input",
+    "googleMaps": "Google Maps",
+    "websites": "Websites",
+    "leadsList": "Leads List",
+    "leadScore": "Lead Score",
+    "timeline": "Timeline",
+    "reports": "Reports",
+    "subscription": "Subscription",
+    "settings": "Settings",
+    "language": "Language",
+    "selectLanguage": "Select Language",
+    "hello": "Hello",
+    "profile": "Profile",
+    "success": "Success",
+    "error": "Error",
+    "settingsError": "Error updating settings",
+    "addLeads": "Add Leads",
+    "leads": "Leads",
+    "support": "Support",
+    "version": "Version"
   },
   "es": {
     "welcomeTour": "¡Bienvenido a nuestro sistema! Hagamos un recorrido rápido para mostrarle las características principales.",
@@ -33,5 +78,26 @@ export const translations = {
     "profileTour": "Acceda a su perfil, configuración y cierre sesión en el sistema.",
     "tourCompleted": "¡Recorrido completado!",
     "tourCompletedDesc": "Ahora conoce las principales características del sistema. ¡Buen trabajo!",
+    "dashboard": "Tablero",
+    "manualInput": "Entrada Manual",
+    "googleMaps": "Google Maps",
+    "websites": "Sitios Web",
+    "leadsList": "Lista de Leads",
+    "leadScore": "Puntuación de Leads",
+    "timeline": "Línea de Tiempo",
+    "reports": "Informes",
+    "subscription": "Suscripción",
+    "settings": "Configuraciones",
+    "language": "Idioma",
+    "selectLanguage": "Seleccione el idioma",
+    "hello": "Hola",
+    "profile": "Perfil",
+    "success": "Éxito",
+    "error": "Error",
+    "settingsError": "Error al actualizar configuraciones",
+    "addLeads": "Agregar Leads",
+    "leads": "Leads",
+    "support": "Soporte",
+    "version": "Versión"
   }
 };

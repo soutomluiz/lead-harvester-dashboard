@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import Joyride, { Step, CallBackProps, STATUS, Status } from "react-joyride";
+import Joyride, { Step, CallBackProps, STATUS } from "react-joyride";
 import { useToast } from "@/components/ui/use-toast";
 import { useLanguage } from "@/contexts/LanguageContext";
 
@@ -54,9 +54,9 @@ export function WelcomeTour() {
   ];
 
   const handleJoyrideCallback = (data: CallBackProps) => {
-    const { status, type } = data;
+    const { status } = data;
     
-    if ([STATUS.FINISHED, STATUS.SKIPPED].includes(status as Status)) {
+    if (status === STATUS.FINISHED || status === STATUS.SKIPPED) {
       setRun(false);
       localStorage.setItem("tourCompleted", "true");
       toast({

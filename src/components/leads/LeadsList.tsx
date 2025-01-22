@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Lead } from "@/types/lead";
 import { LeadTable } from "@/components/LeadTable";
-import { Loader2, ListChecks } from "lucide-react";
+import { ListChecks, Loader2 } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 
 const fetchLeads = async () => {
@@ -25,17 +25,9 @@ const fetchLeads = async () => {
 export function LeadsList() {
   const { toast } = useToast();
   const { data: leads = [], isLoading, error } = useQuery({
-    queryKey: ['leads'],
+    queryKey: ['leads-list'],
     queryFn: fetchLeads,
   });
-
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <Loader2 className="h-8 w-8 animate-spin" />
-      </div>
-    );
-  }
 
   if (error) {
     toast({
@@ -47,6 +39,14 @@ export function LeadsList() {
       <div className="flex flex-col items-center justify-center h-64 text-muted-foreground">
         <ListChecks className="h-12 w-12 mb-4" />
         <p>Erro ao carregar leads</p>
+      </div>
+    );
+  }
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <Loader2 className="h-8 w-8 animate-spin" />
       </div>
     );
   }

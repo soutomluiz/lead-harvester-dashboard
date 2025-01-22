@@ -31,14 +31,6 @@ export function LeadTimeline() {
     queryFn: fetchLeads,
   });
 
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <Loader2 className="h-8 w-8 animate-spin" />
-      </div>
-    );
-  }
-
   if (error) {
     toast({
       title: "Erro ao carregar leads",
@@ -49,6 +41,14 @@ export function LeadTimeline() {
       <div className="flex flex-col items-center justify-center h-64 text-muted-foreground">
         <Timer className="h-12 w-12 mb-4" />
         <p>Erro ao carregar timeline</p>
+      </div>
+    );
+  }
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <Loader2 className="h-8 w-8 animate-spin" />
       </div>
     );
   }

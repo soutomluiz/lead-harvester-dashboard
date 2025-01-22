@@ -1,10 +1,10 @@
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { Lead } from "@/types/lead";
 import { Card } from "@/components/ui/card";
 import { LeadScore } from "@/components/leads/LeadScore";
 import { Award, Loader2, Building2, Mail, Phone, Globe } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 const fetchLeads = async () => {
   const { data, error } = await supabase
@@ -30,14 +30,6 @@ export function LeadScorePage() {
     queryFn: fetchLeads,
   });
 
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <Loader2 className="h-8 w-8 animate-spin" />
-      </div>
-    );
-  }
-
   if (error) {
     toast({
       title: "Erro ao carregar leads",
@@ -48,6 +40,14 @@ export function LeadScorePage() {
       <div className="flex flex-col items-center justify-center h-64 text-muted-foreground">
         <Award className="h-12 w-12 mb-4" />
         <p>Erro ao carregar scores</p>
+      </div>
+    );
+  }
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <Loader2 className="h-8 w-8 animate-spin" />
       </div>
     );
   }

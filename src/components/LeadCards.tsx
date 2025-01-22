@@ -22,8 +22,8 @@ export function LeadCards({ setActiveTab }: LeadCardsProps) {
     {
       id: "leads-places",
       icon: MapPin,
-      title: "Leads do Places",
-      description: "Leads extraídos do Google Places",
+      title: "Leads do Google Maps",
+      description: "Leads extraídos do Google Maps",
     },
     {
       id: "leads-websites",

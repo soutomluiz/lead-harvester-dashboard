@@ -10,17 +10,9 @@ import { Card } from "@/components/ui/card";
 import { Lead } from "@/types/lead";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
-import { LeadTableHeader } from "./leads/LeadTableHeader";
 import { LeadTableRow } from "./leads/LeadTableRow";
-import { ArrowUpDown } from "lucide-react";
-import { Button } from "./ui/button";
-
-const statusColors = {
-  new: "bg-gray-100 text-gray-800",
-  qualified: "bg-green-100 text-green-800",
-  unqualified: "bg-red-100 text-red-800",
-  open: "bg-blue-100 text-blue-800",
-} as const;
+import { LeadTableSort } from "./leads/LeadTableSort";
+import { LeadTableFilters } from "./leads/LeadTableFilters";
 
 interface LeadTableProps {
   leads: Lead[];
@@ -123,12 +115,10 @@ export const LeadTable = ({ leads: initialLeads }: LeadTableProps) => {
 
   const handleSaveNote = async (leadId: string) => {
     try {
-      const { data, error } = await supabase
+      const { error } = await supabase
         .from("leads")
         .update({ notes: noteContent })
-        .eq("id", leadId)
-        .select()
-        .single();
+        .eq("id", leadId);
 
       if (error) throw error;
 
@@ -140,14 +130,14 @@ export const LeadTable = ({ leads: initialLeads }: LeadTableProps) => {
       setNoteContent("");
       
       toast({
-        title: "Note saved successfully",
-        description: "The lead note has been updated.",
+        title: "Nota salva",
+        description: "A nota do lead foi atualizada com sucesso.",
       });
     } catch (error) {
       console.error("Error saving note:", error);
       toast({
-        title: "Error saving note",
-        description: "There was a problem saving the note. Please try again.",
+        title: "Erro ao salvar nota",
+        description: "Não foi possível salvar a nota do lead.",
         variant: "destructive",
       });
     }
@@ -167,7 +157,8 @@ export const LeadTable = ({ leads: initialLeads }: LeadTableProps) => {
       "Email",
       "Phone",
       "Notes",
-      "Status"
+      "Status",
+      "Tags"
     ];
 
     const csvContent = [
@@ -181,7 +172,8 @@ export const LeadTable = ({ leads: initialLeads }: LeadTableProps) => {
           lead.email,
           lead.phone,
           lead.notes,
-          lead.status
+          lead.status,
+          lead.tags.join(";")
         ]
           .map((field) => `"${field || ""}"`)
           .join(",")
@@ -207,7 +199,6 @@ export const LeadTable = ({ leads: initialLeads }: LeadTableProps) => {
       let aValue = a[sortConfig.key!];
       let bValue = b[sortConfig.key!];
 
-      // Handle special cases for certain columns
       if (sortConfig.key === 'location') {
         aValue = capitalizeFirstLetter(aValue as string | null);
         bValue = capitalizeFirstLetter(bValue as string | null);
@@ -245,58 +236,38 @@ export const LeadTable = ({ leads: initialLeads }: LeadTableProps) => {
     location: capitalizeFirstLetter(lead.location)
   }));
 
-  const renderSortIcon = (columnKey: keyof Lead) => {
-    return (
-      <Button
-        variant="ghost"
-        onClick={() => handleSort(columnKey)}
-        className="h-8 w-8 p-0 ml-2 hover:bg-transparent"
-      >
-        <ArrowUpDown className={`h-4 w-4 ${
-          sortConfig.key === columnKey 
-            ? sortConfig.direction === 'asc'
-              ? 'text-primary rotate-180'
-              : 'text-primary'
-            : 'text-muted-foreground'
-        }`} />
-      </Button>
-    );
-  };
-
   return (
     <Card className="w-full">
-      <LeadTableHeader
+      <LeadTableFilters
         searchTerm={searchTerm}
         onSearchChange={setSearchTerm}
         filters={filters}
         onFiltersChange={setFilters}
         onExportCSV={handleExportCSV}
-        sortConfig={sortConfig}
-        onSort={handleSort}
       />
       <Table>
         <TableHeader>
           <TableRow>
             <TableHead className="whitespace-nowrap">
-              Company Name {renderSortIcon('company_name')}
+              Company Name <LeadTableSort columnKey="company_name" sortConfig={sortConfig} onSort={handleSort} />
             </TableHead>
             <TableHead className="whitespace-nowrap">
-              Status {renderSortIcon('status')}
+              Status <LeadTableSort columnKey="status" sortConfig={sortConfig} onSort={handleSort} />
             </TableHead>
             <TableHead className="whitespace-nowrap">
-              Industry {renderSortIcon('industry')}
+              Industry <LeadTableSort columnKey="industry" sortConfig={sortConfig} onSort={handleSort} />
             </TableHead>
             <TableHead className="whitespace-nowrap">
-              Location {renderSortIcon('location')}
+              Location <LeadTableSort columnKey="location" sortConfig={sortConfig} onSort={handleSort} />
             </TableHead>
             <TableHead className="whitespace-nowrap">
-              Contact Name {renderSortIcon('contact_name')}
+              Contact Name <LeadTableSort columnKey="contact_name" sortConfig={sortConfig} onSort={handleSort} />
             </TableHead>
             <TableHead className="whitespace-nowrap">
-              Email {renderSortIcon('email')}
+              Email <LeadTableSort columnKey="email" sortConfig={sortConfig} onSort={handleSort} />
             </TableHead>
             <TableHead className="whitespace-nowrap">
-              Phone {renderSortIcon('phone')}
+              Phone <LeadTableSort columnKey="phone" sortConfig={sortConfig} onSort={handleSort} />
             </TableHead>
             <TableHead>Notes</TableHead>
             <TableHead>Tags</TableHead>
@@ -309,7 +280,6 @@ export const LeadTable = ({ leads: initialLeads }: LeadTableProps) => {
               lead={lead}
               editingNoteId={editingNoteId}
               noteContent={noteContent}
-              statusColors={statusColors}
               onStatusChange={handleStatusChange}
               onEditNote={handleEditNote}
               onSaveNote={handleSaveNote}

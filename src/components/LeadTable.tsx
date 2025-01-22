@@ -170,8 +170,14 @@ export const LeadTable = ({ leads: initialLeads }: LeadTableProps) => {
       (lead.email?.toLowerCase() || "").includes(searchTerm.toLowerCase());
 
     const matchesFilters = Object.entries(filters).every(([key, value]) => {
-      if (!value) return true;
+      if (!value || (Array.isArray(value) && value.length === 0)) return true;
       const leadValue = lead[key as keyof Lead];
+      
+      if (key === 'tags') {
+        const leadTags = leadValue as string[] || [];
+        return (value as string[]).every(tag => leadTags.includes(tag));
+      }
+      
       return typeof leadValue === 'string' ? 
         leadValue.toLowerCase().includes(value.toString().toLowerCase()) : 
         leadValue === value;

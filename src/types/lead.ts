@@ -18,4 +18,5 @@ export interface Lead {
   notes?: string | null;
   status: 'new' | 'qualified' | 'unqualified' | 'open';
   deal_value: number;
+  tags: string[];
 }

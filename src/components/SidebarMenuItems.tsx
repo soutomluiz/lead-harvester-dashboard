@@ -1,4 +1,4 @@
-import { Database, Users, MapPin, Globe, Settings, CreditCard, PlusCircle, LayoutDashboard, Crown, ChevronDown } from "lucide-react";
+import { Database, Users, MapPin, Globe, Settings, CreditCard, PlusCircle, LayoutDashboard, Crown, ChevronDown, KanbanSquare, Timer, LineChart } from "lucide-react";
 import {
   SidebarMenu,
   SidebarMenuItem,
@@ -55,10 +55,9 @@ export function SidebarMenuItems({ activeTab, setActiveTab }: SidebarMenuItemsPr
 
     checkUserRole();
 
-    // Listen for subscription success message
     const handleMessage = (event: MessageEvent) => {
       if (event.data === 'checkout_complete') {
-        checkUserRole(); // Recheck user role after subscription
+        checkUserRole();
       }
     };
 
@@ -87,6 +86,12 @@ export function SidebarMenuItems({ activeTab, setActiveTab }: SidebarMenuItemsPr
   const menuItems = [
     { id: "dashboard", icon: LayoutDashboard, label: "Dashboard" },
     {
+      id: "pipeline",
+      icon: KanbanSquare,
+      label: "Pipeline",
+      requiresSubscription: true,
+    },
+    {
       id: "prospect",
       icon: Database,
       label: "Adicionar Leads",
@@ -106,7 +111,26 @@ export function SidebarMenuItems({ activeTab, setActiveTab }: SidebarMenuItemsPr
         },
       ],
     },
-    { id: "leads", icon: Users, label: "Leads" },
+    { 
+      id: "leads", 
+      icon: Users, 
+      label: "Leads",
+      subItems: [
+        { id: "list", icon: LineChart, label: "Lista de Leads" },
+        { 
+          id: "score", 
+          icon: Crown, 
+          label: "Score de Leads",
+          requiresSubscription: true
+        },
+        { 
+          id: "timeline", 
+          icon: Timer, 
+          label: "Timeline",
+          requiresSubscription: true
+        },
+      ],
+    },
     { id: "subscription", icon: CreditCard, label: "Assinatura" },
     { id: "config", icon: Settings, label: "Configurações" },
   ];
@@ -178,15 +202,24 @@ export function SidebarMenuItems({ activeTab, setActiveTab }: SidebarMenuItemsPr
           ) : (
             <SidebarMenuButton
               isActive={activeTab === item.id}
-              onClick={() => setActiveTab(item.id)}
+              onClick={() => {
+                if (item.requiresSubscription && !hasSubscription) {
+                  handleSubscriptionRequired();
+                } else {
+                  setActiveTab(item.id);
+                }
+              }}
               className={`w-full flex items-center gap-2 transition-colors ${
                 activeTab === item.id 
                   ? 'bg-primary/10 text-primary'
                   : 'hover:bg-primary/5'
-              }`}
+              } ${item.requiresSubscription && !hasSubscription ? 'opacity-50' : ''}`}
             >
               <item.icon className="h-4 w-4" />
               <span className="font-medium">{item.label}</span>
+              {item.requiresSubscription && !hasSubscription && (
+                <Crown className="h-4 w-4 text-yellow-500 ml-auto" />
+              )}
             </SidebarMenuButton>
           )}
         </SidebarMenuItem>

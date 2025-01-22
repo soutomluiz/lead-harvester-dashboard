@@ -20,12 +20,15 @@ export type Database = {
           extraction_date: string | null
           id: string
           industry: string | null
+          kanban_order: number | null
           last_exported_at: string | null
+          last_interaction_at: string | null
           location: string | null
           notes: string | null
           opening_date: string | null
           phone: string | null
           rating: number | null
+          stage: Database["public"]["Enums"]["pipeline_stage"] | null
           status: string | null
           tags: string[] | null
           type: string | null
@@ -43,12 +46,15 @@ export type Database = {
           extraction_date?: string | null
           id?: string
           industry?: string | null
+          kanban_order?: number | null
           last_exported_at?: string | null
+          last_interaction_at?: string | null
           location?: string | null
           notes?: string | null
           opening_date?: string | null
           phone?: string | null
           rating?: number | null
+          stage?: Database["public"]["Enums"]["pipeline_stage"] | null
           status?: string | null
           tags?: string[] | null
           type?: string | null
@@ -66,12 +72,15 @@ export type Database = {
           extraction_date?: string | null
           id?: string
           industry?: string | null
+          kanban_order?: number | null
           last_exported_at?: string | null
+          last_interaction_at?: string | null
           location?: string | null
           notes?: string | null
           opening_date?: string | null
           phone?: string | null
           rating?: number | null
+          stage?: Database["public"]["Enums"]["pipeline_stage"] | null
           status?: string | null
           tags?: string[] | null
           type?: string | null
@@ -158,6 +167,14 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
+      pipeline_stage:
+        | "novo"
+        | "primeiro_contato"
+        | "qualificacao"
+        | "proposta"
+        | "negociacao"
+        | "fechado_ganho"
+        | "fechado_perdido"
       user_role: "admin" | "user"
     }
     CompositeTypes: {

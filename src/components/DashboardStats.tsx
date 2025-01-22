@@ -1,13 +1,12 @@
 import { Lead } from "@/types/lead";
 import { SearchResult } from "@/types/search";
-import { Mail, Phone, Users, Target, Building2, MapPin, TrendingUp, DollarSign, LineChart, Calendar, Clock, Briefcase } from "lucide-react";
+import { Mail, Phone, Users, Target, Building2, MapPin, Clock, Briefcase } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { StatCard } from "./stats/StatCard";
 import { LeadsOriginChart } from "./stats/LeadsOriginChart";
 import { IndustriesChart } from "./stats/IndustriesChart";
 import { LeadsTimelineChart } from "./stats/LeadsTimelineChart";
 import { LeadStatusChart } from "./stats/LeadStatusChart";
-import { DealValueChart } from "./stats/DealValueChart";
 import { format, parseISO, differenceInDays } from "date-fns";
 
 interface DashboardStatsProps {
@@ -45,11 +44,9 @@ export function DashboardStats({ leads, results, searchType }: DashboardStatsPro
     const withLocation = leads.filter(lead => lead.location).length;
     const withWebsite = leads.filter(lead => lead.website).length;
     const withIndustry = leads.filter(lead => lead.industry).length;
-    const totalDealValue = leads.reduce((sum, lead) => sum + (lead.deal_value || 0), 0);
     const qualifiedLeads = leads.filter(lead => lead.status === 'qualified').length;
     
     // New metrics
-    const averageDealValue = totalLeads > 0 ? totalDealValue / totalLeads : 0;
     const leadsWithTags = leads.filter(lead => lead.tags && lead.tags.length > 0).length;
     const recentLeads = leads.filter(lead => {
       if (!lead.created_at) return false;
@@ -64,27 +61,6 @@ export function DashboardStats({ leads, results, searchType }: DashboardStatsPro
         icon: Users,
         color: "text-blue-500",
         description: "Leads cadastrados"
-      },
-      {
-        title: "Valor Total",
-        value: new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(totalDealValue),
-        icon: DollarSign,
-        color: "text-green-500",
-        description: "Valor total dos deals"
-      },
-      {
-        title: "Leads Qualificados",
-        value: qualifiedLeads,
-        icon: TrendingUp,
-        color: "text-purple-500",
-        description: "Leads qualificados"
-      },
-      {
-        title: "Média por Lead",
-        value: new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(averageDealValue),
-        icon: Calendar,
-        color: "text-orange-500",
-        description: "Valor médio por lead"
       },
       {
         title: "Leads Recentes",
@@ -153,15 +129,6 @@ export function DashboardStats({ leads, results, searchType }: DashboardStatsPro
               <LeadsOriginChart leads={leads} chartConfig={chartConfig} />
             </div>
           </Card>
-          <Card className="p-6 flex flex-col">
-            <h3 className="text-lg font-semibold mb-4">Valor dos Deals</h3>
-            <div className="flex-1 w-full min-h-[300px]">
-              <DealValueChart leads={leads} chartConfig={chartConfig} />
-            </div>
-          </Card>
-        </div>
-
-        <div className="grid gap-4 md:grid-cols-2">
           <Card className="p-6 flex flex-col">
             <h3 className="text-lg font-semibold mb-4">Top 5 Indústrias</h3>
             <div className="flex-1 w-full min-h-[300px]">

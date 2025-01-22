@@ -207,7 +207,8 @@ export const LeadTable = ({ leads: initialLeads }: LeadTableProps) => {
             <TableHead>Email</TableHead>
             <TableHead>Phone</TableHead>
             <TableHead>Notes</TableHead>
-            <TableHead>Actions</TableHead>
+            <TableHead>Score</TableHead>
+            <TableHead>Tags</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>

@@ -1,6 +1,6 @@
 import { Lead } from "@/types/lead";
 import { SearchResult } from "@/types/search";
-import { Mail, Phone, Users, Target, Building2, MapPin, TrendingUp, DollarSign, LineChart } from "lucide-react";
+import { Mail, Phone, Users, Target, Building2, MapPin, TrendingUp, DollarSign, LineChart, Calendar, Clock, Briefcase } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { StatCard } from "./stats/StatCard";
 import { LeadsOriginChart } from "./stats/LeadsOriginChart";
@@ -8,6 +8,7 @@ import { IndustriesChart } from "./stats/IndustriesChart";
 import { LeadsTimelineChart } from "./stats/LeadsTimelineChart";
 import { LeadStatusChart } from "./stats/LeadStatusChart";
 import { DealValueChart } from "./stats/DealValueChart";
+import { format, parseISO, differenceInDays } from "date-fns";
 
 interface DashboardStatsProps {
   leads?: Lead[];
@@ -46,6 +47,15 @@ export function DashboardStats({ leads, results, searchType }: DashboardStatsPro
     const withIndustry = leads.filter(lead => lead.industry).length;
     const totalDealValue = leads.reduce((sum, lead) => sum + (lead.deal_value || 0), 0);
     const qualifiedLeads = leads.filter(lead => lead.status === 'qualified').length;
+    
+    // New metrics
+    const averageDealValue = totalLeads > 0 ? totalDealValue / totalLeads : 0;
+    const leadsWithTags = leads.filter(lead => lead.tags && lead.tags.length > 0).length;
+    const recentLeads = leads.filter(lead => {
+      if (!lead.created_at) return false;
+      const daysDiff = differenceInDays(new Date(), parseISO(lead.created_at));
+      return daysDiff <= 30;
+    }).length;
 
     const stats = [
       {
@@ -57,7 +67,7 @@ export function DashboardStats({ leads, results, searchType }: DashboardStatsPro
       },
       {
         title: "Valor Total",
-        value: totalDealValue,
+        value: new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(totalDealValue),
         icon: DollarSign,
         color: "text-green-500",
         description: "Valor total dos deals"
@@ -70,24 +80,45 @@ export function DashboardStats({ leads, results, searchType }: DashboardStatsPro
         description: "Leads qualificados"
       },
       {
+        title: "Média por Lead",
+        value: new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(averageDealValue),
+        icon: Calendar,
+        color: "text-orange-500",
+        description: "Valor médio por lead"
+      },
+      {
+        title: "Leads Recentes",
+        value: recentLeads,
+        icon: Clock,
+        color: "text-yellow-500",
+        description: "Últimos 30 dias"
+      },
+      {
+        title: "Com Tags",
+        value: leadsWithTags,
+        icon: Target,
+        color: "text-pink-500",
+        description: "Leads com tags"
+      },
+      {
         title: "Com Email",
         value: emailsFound,
         icon: Mail,
-        color: "text-orange-500",
+        color: "text-indigo-500",
         description: "Contatos com email"
       },
       {
         title: "Com Telefone",
         value: phonesFound,
         icon: Phone,
-        color: "text-pink-500",
+        color: "text-cyan-500",
         description: "Contatos com telefone"
       },
       {
         title: "Com Website",
         value: withWebsite,
         icon: Building2,
-        color: "text-indigo-500",
+        color: "text-teal-500",
         description: "Com site"
       },
     ];

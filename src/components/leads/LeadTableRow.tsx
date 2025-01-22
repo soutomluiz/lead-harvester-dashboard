@@ -2,15 +2,9 @@ import { Lead } from "@/types/lead";
 import { TableCell, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Edit2, Save } from "lucide-react";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
+import { LeadScore } from "./LeadScore";
 
 interface LeadTableRowProps {
   lead: Lead;
@@ -24,7 +18,7 @@ interface LeadTableRowProps {
   onNoteContentChange: (content: string) => void;
 }
 
-export const LeadTableRow = ({
+export function LeadTableRow({
   lead,
   editingNoteId,
   noteContent,
@@ -34,7 +28,7 @@ export const LeadTableRow = ({
   onEditNote,
   onSaveNote,
   onNoteContentChange,
-}: LeadTableRowProps) => {
+}: LeadTableRowProps) {
   return (
     <TableRow key={lead.id}>
       <TableCell>{lead.company_name}</TableCell>
@@ -43,14 +37,14 @@ export const LeadTableRow = ({
           value={lead.status || "new"}
           onValueChange={(value) => onStatusChange(lead.id, value as Lead["status"])}
         >
-          <SelectTrigger className={`w-32 ${statusColors[lead.status as keyof typeof statusColors] || statusColors.new}`}>
+          <SelectTrigger className="w-32">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="new">New</SelectItem>
-            <SelectItem value="qualified">Qualified</SelectItem>
-            <SelectItem value="unqualified">Unqualified</SelectItem>
-            <SelectItem value="open">Open</SelectItem>
+            <SelectItem value="new">Novo</SelectItem>
+            <SelectItem value="qualified">Qualificado</SelectItem>
+            <SelectItem value="unqualified">Não Qualificado</SelectItem>
+            <SelectItem value="open">Em Aberto</SelectItem>
           </SelectContent>
         </Select>
       </TableCell>
@@ -58,45 +52,48 @@ export const LeadTableRow = ({
         <Input
           type="number"
           value={lead.deal_value || 0}
-          onChange={(e) => onDealValueChange(lead.id, parseFloat(e.target.value))}
-          className="w-24"
+          onChange={(e) => onDealValueChange(lead.id, Number(e.target.value))}
+          className="w-32"
         />
       </TableCell>
-      <TableCell>{lead.industry}</TableCell>
-      <TableCell>{lead.location}</TableCell>
-      <TableCell>{lead.contact_name}</TableCell>
-      <TableCell>{lead.email}</TableCell>
-      <TableCell>{lead.phone}</TableCell>
+      <TableCell>{lead.industry || "-"}</TableCell>
+      <TableCell>{lead.location || "-"}</TableCell>
+      <TableCell>{lead.contact_name || "-"}</TableCell>
+      <TableCell>{lead.email || "-"}</TableCell>
+      <TableCell>{lead.phone || "-"}</TableCell>
       <TableCell>
         {editingNoteId === lead.id ? (
-          <Textarea
-            value={noteContent}
-            onChange={(e) => onNoteContentChange(e.target.value)}
-            className="min-h-[100px]"
-          />
+          <div className="flex gap-2">
+            <Input
+              value={noteContent}
+              onChange={(e) => onNoteContentChange(e.target.value)}
+              className="flex-1"
+            />
+            <Button size="sm" onClick={() => onSaveNote(lead.id)}>
+              Save
+            </Button>
+          </div>
         ) : (
-          <div className="max-w-[200px] truncate">{lead.notes}</div>
+          <div className="flex gap-2 items-center">
+            <span className="truncate max-w-[200px]">{lead.notes || "-"}</span>
+            <Button size="sm" variant="ghost" onClick={() => onEditNote(lead)}>
+              Edit
+            </Button>
+          </div>
         )}
       </TableCell>
       <TableCell>
-        {editingNoteId === lead.id ? (
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => onSaveNote(lead.id)}
-          >
-            <Save className="h-4 w-4" />
-          </Button>
-        ) : (
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => onEditNote(lead)}
-          >
-            <Edit2 className="h-4 w-4" />
-          </Button>
-        )}
+        <LeadScore lead={lead} />
+      </TableCell>
+      <TableCell>
+        <div className="flex flex-wrap gap-1">
+          {lead.tags?.map((tag) => (
+            <Badge key={tag} variant="secondary">
+              {tag}
+            </Badge>
+          ))}
+        </div>
       </TableCell>
     </TableRow>
   );
-};
+}

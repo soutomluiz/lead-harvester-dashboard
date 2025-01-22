@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
@@ -9,13 +9,26 @@ import { ptBR } from "date-fns/locale";
 
 interface ReportsFiltersProps {
   onFilterChange: (filters: any) => void;
+  currentFilters: {
+    dateRange: "today" | "week" | "month" | "custom";
+    customDate?: Date;
+    leadType: string;
+    leadStatus: string;
+  };
 }
 
-export function ReportsFilters({ onFilterChange }: ReportsFiltersProps) {
-  const [dateRange, setDateRange] = useState<"today" | "week" | "month" | "custom">("month");
-  const [customDate, setCustomDate] = useState<Date | undefined>(undefined);
-  const [leadType, setLeadType] = useState<string>("all");
-  const [leadStatus, setLeadStatus] = useState<string>("all");
+export function ReportsFilters({ onFilterChange, currentFilters }: ReportsFiltersProps) {
+  const [dateRange, setDateRange] = useState<"today" | "week" | "month" | "custom">(currentFilters.dateRange);
+  const [customDate, setCustomDate] = useState<Date | undefined>(currentFilters.customDate);
+  const [leadType, setLeadType] = useState<string>(currentFilters.leadType);
+  const [leadStatus, setLeadStatus] = useState<string>(currentFilters.leadStatus);
+
+  useEffect(() => {
+    setDateRange(currentFilters.dateRange);
+    setCustomDate(currentFilters.customDate);
+    setLeadType(currentFilters.leadType);
+    setLeadStatus(currentFilters.leadStatus);
+  }, [currentFilters]);
 
   const handleFilterChange = (key: string, value: any) => {
     if (key === "dateRange") {

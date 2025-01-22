@@ -14,8 +14,8 @@ import { startOfDay, subDays, subWeeks, subMonths, parseISO } from 'date-fns';
 
 export function ReportsPage() {
   const [filters, setFilters] = useState({
-    dateRange: "month",
-    customDate: undefined,
+    dateRange: "month" as "today" | "week" | "month" | "custom",
+    customDate: undefined as Date | undefined,
     leadType: "all",
     leadStatus: "all"
   });
@@ -68,7 +68,7 @@ export function ReportsPage() {
 
   return (
     <div className="space-y-6 p-6">
-      <ReportsFilters onFilterChange={setFilters} />
+      <ReportsFilters onFilterChange={setFilters} currentFilters={filters} />
 
       <div className="grid gap-4 md:grid-cols-2">
         <DealMetricsCard leads={filteredLeads} />

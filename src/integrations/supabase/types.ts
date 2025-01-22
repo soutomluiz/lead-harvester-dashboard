@@ -20,12 +20,14 @@ export type Database = {
           extraction_date: string | null
           id: string
           industry: string | null
+          last_exported_at: string | null
           location: string | null
           notes: string | null
           opening_date: string | null
           phone: string | null
           rating: number | null
           status: string | null
+          tags: string[] | null
           type: string | null
           user_id: string
           user_ratings_total: number | null
@@ -41,12 +43,14 @@ export type Database = {
           extraction_date?: string | null
           id?: string
           industry?: string | null
+          last_exported_at?: string | null
           location?: string | null
           notes?: string | null
           opening_date?: string | null
           phone?: string | null
           rating?: number | null
           status?: string | null
+          tags?: string[] | null
           type?: string | null
           user_id: string
           user_ratings_total?: number | null
@@ -62,12 +66,14 @@ export type Database = {
           extraction_date?: string | null
           id?: string
           industry?: string | null
+          last_exported_at?: string | null
           location?: string | null
           notes?: string | null
           opening_date?: string | null
           phone?: string | null
           rating?: number | null
           status?: string | null
+          tags?: string[] | null
           type?: string | null
           user_id?: string
           user_ratings_total?: number | null

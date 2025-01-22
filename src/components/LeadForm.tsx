@@ -1,141 +1,227 @@
-import { useState } from "react";
-import { Card } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import * as z from "zod";
 import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
-import { toast } from "sonner";
-import { supabase } from "@/integrations/supabase/client";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { TagInput } from "@/components/TagInput";
+import { Lead } from "@/types/lead";
 
-export const LeadForm = ({ onSubmit }: { onSubmit: (data: any) => void }) => {
-  const [formData, setFormData] = useState({
-    company_name: "",
-    industry: "",
-    location: "",
-    contact_name: "",
-    email: "",
-    phone: "",
+const formSchema = z.object({
+  company_name: z.string().min(2, {
+    message: "Nome da empresa deve ter pelo menos 2 caracteres.",
+  }),
+  contact_name: z.string().optional(),
+  email: z.string().email().optional().or(z.literal("")),
+  phone: z.string().optional(),
+  website: z.string().url().optional().or(z.literal("")),
+  industry: z.string().optional(),
+  location: z.string().optional(),
+  deal_value: z.number().optional(),
+  notes: z.string().optional(),
+  status: z.string().optional(),
+  tags: z.array(z.string()).default([]),
+});
+
+interface LeadFormProps {
+  onSubmit: (data: Partial<Lead>) => void;
+  initialData?: Partial<Lead>;
+}
+
+export const LeadForm = ({ onSubmit, initialData }: LeadFormProps) => {
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      company_name: initialData?.company_name || "",
+      contact_name: initialData?.contact_name || "",
+      email: initialData?.email || "",
+      phone: initialData?.phone || "",
+      website: initialData?.website || "",
+      industry: initialData?.industry || "",
+      location: initialData?.location || "",
+      deal_value: initialData?.deal_value || 0,
+      notes: initialData?.notes || "",
+      status: initialData?.status || "novo",
+      tags: initialData?.tags || [],
+    },
   });
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        toast.error("Você precisa estar logado para adicionar leads.");
-        return;
-      }
-
-      const newLead = {
-        ...formData,
-        type: 'manual',
-        user_id: user.id
-      };
-
-      const { error } = await supabase
-        .from('leads')
-        .insert([newLead]);
-
-      if (error) throw error;
-
-      onSubmit(newLead);
-      setFormData({
-        company_name: "",
-        industry: "",
-        location: "",
-        contact_name: "",
-        email: "",
-        phone: "",
-      });
-      toast.success("Lead adicionado com sucesso!");
-    } catch (error) {
-      console.error("Erro ao adicionar lead:", error);
-      toast.error("Erro ao adicionar lead. Tente novamente.");
-    }
-  };
-
   return (
-    <Card className="w-full max-w-md p-6 space-y-6 animate-fadeIn">
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div className="space-y-2">
-          <Label htmlFor="company_name">Nome da Empresa</Label>
-          <Input
-            id="company_name"
-            value={formData.company_name}
-            onChange={(e) =>
-              setFormData({ ...formData, company_name: e.target.value })
-            }
-            required
-            className="w-full"
-          />
-        </div>
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+        <FormField
+          control={form.control}
+          name="company_name"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Nome da Empresa</FormLabel>
+              <FormControl>
+                <Input placeholder="Digite o nome da empresa" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
-        <div className="space-y-2">
-          <Label htmlFor="industry">Indústria/Nicho</Label>
-          <Input
-            id="industry"
-            value={formData.industry}
-            onChange={(e) =>
-              setFormData({ ...formData, industry: e.target.value })
-            }
-            required
-            className="w-full"
-          />
-        </div>
+        <FormField
+          control={form.control}
+          name="contact_name"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Nome do Contato</FormLabel>
+              <FormControl>
+                <Input placeholder="Digite o nome do contato" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
-        <div className="space-y-2">
-          <Label htmlFor="location">Localização</Label>
-          <Input
-            id="location"
-            value={formData.location}
-            onChange={(e) =>
-              setFormData({ ...formData, location: e.target.value })
-            }
-            required
-            className="w-full"
-          />
-        </div>
+        <FormField
+          control={form.control}
+          name="email"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Email</FormLabel>
+              <FormControl>
+                <Input placeholder="Digite o email" type="email" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
-        <div className="space-y-2">
-          <Label htmlFor="contact_name">Nome do Contato</Label>
-          <Input
-            id="contact_name"
-            value={formData.contact_name}
-            onChange={(e) =>
-              setFormData({ ...formData, contact_name: e.target.value })
-            }
-            required
-            className="w-full"
-          />
-        </div>
+        <FormField
+          control={form.control}
+          name="phone"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Telefone</FormLabel>
+              <FormControl>
+                <Input placeholder="Digite o telefone" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
-        <div className="space-y-2">
-          <Label htmlFor="email">Email</Label>
-          <Input
-            id="email"
-            type="email"
-            value={formData.email}
-            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-            required
-            className="w-full"
-          />
-        </div>
+        <FormField
+          control={form.control}
+          name="website"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Website</FormLabel>
+              <FormControl>
+                <Input placeholder="Digite o website" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
-        <div className="space-y-2">
-          <Label htmlFor="phone">Telefone</Label>
-          <Input
-            id="phone"
-            type="tel"
-            value={formData.phone}
-            onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-            required
-            className="w-full"
-          />
-        </div>
+        <FormField
+          control={form.control}
+          name="industry"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Indústria</FormLabel>
+              <FormControl>
+                <Input placeholder="Digite a indústria" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="location"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Localização</FormLabel>
+              <FormControl>
+                <Input placeholder="Digite a localização" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="deal_value"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Valor do Negócio</FormLabel>
+              <FormControl>
+                <Input
+                  placeholder="Digite o valor do negócio"
+                  type="number"
+                  {...field}
+                  onChange={(e) => field.onChange(Number(e.target.value))}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="notes"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Notas</FormLabel>
+              <FormControl>
+                <Input placeholder="Digite as notas" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="status"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Status</FormLabel>
+              <FormControl>
+                <Input placeholder="Digite o status" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="tags"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Tags</FormLabel>
+              <FormControl>
+                <TagInput
+                  tags={field.value || []}
+                  onChange={(newTags) => field.onChange(newTags)}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
         <Button type="submit" className="w-full">
-          Adicionar Lead
+          Salvar Lead
         </Button>
       </form>
-    </Card>
+    </Form>
   );
 };

@@ -8,6 +8,7 @@ import Index from "@/pages/Index";
 import { supabase } from "@/integrations/supabase/client";
 import { Loader2 } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
+import { LanguageProvider } from "@/contexts/LanguageContext";
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
@@ -91,33 +92,35 @@ function App() {
   }
 
   return (
-    <Router>
-      <Routes>
-        <Route
-          path="/"
-          element={
-            isAuthenticated ? (
-              <Index />
-            ) : (
-              <Navigate to="/login" replace />
-            )
-          }
-        />
-        <Route
-          path="/login"
-          element={
-            !isAuthenticated ? (
-              <AuthPage />
-            ) : (
-              <Navigate to="/" replace />
-            )
-          }
-        />
-        <Route path="/pricing" element={<PricingPage />} />
-        <Route path="/subscription/success" element={<SubscriptionSuccess />} />
-      </Routes>
-      <Toaster />
-    </Router>
+    <LanguageProvider>
+      <Router>
+        <Routes>
+          <Route
+            path="/"
+            element={
+              isAuthenticated ? (
+                <Index />
+              ) : (
+                <Navigate to="/login" replace />
+              )
+            }
+          />
+          <Route
+            path="/login"
+            element={
+              !isAuthenticated ? (
+                <AuthPage />
+              ) : (
+                <Navigate to="/" replace />
+              )
+            }
+          />
+          <Route path="/pricing" element={<PricingPage />} />
+          <Route path="/subscription/success" element={<SubscriptionSuccess />} />
+        </Routes>
+        <Toaster />
+      </Router>
+    </LanguageProvider>
   );
 }
 

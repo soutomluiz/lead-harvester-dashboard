@@ -22,11 +22,18 @@ export const ProspectingForm = ({
   const { toast } = useToast();
   const navigate = useNavigate();
 
+  const capitalizeFirstLetter = (string: string) => {
+    return string.split(' ').map(word => 
+      word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+    ).join(' ');
+  };
+
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
 
-    const searchQuery = `${industry} em ${location}`;
+    const capitalizedLocation = capitalizeFirstLetter(location);
+    const searchQuery = `${industry} em ${capitalizedLocation}`;
 
     try {
       const { data: { user } } = await supabase.auth.getUser();
@@ -66,7 +73,7 @@ export const ProspectingForm = ({
             phone: result.formatted_phone_number || "",
             email: "",
             keyword: industry,
-            city: location,
+            city: capitalizedLocation,
             extractionDate: new Date().toISOString(),
             rating: result.rating,
             user_ratings_total: result.user_ratings_total,
@@ -95,7 +102,11 @@ export const ProspectingForm = ({
         if (error) throw error;
 
         if (data.results) {
-          setResults(data.results);
+          const formattedResults = data.results.map((result: SearchResult) => ({
+            ...result,
+            city: capitalizedLocation
+          }));
+          setResults(formattedResults);
           toast({
             title: "Busca realizada com sucesso",
             description: `Encontrados ${data.results.length} resultados`,

@@ -250,7 +250,7 @@ export const LeadTable = ({ leads: initialLeads }: LeadTableProps) => {
       <Button
         variant="ghost"
         onClick={() => handleSort(columnKey)}
-        className="h-8 w-8 p-0"
+        className="h-8 w-8 p-0 ml-2 hover:bg-transparent"
       >
         <ArrowUpDown className={`h-4 w-4 ${
           sortConfig.key === columnKey 
@@ -277,25 +277,25 @@ export const LeadTable = ({ leads: initialLeads }: LeadTableProps) => {
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead className="flex items-center gap-2">
+            <TableHead className="whitespace-nowrap">
               Company Name {renderSortIcon('company_name')}
             </TableHead>
-            <TableHead className="flex items-center gap-2">
+            <TableHead className="whitespace-nowrap">
               Status {renderSortIcon('status')}
             </TableHead>
-            <TableHead className="flex items-center gap-2">
+            <TableHead className="whitespace-nowrap">
               Industry {renderSortIcon('industry')}
             </TableHead>
-            <TableHead className="flex items-center gap-2">
+            <TableHead className="whitespace-nowrap">
               Location {renderSortIcon('location')}
             </TableHead>
-            <TableHead className="flex items-center gap-2">
+            <TableHead className="whitespace-nowrap">
               Contact Name {renderSortIcon('contact_name')}
             </TableHead>
-            <TableHead className="flex items-center gap-2">
+            <TableHead className="whitespace-nowrap">
               Email {renderSortIcon('email')}
             </TableHead>
-            <TableHead className="flex items-center gap-2">
+            <TableHead className="whitespace-nowrap">
               Phone {renderSortIcon('phone')}
             </TableHead>
             <TableHead>Notes</TableHead>

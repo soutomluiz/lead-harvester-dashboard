@@ -15,45 +15,36 @@ export function AuthPage() {
   const { toast } = useToast();
 
   useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+    // Check for existing session on mount
+    const checkSession = async () => {
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      if (session) {
+        navigate("/");
+      }
+      if (sessionError) {
+        console.error("Session error:", sessionError);
+      }
+    };
+    
+    checkSession();
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       console.log("Auth state changed:", event);
       
-      if (event === 'SIGNED_IN') {
-        console.log("User signed in");
+      if (event === 'SIGNED_IN' && session) {
+        console.log("User signed in:", session.user.id);
         navigate("/");
         setError(null);
       } else if (event === 'SIGNED_OUT') {
         console.log("User signed out");
         setError(null);
-      } else if (event === 'USER_UPDATED') {
-        console.log("User updated");
-        const { error } = await supabase.auth.getSession();
-        if (error) {
-          console.error("Auth error:", error);
-          let message = "Ocorreu um erro durante a autenticação.";
-          
-          if (error.message.includes("missing email")) {
-            message = "Por favor, preencha o campo de email.";
-          } else if (error.message.includes("invalid credentials") || error.message.includes("Invalid login credentials")) {
-            message = "Email ou senha inválidos.";
-          } else if (error.message.includes("Email not confirmed")) {
-            message = "Por favor, confirme seu email antes de fazer login. Verifique sua caixa de entrada.";
-          }
-          
-          setError(message);
-          toast({
-            title: "Erro de autenticação",
-            description: message,
-            variant: "destructive",
-          });
-        }
       }
     });
 
     return () => {
       subscription.unsubscribe();
     };
-  }, [navigate, toast]);
+  }, [navigate]);
 
   return (
     <div className="container max-w-lg mx-auto py-8">

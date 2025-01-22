@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Bell } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -15,9 +16,15 @@ interface Notification {
   read: boolean;
   type?: 'info' | 'success' | 'warning' | 'error';
   timestamp: Date;
+  action?: {
+    type: 'navigate' | 'mark_read';
+    path?: string;
+    tab?: string;
+  };
 }
 
 export function NotificationBell() {
+  const navigate = useNavigate();
   const [notifications, setNotifications] = useState<Notification[]>([
     {
       id: "1",
@@ -25,38 +32,67 @@ export function NotificationBell() {
       read: false,
       type: 'info',
       timestamp: new Date(),
+      action: {
+        type: 'navigate',
+        tab: 'prospect'
+      }
     },
     {
       id: "2",
       message: "Dica: Configure seu webhook para integração automática com seu CRM.",
       read: false,
       type: 'info',
-      timestamp: new Date(Date.now() - 1000 * 60 * 5), // 5 minutes ago
+      timestamp: new Date(Date.now() - 1000 * 60 * 5),
+      action: {
+        type: 'navigate',
+        tab: 'config'
+      }
     },
     {
       id: "3",
       message: "Novo: Exporte seus leads em formato CSV ou Excel.",
       read: false,
       type: 'success',
-      timestamp: new Date(Date.now() - 1000 * 60 * 10), // 10 minutes ago
+      timestamp: new Date(Date.now() - 1000 * 60 * 10),
+      action: {
+        type: 'navigate',
+        tab: 'leads-all'
+      }
     },
     {
       id: "4",
       message: "Lembrete: Complete seu perfil para melhor experiência.",
       read: false,
       type: 'warning',
-      timestamp: new Date(Date.now() - 1000 * 60 * 15), // 15 minutes ago
+      timestamp: new Date(Date.now() - 1000 * 60 * 15),
+      action: {
+        type: 'navigate',
+        tab: 'config'
+      }
     },
     {
       id: "5",
       message: "Dica: Use tags para organizar seus leads por categoria.",
       read: false,
       type: 'info',
-      timestamp: new Date(Date.now() - 1000 * 60 * 20), // 20 minutes ago
+      timestamp: new Date(Date.now() - 1000 * 60 * 20),
+      action: {
+        type: 'mark_read'
+      }
     }
   ]);
 
   const unreadCount = notifications.filter((n) => !n.read).length;
+
+  const handleNotificationClick = (notification: Notification) => {
+    if (notification.action?.type === 'navigate' && notification.action.tab) {
+      // Navigate to the specified tab
+      window.dispatchEvent(new CustomEvent('setActiveTab', { detail: notification.action.tab }));
+    }
+    
+    // Mark as read in both cases
+    markAsRead(notification.id);
+  };
 
   const markAsRead = (id: string) => {
     setNotifications(
@@ -119,7 +155,7 @@ export function NotificationBell() {
                 className={`px-4 py-3 cursor-pointer ${
                   notification.read ? 'opacity-60' : ''
                 }`}
-                onClick={() => markAsRead(notification.id)}
+                onClick={() => handleNotificationClick(notification)}
               >
                 <div className="flex flex-col gap-1">
                   <div className="flex items-start justify-between gap-2">

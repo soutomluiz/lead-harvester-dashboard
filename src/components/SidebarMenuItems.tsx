@@ -1,4 +1,4 @@
-import { Database, Users, MapPin, Globe, Settings, CreditCard, PlusCircle, LayoutDashboard, Crown, ChevronRight } from "lucide-react";
+import { Database, Users, MapPin, Globe, Settings, CreditCard, PlusCircle, LayoutDashboard, Crown, ChevronDown } from "lucide-react";
 import {
   SidebarMenu,
   SidebarMenuItem,
@@ -123,20 +123,24 @@ export function SidebarMenuItems({ activeTab, setActiveTab }: SidebarMenuItemsPr
                   toggleMenu(item.id);
                   setActiveTab(item.id);
                 }}
-                className="w-full flex justify-between items-center"
+                className={`w-full flex justify-between items-center transition-colors ${
+                  activeTab.startsWith(item.id) 
+                    ? 'bg-primary/10 text-primary'
+                    : 'hover:bg-primary/5'
+                }`}
               >
-                <div className="flex items-center">
-                  <item.icon className="h-4 w-4 mr-2" />
-                  <span>{item.label}</span>
+                <div className="flex items-center gap-2">
+                  <item.icon className="h-4 w-4" />
+                  <span className="font-medium">{item.label}</span>
                 </div>
-                <ChevronRight 
-                  className={`h-4 w-4 transition-transform ${
-                    expandedMenus.includes(item.id) ? 'rotate-90' : ''
+                <ChevronDown 
+                  className={`h-4 w-4 transition-transform duration-200 ${
+                    expandedMenus.includes(item.id) ? 'rotate-180' : ''
                   }`} 
                 />
               </SidebarMenuButton>
               {expandedMenus.includes(item.id) && (
-                <div className="ml-4 mt-1 space-y-1">
+                <div className="ml-4 mt-1 space-y-1 animate-slideUp">
                   {item.subItems.map((subItem) => {
                     const isSubscriptionRequired = subItem.requiresSubscription && !hasSubscription;
                     return (
@@ -150,13 +154,15 @@ export function SidebarMenuItems({ activeTab, setActiveTab }: SidebarMenuItemsPr
                             setActiveTab(`${item.id}-${subItem.id}`);
                           }
                         }}
-                        className={`w-full flex justify-between items-center ${
-                          isSubscriptionRequired ? 'opacity-50' : ''
-                        }`}
+                        className={`w-full flex justify-between items-center p-2 rounded-md transition-colors ${
+                          activeTab === `${item.id}-${subItem.id}`
+                            ? 'bg-primary/10 text-primary'
+                            : 'hover:bg-primary/5'
+                        } ${isSubscriptionRequired ? 'opacity-50' : ''}`}
                       >
-                        <div className="flex items-center">
-                          <subItem.icon className={`h-4 w-4 mr-2 ${isSubscriptionRequired ? 'text-gray-400' : ''}`} />
-                          <span className={isSubscriptionRequired ? 'text-gray-400' : ''}>
+                        <div className="flex items-center gap-2">
+                          <subItem.icon className={`h-4 w-4 ${isSubscriptionRequired ? 'text-gray-400' : ''}`} />
+                          <span className={`text-sm ${isSubscriptionRequired ? 'text-gray-400' : ''}`}>
                             {subItem.label}
                           </span>
                         </div>
@@ -173,9 +179,14 @@ export function SidebarMenuItems({ activeTab, setActiveTab }: SidebarMenuItemsPr
             <SidebarMenuButton
               isActive={activeTab === item.id}
               onClick={() => setActiveTab(item.id)}
+              className={`w-full flex items-center gap-2 transition-colors ${
+                activeTab === item.id 
+                  ? 'bg-primary/10 text-primary'
+                  : 'hover:bg-primary/5'
+              }`}
             >
               <item.icon className="h-4 w-4" />
-              <span>{item.label}</span>
+              <span className="font-medium">{item.label}</span>
             </SidebarMenuButton>
           )}
         </SidebarMenuItem>

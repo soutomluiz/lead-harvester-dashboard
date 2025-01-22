@@ -17,7 +17,7 @@ const fetchLeads = async () => {
 
   return (data || []).map(lead => ({
     ...lead,
-    type: lead.type as 'website' | 'place' | 'manual',
+    type: (lead.type || 'manual') as 'website' | 'place' | 'manual',
     status: (lead.status || 'new') as 'new' | 'qualified' | 'unqualified' | 'open',
     deal_value: lead.deal_value || 0,
     tags: lead.tags || []

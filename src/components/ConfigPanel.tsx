@@ -3,7 +3,6 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 import { NotificationSettings } from "./config/NotificationSettings";
-import { ThemeSettings } from "./config/ThemeSettings";
 import { WebhookSettings } from "./config/WebhookSettings";
 import { Loader2 } from "lucide-react";
 
@@ -15,10 +14,6 @@ export function ConfigPanel() {
     setIsLoading(true);
     try {
       // Save settings to localStorage or your preferred storage
-      const theme = localStorage.getItem("theme");
-      document.documentElement.classList.remove("light", "dark");
-      document.documentElement.classList.add(theme || "light");
-
       toast({
         title: "Configurações aplicadas",
         description: "Suas configurações foram salvas com sucesso.",
@@ -43,7 +38,6 @@ export function ConfigPanel() {
         <div className="space-y-8">
           <WebhookSettings />
           <NotificationSettings />
-          <ThemeSettings />
           
           <div className="pt-4 border-t">
             <Button 

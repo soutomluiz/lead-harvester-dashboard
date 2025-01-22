@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Bell, Check } from "lucide-react";
+import { Bell } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -13,38 +13,73 @@ interface Notification {
   id: string;
   message: string;
   read: boolean;
+  type?: 'info' | 'success' | 'warning' | 'error';
+  timestamp: Date;
 }
 
 export function NotificationBell() {
   const [notifications, setNotifications] = useState<Notification[]>([
     {
       id: "1",
-      message: "Bem-vindo ao sistema! Explore todas as funcionalidades.",
+      message: "Bem-vindo ao Lead Harvester! Comece importando seus leads.",
       read: false,
+      type: 'info',
+      timestamp: new Date(),
     },
     {
       id: "2",
-      message: "Nova funcionalidade: Modo escuro disponível!",
+      message: "Dica: Configure seu webhook para integração automática com seu CRM.",
       read: false,
+      type: 'info',
+      timestamp: new Date(Date.now() - 1000 * 60 * 5), // 5 minutes ago
     },
     {
       id: "3",
-      message: "Dica: Configure seu webhook para integração com CRM.",
+      message: "Novo: Exporte seus leads em formato CSV ou Excel.",
       read: false,
+      type: 'success',
+      timestamp: new Date(Date.now() - 1000 * 60 * 10), // 10 minutes ago
     },
     {
       id: "4",
-      message: "Atualize seu perfil para uma melhor experiência.",
+      message: "Lembrete: Complete seu perfil para melhor experiência.",
       read: false,
+      type: 'warning',
+      timestamp: new Date(Date.now() - 1000 * 60 * 15), // 15 minutes ago
+    },
+    {
+      id: "5",
+      message: "Dica: Use tags para organizar seus leads por categoria.",
+      read: false,
+      type: 'info',
+      timestamp: new Date(Date.now() - 1000 * 60 * 20), // 20 minutes ago
     }
   ]);
 
   const unreadCount = notifications.filter((n) => !n.read).length;
 
   const markAsRead = (id: string) => {
-    setNotifications((prev) =>
-      prev.map((n) => (n.id === id ? { ...n, read: true } : n))
+    setNotifications(
+      notifications.map((n) =>
+        n.id === id ? { ...n, read: true } : n
+      )
     );
+  };
+
+  const markAllAsRead = () => {
+    setNotifications(
+      notifications.map((n) => ({ ...n, read: true }))
+    );
+  };
+
+  const formatTimestamp = (date: Date) => {
+    const now = new Date();
+    const diffInMinutes = Math.floor((now.getTime() - date.getTime()) / (1000 * 60));
+    
+    if (diffInMinutes < 1) return 'Agora';
+    if (diffInMinutes < 60) return `${diffInMinutes}m atrás`;
+    if (diffInMinutes < 1440) return `${Math.floor(diffInMinutes / 60)}h atrás`;
+    return `${Math.floor(diffInMinutes / 1440)}d atrás`;
   };
 
   return (
@@ -54,7 +89,8 @@ export function NotificationBell() {
           <Bell className="h-5 w-5" />
           {unreadCount > 0 && (
             <Badge
-              className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center bg-primary text-primary-foreground"
+              variant="destructive"
+              className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 text-xs"
             >
               {unreadCount}
             </Badge>
@@ -62,31 +98,50 @@ export function NotificationBell() {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-80">
-        {notifications.length > 0 ? (
-          notifications.map((notification) => (
-            <DropdownMenuItem
-              key={notification.id}
-              className="flex items-center justify-between p-4"
+        <div className="flex items-center justify-between px-4 py-2 border-b">
+          <span className="font-semibold">Notificações</span>
+          {unreadCount > 0 && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={markAllAsRead}
+              className="text-xs"
             >
-              <span className={notification.read ? "text-muted-foreground" : ""}>
-                {notification.message}
-              </span>
-              {!notification.read && (
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => markAsRead(notification.id)}
-                >
-                  <Check className="h-4 w-4" />
-                </Button>
-              )}
-            </DropdownMenuItem>
-          ))
-        ) : (
-          <DropdownMenuItem disabled>
-            Nenhuma notificação no momento
-          </DropdownMenuItem>
-        )}
+              Marcar todas como lidas
+            </Button>
+          )}
+        </div>
+        <div className="max-h-[300px] overflow-y-auto">
+          {notifications.length > 0 ? (
+            notifications.map((notification) => (
+              <DropdownMenuItem
+                key={notification.id}
+                className={`px-4 py-3 cursor-pointer ${
+                  notification.read ? 'opacity-60' : ''
+                }`}
+                onClick={() => markAsRead(notification.id)}
+              >
+                <div className="flex flex-col gap-1">
+                  <div className="flex items-start justify-between gap-2">
+                    <span className={`text-sm ${!notification.read ? 'font-medium' : ''}`}>
+                      {notification.message}
+                    </span>
+                    {!notification.read && (
+                      <Badge variant="secondary" className="h-2 w-2 rounded-full" />
+                    )}
+                  </div>
+                  <span className="text-xs text-muted-foreground">
+                    {formatTimestamp(notification.timestamp)}
+                  </span>
+                </div>
+              </DropdownMenuItem>
+            ))
+          ) : (
+            <div className="px-4 py-3 text-sm text-muted-foreground text-center">
+              Nenhuma notificação
+            </div>
+          )}
+        </div>
       </DropdownMenuContent>
     </DropdownMenu>
   );

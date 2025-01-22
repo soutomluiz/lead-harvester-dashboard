@@ -1,10 +1,10 @@
 import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 import { Lead } from "@/types/lead";
 import { Card } from "@/components/ui/card";
 import { LeadScore } from "@/components/leads/LeadScore";
 import { Award, Loader2, Building2, Mail, Phone, Globe } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
-import { supabase } from "@/integrations/supabase/client";
 
 const fetchLeads = async () => {
   const { data, error } = await supabase
@@ -12,7 +12,10 @@ const fetchLeads = async () => {
     .select('*')
     .order('created_at', { ascending: false });
 
-  if (error) throw error;
+  if (error) {
+    console.error("Error fetching leads:", error);
+    throw error;
+  }
 
   return (data || []).map(lead => ({
     ...lead,
@@ -31,6 +34,7 @@ export function LeadScorePage() {
   });
 
   if (error) {
+    console.error("Error in LeadScorePage:", error);
     toast({
       title: "Erro ao carregar leads",
       description: "Não foi possível carregar os scores dos leads.",

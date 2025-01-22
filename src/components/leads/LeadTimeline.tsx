@@ -4,7 +4,7 @@ import { Lead } from "@/types/lead";
 import { Card } from "@/components/ui/card";
 import { Timer, Loader2, Building2, Mail, Phone, Globe } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
-import { format, parseISO } from "date-fns";
+import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
 const fetchLeads = async () => {
@@ -13,7 +13,10 @@ const fetchLeads = async () => {
     .select('*')
     .order('created_at', { ascending: false });
 
-  if (error) throw error;
+  if (error) {
+    console.error("Error fetching leads:", error);
+    throw error;
+  }
 
   return (data || []).map(lead => ({
     ...lead,
@@ -32,6 +35,7 @@ export function LeadTimeline() {
   });
 
   if (error) {
+    console.error("Error in LeadTimeline:", error);
     toast({
       title: "Erro ao carregar leads",
       description: "Não foi possível carregar a timeline dos leads.",
@@ -73,7 +77,7 @@ export function LeadTimeline() {
             <div className="flex-1">
               <h3 className="font-medium">{lead.company_name}</h3>
               <p className="text-sm text-muted-foreground">
-                {format(new Date(lead.created_at || ''), "PPP 'às' p", { locale: ptBR })}
+                {lead.created_at ? format(new Date(lead.created_at), "PPP 'às' p", { locale: ptBR }) : 'Data não disponível'}
               </p>
               <div className="mt-2 flex flex-wrap gap-2">
                 {lead.email && (

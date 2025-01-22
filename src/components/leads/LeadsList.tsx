@@ -11,7 +11,10 @@ const fetchLeads = async () => {
     .select('*')
     .order('created_at', { ascending: false });
 
-  if (error) throw error;
+  if (error) {
+    console.error("Error fetching leads:", error);
+    throw error;
+  }
 
   return (data || []).map(lead => ({
     ...lead,
@@ -30,6 +33,7 @@ export function LeadsList() {
   });
 
   if (error) {
+    console.error("Error in LeadsList:", error);
     toast({
       title: "Erro ao carregar leads",
       description: "Não foi possível carregar a lista de leads.",

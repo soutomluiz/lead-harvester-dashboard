@@ -6,6 +6,7 @@ import { ListChecks, Loader2 } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 
 const fetchLeads = async () => {
+  console.log("Fetching leads for LeadsList...");
   const { data, error } = await supabase
     .from('leads')
     .select('*')
@@ -16,6 +17,7 @@ const fetchLeads = async () => {
     throw error;
   }
 
+  console.log("Leads fetched:", data);
   return (data || []).map(lead => ({
     ...lead,
     type: (lead.type || 'manual') as 'website' | 'place' | 'manual',
@@ -30,7 +32,10 @@ export function LeadsList() {
   const { data: leads = [], isLoading, error } = useQuery({
     queryKey: ['leads-list'],
     queryFn: fetchLeads,
+    retry: 1
   });
+
+  console.log("LeadsList render:", { leads, isLoading, error });
 
   if (error) {
     console.error("Error in LeadsList:", error);

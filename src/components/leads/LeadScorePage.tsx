@@ -7,6 +7,7 @@ import { Award, Loader2, Building2, Mail, Phone, Globe } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 
 const fetchLeads = async () => {
+  console.log("Fetching leads for LeadScorePage...");
   const { data, error } = await supabase
     .from('leads')
     .select('*')
@@ -17,6 +18,7 @@ const fetchLeads = async () => {
     throw error;
   }
 
+  console.log("Leads fetched:", data);
   return (data || []).map(lead => ({
     ...lead,
     type: (lead.type || 'manual') as 'website' | 'place' | 'manual',
@@ -31,7 +33,10 @@ export function LeadScorePage() {
   const { data: leads = [], isLoading, error } = useQuery({
     queryKey: ['leads-score'],
     queryFn: fetchLeads,
+    retry: 1
   });
+
+  console.log("LeadScorePage render:", { leads, isLoading, error });
 
   if (error) {
     console.error("Error in LeadScorePage:", error);

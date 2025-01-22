@@ -8,6 +8,7 @@ import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
 const fetchLeads = async () => {
+  console.log("Fetching leads for LeadTimeline...");
   const { data, error } = await supabase
     .from('leads')
     .select('*')
@@ -18,6 +19,7 @@ const fetchLeads = async () => {
     throw error;
   }
 
+  console.log("Leads fetched:", data);
   return (data || []).map(lead => ({
     ...lead,
     type: (lead.type || 'manual') as 'website' | 'place' | 'manual',
@@ -32,7 +34,10 @@ export function LeadTimeline() {
   const { data: leads = [], isLoading, error } = useQuery({
     queryKey: ['leads-timeline'],
     queryFn: fetchLeads,
+    retry: 1
   });
+
+  console.log("LeadTimeline render:", { leads, isLoading, error });
 
   if (error) {
     console.error("Error in LeadTimeline:", error);

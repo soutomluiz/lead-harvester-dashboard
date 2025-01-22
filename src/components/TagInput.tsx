@@ -76,7 +76,7 @@ export const TagInput: React.FC<TagInputProps> = ({
         onChange={(e) => setInputValue(e.target.value)}
         onKeyDown={handleKeyDown}
         placeholder={placeholder}
-        className="w-full"
+        className="w-full min-w-[200px]"
       />
     </div>
   );

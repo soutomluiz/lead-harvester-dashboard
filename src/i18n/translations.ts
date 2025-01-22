@@ -14,16 +14,20 @@ export const translations = {
     "contactsWithPhone": "Contatos com telefone",
     "withSite": "Com site",
     
-    // Auth
-    "login": "Login",
-    "signup": "Cadastro",
-    "email": "Email",
-    "password": "Senha",
-    "loginSuccess": "Login realizado",
-    "welcomeBack": "Bem-vindo de volta!",
+    // Menu Items
+    "addLeads": "Adicionar Leads",
+    "manualInput": "Inserir manualmente",
+    "googleMaps": "Google Maps",
+    "websites": "Websites",
+    "leads": "Leads",
+    "leadsList": "Lista de Leads",
+    "leadScore": "Score de Leads",
+    "timeline": "Timeline",
+    "reports": "Relatórios",
+    "subscription": "Assinatura",
+    "settings": "Configurações",
     
     // Config
-    "settings": "Configurações",
     "language": "Idioma",
     "selectLanguage": "Selecione o idioma",
     "notifications": "Notificações",
@@ -43,6 +47,11 @@ export const translations = {
     "edit": "Editar",
     "search": "Buscar",
     "noResults": "Nenhum resultado encontrado",
+    "hello": "Olá",
+    "logout": "Sair",
+    "profile": "Perfil do Usuário",
+    "support": "Suporte",
+    "version": "Versão",
   },
   "en": {
     // Dashboard
@@ -59,16 +68,20 @@ export const translations = {
     "contactsWithPhone": "Contacts with phone",
     "withSite": "With website",
     
-    // Auth
-    "login": "Login",
-    "signup": "Sign Up",
-    "email": "Email",
-    "password": "Password",
-    "loginSuccess": "Login successful",
-    "welcomeBack": "Welcome back!",
+    // Menu Items
+    "addLeads": "Add Leads",
+    "manualInput": "Manual Input",
+    "googleMaps": "Google Maps",
+    "websites": "Websites",
+    "leads": "Leads",
+    "leadsList": "Leads List",
+    "leadScore": "Lead Score",
+    "timeline": "Timeline",
+    "reports": "Reports",
+    "subscription": "Subscription",
+    "settings": "Settings",
     
     // Config
-    "settings": "Settings",
     "language": "Language",
     "selectLanguage": "Select language",
     "notifications": "Notifications",
@@ -88,6 +101,11 @@ export const translations = {
     "edit": "Edit",
     "search": "Search",
     "noResults": "No results found",
+    "hello": "Hello",
+    "logout": "Logout",
+    "profile": "User Profile",
+    "support": "Support",
+    "version": "Version",
   },
   "es": {
     // Dashboard
@@ -104,16 +122,20 @@ export const translations = {
     "contactsWithPhone": "Contactos con teléfono",
     "withSite": "Con sitio web",
     
-    // Auth
-    "login": "Iniciar Sesión",
-    "signup": "Registrarse",
-    "email": "Email",
-    "password": "Contraseña",
-    "loginSuccess": "Inicio de sesión exitoso",
-    "welcomeBack": "¡Bienvenido de vuelta!",
+    // Menu Items
+    "addLeads": "Agregar Leads",
+    "manualInput": "Entrada Manual",
+    "googleMaps": "Google Maps",
+    "websites": "Sitios Web",
+    "leads": "Leads",
+    "leadsList": "Lista de Leads",
+    "leadScore": "Puntuación de Leads",
+    "timeline": "Línea de Tiempo",
+    "reports": "Informes",
+    "subscription": "Suscripción",
+    "settings": "Configuración",
     
     // Config
-    "settings": "Configuración",
     "language": "Idioma",
     "selectLanguage": "Seleccionar idioma",
     "notifications": "Notificaciones",
@@ -133,6 +155,11 @@ export const translations = {
     "edit": "Editar",
     "search": "Buscar",
     "noResults": "No se encontraron resultados",
+    "hello": "Hola",
+    "logout": "Cerrar Sesión",
+    "profile": "Perfil de Usuario",
+    "support": "Soporte",
+    "version": "Versión",
   }
 };
 

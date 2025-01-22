@@ -1,5 +1,6 @@
 import { Package, Mail } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface SidebarUserSectionProps {
   className?: string;
@@ -10,6 +11,7 @@ export function SidebarUserSection({ className }: SidebarUserSectionProps) {
   const supportEmail = "contato@abbacreator.com.br";
   const supportPhone = "(48) 9 9142-4168";
   const whatsappLink = `https://wa.me/${supportPhone.replace(/\D/g, '')}`;
+  const { t } = useLanguage();
 
   return (
     <div className={cn("p-4 border-t", className)}>
@@ -32,7 +34,7 @@ export function SidebarUserSection({ className }: SidebarUserSectionProps) {
           >
             <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>
           </svg>
-          <span className="text-xs">{supportPhone}</span>
+          <span className="text-xs">{t("support")}: {supportPhone}</span>
         </a>
         <a 
           href={`mailto:${supportEmail}`}
@@ -43,7 +45,7 @@ export function SidebarUserSection({ className }: SidebarUserSectionProps) {
         </a>
         <div className="flex items-center gap-2 pt-2">
           <Package className="h-4 w-4" />
-          <span className="text-xs">v{version}</span>
+          <span className="text-xs">{t("version")} {version}</span>
         </div>
       </div>
     </div>

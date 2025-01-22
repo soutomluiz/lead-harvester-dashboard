@@ -8,6 +8,7 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/components/ui/use-toast";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface SidebarMenuItemsProps {
   activeTab: string;
@@ -19,6 +20,7 @@ export function SidebarMenuItems({ activeTab, setActiveTab }: SidebarMenuItemsPr
   const [isAdmin, setIsAdmin] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { t } = useLanguage();
 
   useEffect(() => {
     const checkUserRole = async () => {
@@ -51,30 +53,30 @@ export function SidebarMenuItems({ activeTab, setActiveTab }: SidebarMenuItemsPr
   };
 
   const menuItems = [
-    { id: "dashboard", icon: LayoutDashboard, label: "Dashboard" },
+    { id: "dashboard", icon: LayoutDashboard, label: t("dashboard") },
     {
       id: "prospect",
       icon: Database,
-      label: "Adicionar Leads",
+      label: t("addLeads"),
       subItems: [
-        { id: "prospect-form", icon: PlusCircle, label: "Inserir manualmente" },
-        { id: "prospect-places", icon: MapPin, label: "Google Maps", requiresAdmin: false },
-        { id: "prospect-websites", icon: Globe, label: "Websites", requiresAdmin: false },
+        { id: "prospect-form", icon: PlusCircle, label: t("manualInput") },
+        { id: "prospect-places", icon: MapPin, label: t("googleMaps"), requiresAdmin: false },
+        { id: "prospect-websites", icon: Globe, label: t("websites"), requiresAdmin: false },
       ],
     },
     { 
       id: "leads", 
       icon: Users, 
-      label: "Leads",
+      label: t("leads"),
       subItems: [
-        { id: "leads-list", icon: ListChecks, label: "Lista de Leads" },
-        { id: "leads-score", icon: Award, label: "Score de Leads", requiresAdmin: false },
-        { id: "leads-timeline", icon: Timer, label: "Timeline", requiresAdmin: false },
+        { id: "leads-list", icon: ListChecks, label: t("leadsList") },
+        { id: "leads-score", icon: Award, label: t("leadScore"), requiresAdmin: false },
+        { id: "leads-timeline", icon: Timer, label: t("timeline"), requiresAdmin: false },
       ],
     },
-    { id: "reports", icon: BarChart, label: "Relatórios" },
-    { id: "subscription", icon: CreditCard, label: "Assinatura" },
-    { id: "config", icon: Settings, label: "Configurações" },
+    { id: "reports", icon: BarChart, label: t("reports") },
+    { id: "subscription", icon: CreditCard, label: t("subscription") },
+    { id: "config", icon: Settings, label: t("settings") },
   ];
 
   const handleMenuClick = (menuId: string, subItemId?: string) => {

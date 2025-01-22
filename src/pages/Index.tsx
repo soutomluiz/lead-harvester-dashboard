@@ -16,6 +16,7 @@ import { useNavigate } from "react-router-dom";
 import { useToast } from "@/components/ui/use-toast";
 import { NotificationBell } from "@/components/NotificationBell";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const Index = () => {
   const [leads, setLeads] = useState<Lead[]>([]);
@@ -25,6 +26,7 @@ const Index = () => {
   const [userProfile, setUserProfile] = useState<any>(null);
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { t } = useLanguage();
 
   useEffect(() => {
     // Listen for setActiveTab events from notifications
@@ -42,31 +44,25 @@ const Index = () => {
   const getPageTitle = (tab: string) => {
     switch (tab) {
       case "dashboard":
-        return "Dashboard";
+        return t("dashboard");
       case "prospect-form":
-        return "Inserir Lead Manualmente";
+        return t("manualInput");
       case "prospect-places":
-        return "Prospecção Google Maps";
+        return t("googleMaps");
       case "prospect-websites":
-        return "Prospecção Websites";
+        return t("websites");
       case "leads-list":
-        return "Lista de Leads";
+        return t("leadsList");
       case "leads-score":
-        return "Score de Leads";
+        return t("leadScore");
       case "leads-timeline":
-        return "Timeline de Leads";
-      case "leads-all":
-        return "Todos os Leads";
-      case "leads-manual":
-        return "Leads Manuais";
-      case "leads-places":
-        return "Leads do Google Maps";
-      case "leads-websites":
-        return "Leads de Websites";
-      case "config":
-        return "Configurações";
+        return t("timeline");
+      case "reports":
+        return t("reports");
       case "subscription":
-        return "Assinatura";
+        return t("subscription");
+      case "config":
+        return t("settings");
       default:
         return "";
     }
@@ -98,14 +94,14 @@ const Index = () => {
       await supabase.auth.signOut();
       navigate('/login');
       toast({
-        title: "Logout realizado",
+        title: t("success"),
         description: "Você foi desconectado com sucesso.",
       });
     } catch (error) {
       toast({
         variant: "destructive",
-        title: "Erro ao sair",
-        description: "Não foi possível realizar o logout. Tente novamente.",
+        title: t("error"),
+        description: t("settingsError"),
       });
     }
   };
@@ -133,7 +129,7 @@ const Index = () => {
             </h1>
             <div className="flex items-center gap-4">
               <span className="text-sm font-medium">
-                Olá, {userName}
+                {t("hello")}, {userName}
               </span>
               <NotificationBell />
               <ThemeToggle />
@@ -148,7 +144,7 @@ const Index = () => {
                 </SheetTrigger>
                 <SheetContent className="w-[400px] sm:w-[540px]">
                   <SheetHeader>
-                    <SheetTitle>Perfil do Usuário</SheetTitle>
+                    <SheetTitle>{t("profile")}</SheetTitle>
                   </SheetHeader>
                   <UserProfilePanel initialData={userProfile} />
                 </SheetContent>

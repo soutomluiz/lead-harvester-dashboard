@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Lead } from "@/types/lead";
 import { LeadTable } from "@/components/LeadTable";
-import { Loader2 } from "lucide-react";
+import { Loader2, ListChecks } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 
 export function LeadsList() {
@@ -20,7 +20,15 @@ export function LeadsList() {
 
         if (error) throw error;
 
-        setLeads(data || []);
+        const typedLeads: Lead[] = (data || []).map(lead => ({
+          ...lead,
+          type: lead.type as 'website' | 'place' | 'manual',
+          status: (lead.status || 'new') as 'new' | 'qualified' | 'unqualified' | 'open',
+          deal_value: lead.deal_value || 0,
+          tags: lead.tags || []
+        }));
+
+        setLeads(typedLeads);
       } catch (error) {
         console.error('Error fetching leads:', error);
         toast({

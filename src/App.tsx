@@ -9,6 +9,16 @@ import { supabase } from "@/integrations/supabase/client";
 import { Loader2 } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { LanguageProvider } from "@/contexts/LanguageContext";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: 1,
+      refetchOnWindowFocus: false,
+    },
+  },
+});
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
@@ -92,35 +102,37 @@ function App() {
   }
 
   return (
-    <LanguageProvider>
-      <Router>
-        <Routes>
-          <Route
-            path="/"
-            element={
-              isAuthenticated ? (
-                <Index />
-              ) : (
-                <Navigate to="/login" replace />
-              )
-            }
-          />
-          <Route
-            path="/login"
-            element={
-              !isAuthenticated ? (
-                <AuthPage />
-              ) : (
-                <Navigate to="/" replace />
-              )
-            }
-          />
-          <Route path="/pricing" element={<PricingPage />} />
-          <Route path="/subscription/success" element={<SubscriptionSuccess />} />
-        </Routes>
-        <Toaster />
-      </Router>
-    </LanguageProvider>
+    <QueryClientProvider client={queryClient}>
+      <LanguageProvider>
+        <Router>
+          <Routes>
+            <Route
+              path="/"
+              element={
+                isAuthenticated ? (
+                  <Index />
+                ) : (
+                  <Navigate to="/login" replace />
+                )
+              }
+            />
+            <Route
+              path="/login"
+              element={
+                !isAuthenticated ? (
+                  <AuthPage />
+                ) : (
+                  <Navigate to="/" replace />
+                )
+              }
+            />
+            <Route path="/pricing" element={<PricingPage />} />
+            <Route path="/subscription/success" element={<SubscriptionSuccess />} />
+          </Routes>
+          <Toaster />
+        </Router>
+      </LanguageProvider>
+    </QueryClientProvider>
   );
 }
 

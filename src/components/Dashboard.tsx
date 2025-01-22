@@ -7,6 +7,7 @@ import { SubscriptionPanel } from "@/components/SubscriptionPanel";
 import { ExtractionCards } from "@/components/ExtractionCards";
 import { LeadCards } from "@/components/LeadCards";
 import { DashboardStats } from "@/components/DashboardStats";
+import { KanbanBoard } from "@/components/KanbanBoard";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { Lead } from "@/types/lead";
@@ -82,6 +83,9 @@ export function Dashboard({ activeTab, leads, onSubmit, onAddLeads, setActiveTab
     <div className="w-full bg-background">
       {activeTab === "dashboard" && (
         <DashboardStats leads={dbLeads} />
+      )}
+      {activeTab === "pipeline" && (
+        <KanbanBoard />
       )}
       {activeTab === "prospect" && (
         <ExtractionCards setActiveTab={setActiveTab} />

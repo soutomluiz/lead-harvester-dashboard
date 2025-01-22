@@ -26,6 +26,41 @@ const Index = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
 
+  const getPageTitle = (tab: string) => {
+    switch (tab) {
+      case "dashboard":
+        return "Dashboard";
+      case "pipeline":
+        return "Pipeline";
+      case "prospect-form":
+        return "Inserir Lead Manualmente";
+      case "prospect-places":
+        return "Prospecção Google Maps";
+      case "prospect-websites":
+        return "Prospecção Websites";
+      case "leads-list":
+        return "Lista de Leads";
+      case "leads-score":
+        return "Score de Leads";
+      case "leads-timeline":
+        return "Timeline de Leads";
+      case "leads-all":
+        return "Todos os Leads";
+      case "leads-manual":
+        return "Leads Manuais";
+      case "leads-places":
+        return "Leads do Google Maps";
+      case "leads-websites":
+        return "Leads de Websites";
+      case "config":
+        return "Configurações";
+      case "subscription":
+        return "Assinatura";
+      default:
+        return "";
+    }
+  };
+
   useEffect(() => {
     const fetchUserProfile = async () => {
       const { data: { user } } = await supabase.auth.getUser();
@@ -83,7 +118,7 @@ const Index = () => {
         <main className="flex-1 p-6 pb-16">
           <div className="flex justify-between items-center mb-8 animate-fadeIn">
             <h1 className="text-2xl font-bold">
-              Dashboard
+              {getPageTitle(activeTab)}
             </h1>
             <div className="flex items-center gap-4">
               <span className="text-sm font-medium">

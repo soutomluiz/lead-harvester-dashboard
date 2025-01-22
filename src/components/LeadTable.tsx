@@ -269,8 +269,8 @@ export const LeadTable = ({ leads: initialLeads }: LeadTableProps) => {
             <TableHead className="whitespace-nowrap">
               Phone <LeadTableSort columnKey="phone" sortConfig={sortConfig} onSort={handleSort} />
             </TableHead>
-            <TableHead>Score</TableHead>
             <TableHead>Notes</TableHead>
+            <TableHead>Score</TableHead>
             <TableHead>Tags</TableHead>
           </TableRow>
         </TableHeader>

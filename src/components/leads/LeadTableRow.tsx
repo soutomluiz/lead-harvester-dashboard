@@ -10,7 +10,6 @@ interface LeadTableRowProps {
   lead: Lead;
   editingNoteId: string | null;
   noteContent: string;
-  statusColors: Record<string, string>;
   onStatusChange: (leadId: string, newStatus: Lead["status"]) => void;
   onEditNote: (lead: Lead) => void;
   onSaveNote: (leadId: string) => void;
@@ -22,7 +21,6 @@ export function LeadTableRow({
   lead,
   editingNoteId,
   noteContent,
-  statusColors,
   onStatusChange,
   onEditNote,
   onSaveNote,

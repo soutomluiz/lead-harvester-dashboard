@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { Card } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
 import { Lead } from "@/types/lead";
@@ -13,73 +13,71 @@ interface KanbanColumn {
   leads: Lead[];
 }
 
+const initialColumns: KanbanColumn[] = [
+  { id: 'novo', title: 'Novo', leads: [] },
+  { id: 'primeiro_contato', title: 'Em Contato', leads: [] },
+  { id: 'proposta', title: 'Proposta Enviada', leads: [] },
+  { id: 'negociacao', title: 'Em Negociação', leads: [] },
+  { id: 'fechado_ganho', title: 'Fechado', leads: [] },
+  { id: 'fechado_perdido', title: 'Perdido', leads: [] },
+];
+
 export function KanbanBoard() {
-  const [columns, setColumns] = useState<KanbanColumn[]>([
-    { id: 'novo', title: 'Novo', leads: [] },
-    { id: 'primeiro_contato', title: 'Em Contato', leads: [] },
-    { id: 'proposta', title: 'Proposta Enviada', leads: [] },
-    { id: 'negociacao', title: 'Em Negociação', leads: [] },
-    { id: 'fechado_ganho', title: 'Fechado', leads: [] },
-    { id: 'fechado_perdido', title: 'Perdido', leads: [] },
-  ]);
+  const [columns, setColumns] = useState<KanbanColumn[]>(initialColumns);
   const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
 
-  useEffect(() => {
-    const fetchLeads = async () => {
-      try {
-        const { data: leads, error } = await supabase
-          .from('leads')
-          .select('*')
-          .order('kanban_order', { ascending: true });
+  const fetchLeads = useCallback(async () => {
+    try {
+      const { data: leads, error } = await supabase
+        .from('leads')
+        .select('*')
+        .order('kanban_order', { ascending: true });
 
-        if (error) throw error;
+      if (error) throw error;
 
-        // Update columns with leads
-        setColumns(prevColumns => 
-          prevColumns.map(column => ({
-            ...column,
-            leads: (leads || [])
-              .filter(lead => lead.stage === column.id)
-              .map(lead => ({
-                ...lead,
-                type: lead.type as 'website' | 'place' | 'manual',
-                status: (lead.status || 'new') as 'new' | 'qualified' | 'unqualified' | 'open',
-                deal_value: lead.deal_value || 0,
-                tags: lead.tags || []
-              }))
+      const updatedColumns = initialColumns.map(column => ({
+        ...column,
+        leads: (leads || [])
+          .filter(lead => lead.stage === column.id)
+          .map(lead => ({
+            ...lead,
+            type: lead.type as 'website' | 'place' | 'manual',
+            status: (lead.status || 'new') as 'new' | 'qualified' | 'unqualified' | 'open',
+            deal_value: lead.deal_value || 0,
+            tags: lead.tags || []
           }))
-        );
-      } catch (error) {
-        console.error('Error fetching leads:', error);
-        toast({
-          title: "Erro ao carregar leads",
-          description: "Não foi possível carregar os leads do pipeline.",
-          variant: "destructive",
-        });
-      } finally {
-        setIsLoading(false);
-      }
-    };
+      }));
 
+      setColumns(updatedColumns);
+      setIsLoading(false);
+    } catch (error) {
+      console.error('Error fetching leads:', error);
+      toast({
+        title: "Erro ao carregar leads",
+        description: "Não foi possível carregar os leads do pipeline.",
+        variant: "destructive",
+      });
+      setIsLoading(false);
+    }
+  }, [toast]);
+
+  useEffect(() => {
     fetchLeads();
 
-    // Subscribe to realtime updates
     const channel = supabase
       .channel('public:leads')
       .on(
         'postgres_changes',
         { event: '*', schema: 'public', table: 'leads' },
-        () => {
-          fetchLeads();
-        }
+        fetchLeads
       )
       .subscribe();
 
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [toast]);
+  }, [fetchLeads]);
 
   const handleDragStart = (e: React.DragEvent, leadId: string) => {
     e.dataTransfer.setData('text/plain', leadId);

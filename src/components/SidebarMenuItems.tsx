@@ -58,9 +58,9 @@ export function SidebarMenuItems({ activeTab, setActiveTab }: SidebarMenuItemsPr
       icon: Database,
       label: "Adicionar Leads",
       subItems: [
-        { id: "form", icon: PlusCircle, label: "Inserir manualmente" },
-        { id: "places", icon: MapPin, label: "Google Maps", requiresAdmin: false },
-        { id: "websites", icon: Globe, label: "Websites", requiresAdmin: false },
+        { id: "prospect-form", icon: PlusCircle, label: "Inserir manualmente" },
+        { id: "prospect-places", icon: MapPin, label: "Google Maps", requiresAdmin: false },
+        { id: "prospect-websites", icon: Globe, label: "Websites", requiresAdmin: false },
       ],
     },
     { 
@@ -68,21 +68,21 @@ export function SidebarMenuItems({ activeTab, setActiveTab }: SidebarMenuItemsPr
       icon: Users, 
       label: "Leads",
       subItems: [
-        { id: "list", icon: ListChecks, label: "Lista de Leads" },
-        { id: "score", icon: Award, label: "Score de Leads", requiresAdmin: false },
-        { id: "timeline", icon: Timer, label: "Timeline", requiresAdmin: false },
+        { id: "leads-list", icon: ListChecks, label: "Lista de Leads" },
+        { id: "leads-score", icon: Award, label: "Score de Leads", requiresAdmin: false },
+        { id: "leads-timeline", icon: Timer, label: "Timeline", requiresAdmin: false },
       ],
     },
     { id: "subscription", icon: CreditCard, label: "Assinatura" },
     { id: "config", icon: Settings, label: "Configurações" },
   ];
 
-  const handleMenuClick = (item: any) => {
-    if (item.subItems) {
-      toggleMenu(item.id);
-      setActiveTab(item.id);
-    } else {
-      setActiveTab(item.id);
+  const handleMenuClick = (menuId: string, subItemId?: string) => {
+    const targetId = subItemId || menuId;
+    console.log("Menu clicked:", targetId); // Debug log
+    setActiveTab(targetId);
+    if (!subItemId) {
+      toggleMenu(menuId);
     }
   };
 
@@ -94,7 +94,7 @@ export function SidebarMenuItems({ activeTab, setActiveTab }: SidebarMenuItemsPr
             <>
               <SidebarMenuButton
                 isActive={activeTab.startsWith(item.id)}
-                onClick={() => handleMenuClick(item)}
+                onClick={() => handleMenuClick(item.id)}
                 className={`w-full flex justify-between items-center transition-colors ${
                   activeTab.startsWith(item.id) 
                     ? 'bg-primary/10 text-primary'
@@ -116,10 +116,10 @@ export function SidebarMenuItems({ activeTab, setActiveTab }: SidebarMenuItemsPr
                   {item.subItems.map((subItem) => (
                     <SidebarMenuButton
                       key={`${item.id}-${subItem.id}`}
-                      isActive={activeTab === `${item.id}-${subItem.id}`}
-                      onClick={() => handleMenuClick(subItem)}
+                      isActive={activeTab === subItem.id}
+                      onClick={() => handleMenuClick(item.id, subItem.id)}
                       className={`w-full flex items-center gap-2 p-2 rounded-md transition-colors ${
-                        activeTab === `${item.id}-${subItem.id}`
+                        activeTab === subItem.id
                           ? 'bg-primary/10 text-primary'
                           : 'hover:bg-primary/5'
                       }`}
@@ -134,7 +134,7 @@ export function SidebarMenuItems({ activeTab, setActiveTab }: SidebarMenuItemsPr
           ) : (
             <SidebarMenuButton
               isActive={activeTab === item.id}
-              onClick={() => handleMenuClick(item)}
+              onClick={() => handleMenuClick(item.id)}
               className={`w-full flex items-center gap-2 transition-colors ${
                 activeTab === item.id 
                   ? 'bg-primary/10 text-primary'

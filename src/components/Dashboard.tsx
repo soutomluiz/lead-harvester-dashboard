@@ -49,6 +49,7 @@ export function Dashboard({ activeTab, leads, onSubmit, onAddLeads, setActiveTab
         }));
 
         setDbLeads(typedLeads);
+        console.log("Fetched leads:", typedLeads); // Debug log
       } catch (error) {
         console.error("Error fetching leads:", error);
         toast({

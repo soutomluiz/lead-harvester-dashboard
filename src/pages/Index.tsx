@@ -28,45 +28,6 @@ const Index = () => {
   const { handleSignOut } = useAuth();
 
   useEffect(() => {
-    const handleSetActiveTab = (event: CustomEvent) => {
-      setActiveTab(event.detail);
-    };
-
-    window.addEventListener('setActiveTab', handleSetActiveTab as EventListener);
-
-    return () => {
-      window.removeEventListener('setActiveTab', handleSetActiveTab as EventListener);
-    };
-  }, []);
-
-  const getPageTitle = (tab: string) => {
-    switch (tab) {
-      case "dashboard":
-        return t("dashboard");
-      case "prospect-form":
-        return t("manualInput");
-      case "prospect-places":
-        return t("googleMaps");
-      case "prospect-websites":
-        return t("websites");
-      case "leads-list":
-        return t("leadsList");
-      case "leads-score":
-        return t("leadScore");
-      case "leads-timeline":
-        return t("timeline");
-      case "reports":
-        return t("reports");
-      case "subscription":
-        return t("subscription");
-      case "config":
-        return t("settings");
-      default:
-        return "";
-    }
-  };
-
-  useEffect(() => {
     const fetchUserProfile = async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {

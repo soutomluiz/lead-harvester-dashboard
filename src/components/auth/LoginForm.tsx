@@ -41,6 +41,8 @@ export function LoginForm() {
         let message = "Email ou senha incorretos. Por favor, verifique suas credenciais.";
         if (error.message.includes("Email not confirmed")) {
           message = "Por favor, confirme seu email antes de fazer login.";
+        } else if (error.message.includes("Invalid login credentials")) {
+          message = "Credenciais inválidas. Por favor, verifique seu email e senha.";
         }
         
         toast({
@@ -53,6 +55,10 @@ export function LoginForm() {
 
       if (data?.user) {
         console.log("Login successful for user:", data.user.id);
+        toast({
+          title: "Login realizado com sucesso",
+          description: "Você será redirecionado para o dashboard.",
+        });
         navigate("/");
       }
     } catch (error) {

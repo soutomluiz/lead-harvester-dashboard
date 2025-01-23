@@ -14,7 +14,7 @@ export const useAuth = () => {
       console.log("Auth state changed in useAuth:", event);
       if (event === 'SIGNED_OUT') {
         console.log("User signed out in useAuth, redirecting to login");
-        navigate('/login');
+        window.location.href = '/login';  // Force a full page reload and navigation
       }
     });
 
@@ -36,8 +36,8 @@ export const useAuth = () => {
         description: t("logoutSuccess"),
       });
       
-      // Force navigation to login page
-      navigate('/login');
+      // Force a full page reload and navigation to login
+      window.location.href = '/login';
     } catch (error) {
       console.error('Error signing out:', error);
       toast({

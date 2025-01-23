@@ -56,22 +56,46 @@ const Index = () => {
 
   useEffect(() => {
     const checkAuth = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
+      // Get and log the current session
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      
+      if (sessionError) {
+        console.error("Error checking session:", sessionError);
+        navigate('/login');
+        return;
+      }
+
       if (!session) {
         console.log("No active session found in Index, redirecting to login");
         navigate('/login');
         return;
       }
 
-      const { data: profile } = await supabase
+      // Log detailed session information
+      console.log("Current session:", {
+        user: {
+          id: session.user.id,
+          email: session.user.email,
+          phone: session.user.phone,
+          created_at: session.user.created_at,
+          last_sign_in_at: session.user.last_sign_in_at
+        },
+        expires_at: session.expires_at
+      });
+
+      // Get and log user profile
+      const { data: profile, error: profileError } = await supabase
         .from('profiles')
         .select('*')
         .eq('id', session.user.id)
         .single();
       
-      if (profile) {
-        setUserName(profile.full_name || '');
-        setAvatarUrl(profile.avatar_url);
+      if (profileError) {
+        console.error("Error fetching profile:", profileError);
+      } else {
+        console.log("User profile:", profile);
+        setUserName(profile?.full_name || '');
+        setAvatarUrl(profile?.avatar_url);
         setUserProfile(profile);
       }
     };

@@ -51,7 +51,7 @@ const Index = () => {
   const [userName, setUserName] = useState<string>("");
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [userProfile, setUserProfile] = useState<any>(null);
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
   const { t } = useLanguage();
@@ -67,16 +67,19 @@ const Index = () => {
 
       if (error) {
         console.error("Error fetching profile:", error);
-        return;
+        return false;
       }
 
       if (profile) {
         setUserName(profile.full_name || '');
         setAvatarUrl(profile.avatar_url);
         setUserProfile(profile);
+        return true;
       }
+      return false;
     } catch (error) {
       console.error("Error in fetchUserProfile:", error);
+      return false;
     }
   };
 
@@ -91,18 +94,19 @@ const Index = () => {
           return;
         }
 
+        const profileLoaded = await fetchUserProfile(session.user.id);
         setIsAuthenticated(true);
-        await fetchUserProfile(session.user.id);
         setIsLoading(false);
       } catch (error) {
         console.error("Error in checkAuth:", error);
+        setIsAuthenticated(false);
         setIsLoading(false);
       }
     };
 
     checkAuth();
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+    const subscription = supabase.auth.onAuthStateChange(async (event, session) => {
       if (event === 'SIGNED_OUT' || !session) {
         setIsAuthenticated(false);
         setUserName('');
@@ -110,8 +114,8 @@ const Index = () => {
         setUserProfile(null);
         setIsLoading(false);
       } else if (event === 'SIGNED_IN' && session) {
+        const profileLoaded = await fetchUserProfile(session.user.id);
         setIsAuthenticated(true);
-        await fetchUserProfile(session.user.id);
         setIsLoading(false);
       }
     });

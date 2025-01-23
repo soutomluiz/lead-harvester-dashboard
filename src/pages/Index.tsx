@@ -17,6 +17,33 @@ import { ThemeToggle } from "@/components/ThemeToggle";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/hooks/useAuth";
 
+const getPageTitle = (tab: string) => {
+  switch (tab) {
+    case "dashboard":
+      return "Dashboard";
+    case "prospect-form":
+      return "Manual Input";
+    case "prospect-places":
+      return "Google Maps";
+    case "prospect-websites":
+      return "Websites";
+    case "leads-list":
+      return "Leads List";
+    case "leads-score":
+      return "Lead Score";
+    case "leads-timeline":
+      return "Timeline";
+    case "reports":
+      return "Reports";
+    case "subscription":
+      return "Subscription";
+    case "config":
+      return "Settings";
+    default:
+      return "";
+  }
+};
+
 const Index = () => {
   const [leads, setLeads] = useState<Lead[]>([]);
   const [activeTab, setActiveTab] = useState("dashboard");

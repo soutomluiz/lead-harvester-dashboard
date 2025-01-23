@@ -58,24 +58,30 @@ export const AdvancedSearchForm = ({
             <div className="space-y-4">
               <div>
                 <Label>Nicho de Atuação</Label>
-                <Input
-                  value={industry}
-                  onChange={(e) => setIndustry(e.target.value)}
-                  placeholder="Ex: Restaurantes, Academias..."
-                  icon={<Building2 className="h-4 w-4" />}
-                  required
-                />
+                <div className="relative">
+                  <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    value={industry}
+                    onChange={(e) => setIndustry(e.target.value)}
+                    placeholder="Ex: Restaurantes, Academias..."
+                    className="pl-10"
+                    required
+                  />
+                </div>
               </div>
               
               <div>
                 <Label>Localização</Label>
-                <Input
-                  value={location}
-                  onChange={(e) => setLocation(e.target.value)}
-                  placeholder="Ex: São Paulo, SP"
-                  icon={<MapPin className="h-4 w-4" />}
-                  required
-                />
+                <div className="relative">
+                  <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    value={location}
+                    onChange={(e) => setLocation(e.target.value)}
+                    placeholder="Ex: São Paulo, SP"
+                    className="pl-10"
+                    required
+                  />
+                </div>
               </div>
 
               <div>
@@ -103,24 +109,30 @@ export const AdvancedSearchForm = ({
             <div className="space-y-4">
               <div>
                 <Label>Nicho de Atuação</Label>
-                <Input
-                  value={industry}
-                  onChange={(e) => setIndustry(e.target.value)}
-                  placeholder="Ex: Restaurantes, Academias..."
-                  icon={<Building2 className="h-4 w-4" />}
-                  required
-                />
+                <div className="relative">
+                  <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    value={industry}
+                    onChange={(e) => setIndustry(e.target.value)}
+                    placeholder="Ex: Restaurantes, Academias..."
+                    className="pl-10"
+                    required
+                  />
+                </div>
               </div>
               
               <div>
                 <Label>Localização</Label>
-                <Input
-                  value={location}
-                  onChange={(e) => setLocation(e.target.value)}
-                  placeholder="Ex: São Paulo, SP"
-                  icon={<MapPin className="h-4 w-4" />}
-                  required
-                />
+                <div className="relative">
+                  <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    value={location}
+                    onChange={(e) => setLocation(e.target.value)}
+                    placeholder="Ex: São Paulo, SP"
+                    className="pl-10"
+                    required
+                  />
+                </div>
               </div>
 
               <div>

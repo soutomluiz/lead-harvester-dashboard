@@ -45,20 +45,22 @@ export function LoginForm() {
           title: "Erro ao reenviar email",
           description: "Não foi possível reenviar o email de confirmação. Por favor, tente novamente.",
           variant: "destructive",
+          duration: 4000,
         });
-        return;
+      } else {
+        toast({
+          title: "Email reenviado com sucesso!",
+          description: "Por favor, verifique sua caixa de entrada e confirme seu email.",
+          duration: 4000,
+        });
       }
-
-      toast({
-        title: "Email reenviado",
-        description: "Por favor, verifique sua caixa de entrada e confirme seu email.",
-      });
     } catch (error) {
       console.error("Erro inesperado ao reenviar email:", error);
       toast({
         title: "Erro ao reenviar email",
         description: "Ocorreu um erro inesperado. Por favor, tente novamente.",
         variant: "destructive",
+        duration: 4000,
       });
     } finally {
       setIsResendingEmail(false);
@@ -78,7 +80,7 @@ export function LoginForm() {
       setIsLoading(true);
       console.log("Tentando fazer login com email:", email);
 
-      const { data, error } = await supabase.auth.signInWithPassword({
+      const { data: { session }, error } = await supabase.auth.signInWithPassword({
         email: email.trim(),
         password: password.trim(),
       });
@@ -86,7 +88,6 @@ export function LoginForm() {
       if (error) {
         console.error("Erro no login:", error);
         console.log("Mensagem de erro:", error.message);
-        console.log("Detalhes do erro:", JSON.stringify(error, null, 2));
         
         let message: string | JSX.Element = "";
         
@@ -128,8 +129,8 @@ export function LoginForm() {
         return;
       }
 
-      if (data?.user) {
-        console.log("Login realizado com sucesso para usuário:", data.user.id);
+      if (session) {
+        console.log("Login realizado com sucesso para usuário:", session.user.id);
         toast({
           title: "Login realizado com sucesso",
           description: "Você será redirecionado para o dashboard.",
@@ -144,6 +145,37 @@ export function LoginForm() {
       setIsLoading(false);
     }
   };
+
+  // Verificar o estado da sessão e parâmetros da URL ao carregar
+  useEffect(() => {
+    const checkEmailVerification = async () => {
+      const params = new URLSearchParams(window.location.search);
+      const isEmailConfirmation = params.has('email_confirm');
+      
+      if (isEmailConfirmation) {
+        const { data: { session }, error } = await supabase.auth.getSession();
+        
+        if (session) {
+          toast({
+            title: "Email confirmado com sucesso!",
+            description: "Seu email foi verificado. Você pode fazer login agora.",
+            duration: 4000,
+          });
+          navigate("/login");
+        } else if (error) {
+          console.error("Erro ao verificar sessão:", error);
+          toast({
+            title: "Erro na verificação",
+            description: "Houve um problema ao verificar seu email. Por favor, tente novamente.",
+            variant: "destructive",
+            duration: 4000,
+          });
+        }
+      }
+    };
+
+    checkEmailVerification();
+  }, [navigate, toast]);
 
   return (
     <form onSubmit={handleLogin} className="space-y-4">

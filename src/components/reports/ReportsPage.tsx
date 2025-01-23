@@ -8,7 +8,7 @@ import { ExtractionEfficiencyChart } from "./ExtractionEfficiencyChart";
 import { IndustryDistributionChart } from "./IndustryDistributionChart";
 import { ActivityTimelineChart } from "./ActivityTimelineChart";
 import { ReportsFilters } from "./ReportsFilters";
-import { DealMetricsCard } from "./DealMetricsCard";
+import { ProspectingMetricsCard } from "./ProspectingMetricsCard";
 import { TagsDistributionChart } from "./TagsDistributionChart";
 import { startOfDay, endOfDay, subWeeks, subMonths, parseISO } from 'date-fns';
 
@@ -94,7 +94,7 @@ export function ReportsPage() {
       <ReportsFilters onFilterChange={setFilters} currentFilters={filters} />
 
       <div className="grid gap-4 md:grid-cols-2">
-        <DealMetricsCard leads={filteredLeads} />
+        <ProspectingMetricsCard leads={filteredLeads} />
         <TagsDistributionChart leads={filteredLeads} />
       </div>
 

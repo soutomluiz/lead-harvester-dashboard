@@ -47,13 +47,15 @@ export function LoginForm() {
           variant: "destructive",
           duration: 4000,
         });
-      } else {
-        toast({
-          title: "Email reenviado com sucesso!",
-          description: "Por favor, verifique sua caixa de entrada e confirme seu email.",
-          duration: 4000,
-        });
+        setIsResendingEmail(false);
+        return;
       }
+
+      toast({
+        title: "Email reenviado com sucesso!",
+        description: "Por favor, verifique sua caixa de entrada e confirme seu email antes de fazer login.",
+        duration: 6000,
+      });
     } catch (error) {
       console.error("Erro inesperado ao reenviar email:", error);
       toast({
@@ -87,25 +89,27 @@ export function LoginForm() {
 
       if (error) {
         console.error("Erro no login:", error);
-        console.log("Mensagem de erro:", error.message);
         
         let message: string | JSX.Element = "";
         
         if (error.message.includes("Email not confirmed")) {
           message = (
-            <div>
-              <p>Por favor, confirme seu email antes de fazer login.</p>
+            <div className="space-y-2">
+              <p>Seu email ainda não foi confirmado. Por favor, confirme seu email antes de fazer login.</p>
+              <p className="text-sm text-muted-foreground">
+                Não recebeu o email de confirmação?
+              </p>
               <Button
                 variant="outline"
                 size="sm"
                 onClick={handleResendConfirmationEmail}
                 disabled={isResendingEmail}
-                className="mt-2"
+                className="w-full"
               >
                 {isResendingEmail ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Reenviando...
+                    Reenviando email...
                   </>
                 ) : (
                   "Reenviar email de confirmação"
@@ -158,7 +162,7 @@ export function LoginForm() {
           toast({
             title: "Email confirmado com sucesso!",
             description: "Seu email foi verificado. Você pode fazer login agora.",
-            duration: 4000,
+            duration: 6000,
           });
           navigate("/login");
         } else if (error) {
@@ -167,7 +171,7 @@ export function LoginForm() {
             title: "Erro na verificação",
             description: "Houve um problema ao verificar seu email. Por favor, tente novamente.",
             variant: "destructive",
-            duration: 4000,
+            duration: 6000,
           });
         }
       }

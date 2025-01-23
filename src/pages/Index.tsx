@@ -12,10 +12,10 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/co
 import { UserProfilePanel } from "@/components/UserProfilePanel";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
-import { useToast } from "@/components/ui/use-toast";
 import { NotificationBell } from "@/components/NotificationBell";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useAuth } from "@/hooks/useAuth";
 
 const Index = () => {
   const [leads, setLeads] = useState<Lead[]>([]);
@@ -24,11 +24,10 @@ const Index = () => {
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [userProfile, setUserProfile] = useState<any>(null);
   const navigate = useNavigate();
-  const { toast } = useToast();
   const { t } = useLanguage();
+  const { handleSignOut } = useAuth();
 
   useEffect(() => {
-    // Listen for setActiveTab events from notifications
     const handleSetActiveTab = (event: CustomEvent) => {
       setActiveTab(event.detail);
     };
@@ -83,41 +82,12 @@ const Index = () => {
           setUserProfile(profile);
         }
       } else {
-        // If no user is found, redirect to login
         navigate('/login');
       }
     };
 
     fetchUserProfile();
   }, [navigate]);
-
-  const handleSignOut = async () => {
-    try {
-      const { error } = await supabase.auth.signOut();
-      if (error) throw error;
-      
-      // Clear local state
-      setUserName('');
-      setAvatarUrl(null);
-      setUserProfile(null);
-      
-      // Redirect to login page
-      navigate('/login');
-      
-      toast({
-        title: t("success"),
-        description: t("logoutSuccess"),
-        variant: "default",
-      });
-    } catch (error) {
-      console.error('Error signing out:', error);
-      toast({
-        variant: "destructive",
-        title: t("error"),
-        description: t("logoutError"),
-      });
-    }
-  };
 
   const handleAddLead = (data: Omit<Lead, "id">) => {
     const newLead = {

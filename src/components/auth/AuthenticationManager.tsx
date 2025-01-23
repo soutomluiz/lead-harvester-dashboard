@@ -32,6 +32,8 @@ export function AuthenticationManager({ onAuthStateChange, children }: Authentic
   };
 
   useEffect(() => {
+    let mounted = true;
+
     const checkAuth = async () => {
       try {
         console.log("Checking authentication status...");
@@ -39,19 +41,25 @@ export function AuthenticationManager({ onAuthStateChange, children }: Authentic
         
         if (!session) {
           console.log("No active session found");
-          onAuthStateChange(false);
-          setIsLoading(false);
+          if (mounted) {
+            onAuthStateChange(false);
+            setIsLoading(false);
+          }
           return;
         }
 
         console.log("Active session found for user:", session.user.id);
         const profile = await fetchUserProfile(session.user.id);
-        onAuthStateChange(true, profile);
+        if (mounted) {
+          onAuthStateChange(true, profile);
+          setIsLoading(false);
+        }
       } catch (error) {
         console.error("Error in checkAuth:", error);
-        onAuthStateChange(false);
-      } finally {
-        setIsLoading(false);
+        if (mounted) {
+          onAuthStateChange(false);
+          setIsLoading(false);
+        }
       }
     };
 
@@ -62,18 +70,23 @@ export function AuthenticationManager({ onAuthStateChange, children }: Authentic
       
       if (event === 'SIGNED_OUT' || !session) {
         console.log("User signed out or no session");
-        onAuthStateChange(false);
+        if (mounted) {
+          onAuthStateChange(false);
+        }
         return;
       }
       
       if (event === 'SIGNED_IN' && session) {
         console.log("User signed in:", session.user.id);
         const profile = await fetchUserProfile(session.user.id);
-        onAuthStateChange(true, profile);
+        if (mounted) {
+          onAuthStateChange(true, profile);
+        }
       }
     });
 
     return () => {
+      mounted = false;
       subscription.unsubscribe();
     };
   }, [onAuthStateChange]);

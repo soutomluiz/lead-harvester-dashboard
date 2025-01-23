@@ -38,12 +38,6 @@ export function AuthPage() {
         console.log("User signed in, redirecting to dashboard");
         navigate("/");
         setError(null);
-      } else if (event === 'SIGNED_OUT') {
-        console.log("User signed out, staying on login page");
-        // Garantir que o usuário permaneça na página de login após o logout
-        if (window.location.pathname !== '/login') {
-          navigate("/login");
-        }
       }
     });
 

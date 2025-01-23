@@ -29,8 +29,6 @@ export function LoginForm() {
 
     try {
       setIsResendingEmail(true);
-      console.log("Reenviando email de confirmação para:", email);
-      
       const { error } = await supabase.auth.resend({
         type: 'signup',
         email: email.trim(),
@@ -39,17 +37,7 @@ export function LoginForm() {
         }
       });
 
-      if (error) {
-        console.error("Erro ao reenviar email:", error);
-        toast({
-          title: "Erro ao reenviar email",
-          description: "Não foi possível reenviar o email de confirmação. Por favor, tente novamente.",
-          variant: "destructive",
-          duration: 4000,
-        });
-        setIsResendingEmail(false);
-        return;
-      }
+      if (error) throw error;
 
       toast({
         title: "Email reenviado com sucesso!",
@@ -57,7 +45,7 @@ export function LoginForm() {
         duration: 6000,
       });
     } catch (error) {
-      console.error("Erro inesperado ao reenviar email:", error);
+      console.error("Erro ao reenviar email:", error);
       toast({
         title: "Erro ao reenviar email",
         description: "Ocorreu um erro inesperado. Por favor, tente novamente.",
@@ -149,36 +137,6 @@ export function LoginForm() {
       setIsLoading(false);
     }
   };
-
-  useEffect(() => {
-    const checkEmailVerification = async () => {
-      const params = new URLSearchParams(window.location.search);
-      const isEmailConfirmation = params.has('email_confirm');
-      
-      if (isEmailConfirmation) {
-        const { data: { session }, error } = await supabase.auth.getSession();
-        
-        if (session) {
-          toast({
-            title: "Email confirmado com sucesso!",
-            description: "Seu email foi verificado. Você pode fazer login agora.",
-            duration: 6000,
-          });
-          navigate("/login");
-        } else if (error) {
-          console.error("Erro ao verificar sessão:", error);
-          toast({
-            title: "Erro na verificação",
-            description: "Houve um problema ao verificar seu email. Por favor, tente novamente.",
-            variant: "destructive",
-            duration: 6000,
-          });
-        }
-      }
-    };
-
-    checkEmailVerification();
-  }, [navigate, toast]);
 
   return (
     <form onSubmit={handleLogin} className="space-y-4">

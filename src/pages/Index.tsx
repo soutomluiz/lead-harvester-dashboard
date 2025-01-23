@@ -59,7 +59,7 @@ const Index = () => {
 
   const fetchUserProfile = async (userId: string) => {
     try {
-      console.log("Fetching user profile for ID:", userId);
+      console.log("Starting to fetch user profile for ID:", userId);
       const { data: profile, error } = await supabase
         .from('profiles')
         .select('*')
@@ -72,10 +72,12 @@ const Index = () => {
       }
 
       if (profile) {
-        console.log("Profile loaded:", profile);
+        console.log("Profile loaded successfully:", profile);
         setUserName(profile.full_name || '');
         setAvatarUrl(profile.avatar_url);
         setUserProfile(profile);
+      } else {
+        console.log("No profile found for user:", userId);
       }
     } catch (error) {
       console.error("Error in fetchUserProfile:", error);
@@ -84,14 +86,15 @@ const Index = () => {
 
   useEffect(() => {
     let mounted = true;
+    let authSubscription: { unsubscribe: () => void } | null = null;
 
     const checkAuth = async () => {
       try {
-        console.log("Checking authentication status...");
+        console.log("Starting authentication check...");
         const { data: { session }, error: sessionError } = await supabase.auth.getSession();
         
         if (sessionError) {
-          console.error("Error checking session:", sessionError);
+          console.error("Session check error:", sessionError);
           if (mounted) {
             setIsAuthenticated(false);
             setIsLoading(false);
@@ -108,10 +111,11 @@ const Index = () => {
           return;
         }
 
+        console.log("Active session found, fetching user profile...");
         if (mounted) {
           setIsAuthenticated(true);
           await fetchUserProfile(session.user.id);
-          setIsLoading(false);  // Move this here to ensure it's set after profile fetch
+          setIsLoading(false);
         }
       } catch (error) {
         console.error("Error in checkAuth:", error);
@@ -124,29 +128,41 @@ const Index = () => {
 
     checkAuth();
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      console.log("Auth state changed:", event);
-      
-      if (event === 'SIGNED_OUT' || !session) {
-        if (mounted) {
-          setIsAuthenticated(false);
-          setUserName('');
-          setAvatarUrl(null);
-          setUserProfile(null);
-          setIsLoading(false);
+    try {
+      authSubscription = supabase.auth.onAuthStateChange(async (event, session) => {
+        console.log("Auth state changed:", event, "Session:", session?.user?.id);
+        
+        if (event === 'SIGNED_OUT' || !session) {
+          console.log("User signed out or no session");
+          if (mounted) {
+            setIsAuthenticated(false);
+            setUserName('');
+            setAvatarUrl(null);
+            setUserProfile(null);
+            setIsLoading(false);
+          }
+        } else if (event === 'SIGNED_IN' && session) {
+          console.log("User signed in, fetching profile...");
+          if (mounted) {
+            setIsAuthenticated(true);
+            await fetchUserProfile(session.user.id);
+            setIsLoading(false);
+          }
         }
-      } else if (event === 'SIGNED_IN' && session) {
-        if (mounted) {
-          setIsAuthenticated(true);
-          await fetchUserProfile(session.user.id);
-          setIsLoading(false);  // Add this here too
-        }
+      });
+    } catch (error) {
+      console.error("Error setting up auth subscription:", error);
+      if (mounted) {
+        setIsLoading(false);
       }
-    });
+    }
 
     return () => {
+      console.log("Cleaning up auth subscriptions...");
       mounted = false;
-      subscription.unsubscribe();
+      if (authSubscription) {
+        authSubscription.unsubscribe();
+      }
     };
   }, []);
 
@@ -163,6 +179,7 @@ const Index = () => {
   };
 
   if (isLoading) {
+    console.log("Rendering loading state...");
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
@@ -171,9 +188,11 @@ const Index = () => {
   }
 
   if (!isAuthenticated) {
+    console.log("User not authenticated, rendering AuthPage...");
     return <AuthPage />;
   }
 
+  console.log("Rendering main dashboard...");
   return (
     <SidebarProvider>
       <div className="flex min-h-screen w-full bg-background">

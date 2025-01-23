@@ -5,49 +5,57 @@ import { Button } from "@/components/ui/button";
 import { UserProfilePanel } from "@/components/UserProfilePanel";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
-import { UserRound, LogOut } from "lucide-react";
+import { UserRound, LogOut, Loader } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 
 export function SidebarUserSection() {
   const [userProfile, setUserProfile] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState(true);
   const { handleSignOut } = useAuth();
   const { toast } = useToast();
 
-  useEffect(() => {
-    const fetchProfile = async () => {
-      try {
-        const { data: { session } } = await supabase.auth.getSession();
-        if (!session) return;
-
-        const { data: profile, error } = await supabase
-          .from('profiles')
-          .select('*')
-          .eq('id', session.user.id)
-          .single();
-
-        if (error) throw error;
-        
-        console.log("Profile loaded:", profile);
-        setUserProfile(profile);
-      } catch (error) {
-        console.error("Error fetching profile:", error);
-        toast({
-          variant: "destructive",
-          title: "Erro ao carregar perfil",
-          description: "Não foi possível carregar suas informações. Por favor, tente novamente.",
-        });
+  const fetchProfile = async () => {
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        setIsLoading(false);
+        return;
       }
-    };
 
+      const { data: profile, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', session.user.id)
+        .maybeSingle();
+
+      if (error) throw error;
+      
+      console.log("Profile loaded:", profile);
+      setUserProfile(profile);
+    } catch (error) {
+      console.error("Error fetching profile:", error);
+      toast({
+        variant: "destructive",
+        title: "Erro ao carregar perfil",
+        description: "Não foi possível carregar suas informações. Por favor, tente novamente.",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
     fetchProfile();
 
     // Subscribe to auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      console.log("Auth state changed:", event);
+      console.log("Auth state changed:", event, session);
       if (event === 'SIGNED_IN') {
+        setIsLoading(true);
         fetchProfile();
       } else if (event === 'SIGNED_OUT') {
         setUserProfile(null);
+        setIsLoading(false);
       }
     });
 
@@ -55,6 +63,24 @@ export function SidebarUserSection() {
       subscription.unsubscribe();
     };
   }, [toast]);
+
+  if (isLoading) {
+    return (
+      <div className="p-4">
+        <div className="flex items-center gap-2">
+          <Avatar>
+            <AvatarFallback>
+              <Loader className="h-5 w-5 animate-spin" />
+            </AvatarFallback>
+          </Avatar>
+          <div className="flex-1 space-y-2">
+            <div className="h-4 w-24 bg-muted animate-pulse rounded" />
+            <div className="h-3 w-32 bg-muted animate-pulse rounded" />
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (!userProfile) {
     return (
@@ -66,7 +92,7 @@ export function SidebarUserSection() {
             </AvatarFallback>
           </Avatar>
           <div className="flex-1">
-            <div className="h-4 w-24 bg-muted animate-pulse rounded" />
+            <div className="text-sm text-muted-foreground">Sem perfil</div>
           </div>
         </div>
       </div>

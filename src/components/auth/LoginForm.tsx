@@ -39,15 +39,19 @@ export function LoginForm() {
         console.error("Login error:", error);
         
         let message = "Email ou senha incorretos. Por favor, verifique suas credenciais.";
+        let description = "";
+        
         if (error.message.includes("Email not confirmed")) {
-          message = "Por favor, confirme seu email antes de fazer login.";
+          message = "Email não confirmado";
+          description = "Por favor, verifique sua caixa de entrada e confirme seu email antes de fazer login. Se não encontrar o email de confirmação, você pode solicitar um novo no processo de cadastro.";
         } else if (error.message.includes("Invalid login credentials")) {
-          message = "Credenciais inválidas. Por favor, verifique seu email e senha.";
+          message = "Credenciais inválidas";
+          description = "Por favor, verifique seu email e senha.";
         }
         
         toast({
-          title: "Erro no login",
-          description: message,
+          title: message,
+          description: description,
           variant: "destructive",
         });
         return;

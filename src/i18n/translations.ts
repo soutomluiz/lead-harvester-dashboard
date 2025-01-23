@@ -86,7 +86,10 @@ export const translations = {
     "support": "Suporte",
     "version": "Versão",
     "hello": "Olá",
-    "profile": "Perfil"
+    "profile": "Perfil",
+    "notifications": "Notificações",
+    "browserNotifications": "Notificações do navegador",
+    "soundNotifications": "Notificações sonoras"
   },
   "en": {
     "welcomeTour": "Welcome to our system! Let's take a quick tour to show you the main features.",
@@ -172,7 +175,10 @@ export const translations = {
     "support": "Support",
     "version": "Version",
     "hello": "Hello",
-    "profile": "Profile"
+    "profile": "Profile",
+    "notifications": "Notifications",
+    "browserNotifications": "Browser notifications",
+    "soundNotifications": "Sound notifications"
   },
   "es": {
     "welcomeTour": "¡Bienvenido a nuestro sistema! Hagamos un recorrido rápido para mostrarle las características principales.",
@@ -258,6 +264,9 @@ export const translations = {
     "support": "Soporte",
     "version": "Versión",
     "hello": "Hola",
-    "profile": "Perfil"
+    "profile": "Perfil",
+    "notifications": "Notificaciones",
+    "browserNotifications": "Notificaciones del navegador",
+    "soundNotifications": "Notificaciones sonoras"
   }
 };

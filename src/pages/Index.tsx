@@ -52,54 +52,77 @@ const Index = () => {
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [userProfile, setUserProfile] = useState<any>(null);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
   const { t } = useLanguage();
   const { handleSignOut } = useAuth();
 
-  useEffect(() => {
-    const checkAuth = async () => {
-      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-      
-      if (sessionError) {
-        console.error("Error checking session:", sessionError);
-        setIsAuthenticated(false);
-        return;
-      }
-
-      if (!session) {
-        console.log("No active session found in Index");
-        setIsAuthenticated(false);
-        return;
-      }
-
-      setIsAuthenticated(true);
-
-      // Get and log user profile
-      const { data: profile, error: profileError } = await supabase
+  const fetchUserProfile = async (userId: string) => {
+    try {
+      const { data: profile, error } = await supabase
         .from('profiles')
         .select('*')
-        .eq('id', session.user.id)
+        .eq('id', userId)
         .single();
-      
-      if (profileError) {
-        console.error("Error fetching profile:", profileError);
-      } else {
-        console.log("User profile:", profile);
-        setUserName(profile?.full_name || '');
-        setAvatarUrl(profile?.avatar_url);
+
+      if (error) {
+        console.error("Error fetching profile:", error);
+        return;
+      }
+
+      if (profile) {
+        console.log("Profile loaded:", profile);
+        setUserName(profile.full_name || '');
+        setAvatarUrl(profile.avatar_url);
         setUserProfile(profile);
+      }
+    } catch (error) {
+      console.error("Error in fetchUserProfile:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+        
+        if (sessionError) {
+          console.error("Error checking session:", sessionError);
+          setIsAuthenticated(false);
+          setIsLoading(false);
+          return;
+        }
+
+        if (!session) {
+          console.log("No active session found");
+          setIsAuthenticated(false);
+          setIsLoading(false);
+          return;
+        }
+
+        setIsAuthenticated(true);
+        await fetchUserProfile(session.user.id);
+      } catch (error) {
+        console.error("Error in checkAuth:", error);
+        setIsLoading(false);
       }
     };
 
     checkAuth();
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      console.log("Auth state changed in Index:", event);
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      console.log("Auth state changed:", event);
+      
       if (event === 'SIGNED_OUT' || !session) {
-        console.log("User signed out or no session in Index");
         setIsAuthenticated(false);
+        setUserName('');
+        setAvatarUrl(null);
+        setUserProfile(null);
       } else if (event === 'SIGNED_IN' && session) {
         setIsAuthenticated(true);
+        await fetchUserProfile(session.user.id);
       }
     });
 
@@ -120,8 +143,7 @@ const Index = () => {
     setLeads([...leads, ...newLeads]);
   };
 
-  // Show loading state
-  if (isAuthenticated === null) {
+  if (isAuthenticated === null || isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
@@ -129,12 +151,10 @@ const Index = () => {
     );
   }
 
-  // Show login page if not authenticated
   if (!isAuthenticated) {
     return <AuthPage />;
   }
 
-  // Show dashboard if authenticated
   return (
     <SidebarProvider>
       <div className="flex min-h-screen w-full bg-background">
@@ -145,9 +165,11 @@ const Index = () => {
               {getPageTitle(activeTab)}
             </h1>
             <div className="flex items-center gap-4">
-              <span className="text-sm font-medium">
-                {t("hello")}, {userName}
-              </span>
+              {userName && (
+                <span className="text-sm font-medium">
+                  {t("hello")}, {userName}
+                </span>
+              )}
               <NotificationBell />
               <ThemeToggle />
               <Sheet>

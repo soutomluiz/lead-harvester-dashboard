@@ -13,7 +13,7 @@ export function LoginForm() {
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isResendingEmail, setIsResendingEmail] = useState(false);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | JSX.Element | null>(null);
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -83,7 +83,7 @@ export function LoginForm() {
         console.log("Mensagem de erro:", error.message);
         console.log("Detalhes do erro:", JSON.stringify(error, null, 2));
         
-        let message = "";
+        let message: string | JSX.Element = "";
         
         if (error.message.includes("Email not confirmed")) {
           message = (
@@ -145,7 +145,7 @@ export function LoginForm() {
       {errorMessage && (
         <Alert variant="destructive">
           <AlertDescription>
-            {typeof errorMessage === 'string' ? errorMessage : errorMessage}
+            {errorMessage}
           </AlertDescription>
         </Alert>
       )}

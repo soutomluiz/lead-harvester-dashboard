@@ -71,32 +71,21 @@ const Index = () => {
       }
 
       if (profile) {
-        console.log("Profile loaded:", profile);
         setUserName(profile.full_name || '');
         setAvatarUrl(profile.avatar_url);
         setUserProfile(profile);
       }
     } catch (error) {
       console.error("Error in fetchUserProfile:", error);
-    } finally {
-      setIsLoading(false);
     }
   };
 
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+        const { data: { session } } = await supabase.auth.getSession();
         
-        if (sessionError) {
-          console.error("Error checking session:", sessionError);
-          setIsAuthenticated(false);
-          setIsLoading(false);
-          return;
-        }
-
         if (!session) {
-          console.log("No active session found");
           setIsAuthenticated(false);
           setIsLoading(false);
           return;
@@ -104,6 +93,7 @@ const Index = () => {
 
         setIsAuthenticated(true);
         await fetchUserProfile(session.user.id);
+        setIsLoading(false);
       } catch (error) {
         console.error("Error in checkAuth:", error);
         setIsLoading(false);
@@ -113,16 +103,16 @@ const Index = () => {
     checkAuth();
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      console.log("Auth state changed:", event);
-      
       if (event === 'SIGNED_OUT' || !session) {
         setIsAuthenticated(false);
         setUserName('');
         setAvatarUrl(null);
         setUserProfile(null);
+        setIsLoading(false);
       } else if (event === 'SIGNED_IN' && session) {
         setIsAuthenticated(true);
         await fetchUserProfile(session.user.id);
+        setIsLoading(false);
       }
     });
 
@@ -143,7 +133,7 @@ const Index = () => {
     setLeads([...leads, ...newLeads]);
   };
 
-  if (isAuthenticated === null || isLoading) {
+  if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>

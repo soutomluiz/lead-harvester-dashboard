@@ -6,29 +6,28 @@ import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2 } from "lucide-react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 export function LoginForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const { toast } = useToast();
   const navigate = useNavigate();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    setErrorMessage(null);
     
     if (!email || !password) {
-      toast({
-        title: "Campos obrigatórios",
-        description: "Por favor, preencha todos os campos.",
-        variant: "destructive",
-      });
+      setErrorMessage("Por favor, preencha todos os campos.");
       return;
     }
 
     try {
       setIsLoading(true);
-      console.log("Attempting login for email:", email);
+      console.log("Tentando fazer login com email:", email);
 
       const { data, error } = await supabase.auth.signInWithPassword({
         email: email.trim(),
@@ -36,48 +35,42 @@ export function LoginForm() {
       });
 
       if (error) {
-        console.error("Login error:", error);
-        console.log("Error message:", error.message);
-        console.log("Error details:", JSON.stringify(error, null, 2));
+        console.error("Erro no login:", error);
+        console.log("Mensagem de erro:", error.message);
+        console.log("Detalhes do erro:", JSON.stringify(error, null, 2));
         
-        let title = "Erro no login";
-        let description = "Email ou senha incorretos. Por favor, verifique suas credenciais.";
+        let message = "";
         
-        if (error.message.includes("Email not confirmed")) {
-          title = "Email não confirmado";
-          description = "Por favor, verifique sua caixa de entrada e confirme seu email antes de fazer login. Se não encontrar o email de confirmação, você pode solicitar um novo no processo de cadastro.";
-          
-          // Add a note about disabling email confirmation for testing
-          console.log("Note: For testing, you may want to disable email confirmation in the Supabase dashboard");
-        } else if (error.message.includes("Invalid login credentials")) {
-          title = "Credenciais inválidas";
-          description = "Por favor, verifique seu email e senha.";
+        if (error.message.includes("Invalid login credentials")) {
+          message = "Email ou senha incorretos. Por favor, verifique suas credenciais.";
+        } else if (error.message.includes("Email not confirmed")) {
+          message = "Por favor, verifique sua caixa de entrada e confirme seu email antes de fazer login. Se não encontrar o email de confirmação, você pode solicitar um novo no processo de cadastro.";
+        } else {
+          message = "Erro ao tentar fazer login. Por favor, tente novamente.";
         }
         
+        setErrorMessage(message);
         toast({
-          title,
-          description,
+          title: "Erro no login",
+          description: message,
           variant: "destructive",
-          duration: 6000, // Increased duration for email confirmation message
+          duration: 6000,
         });
         return;
       }
 
       if (data?.user) {
-        console.log("Login successful for user:", data.user.id);
+        console.log("Login realizado com sucesso para usuário:", data.user.id);
         toast({
           title: "Login realizado com sucesso",
           description: "Você será redirecionado para o dashboard.",
+          duration: 4000,
         });
         navigate("/");
       }
     } catch (error) {
-      console.error("Unexpected login error:", error);
-      toast({
-        title: "Erro no login",
-        description: "Ocorreu um erro inesperado. Por favor, tente novamente.",
-        variant: "destructive",
-      });
+      console.error("Erro inesperado durante login:", error);
+      setErrorMessage("Ocorreu um erro inesperado. Por favor, tente novamente.");
     } finally {
       setIsLoading(false);
     }
@@ -85,6 +78,12 @@ export function LoginForm() {
 
   return (
     <form onSubmit={handleLogin} className="space-y-4">
+      {errorMessage && (
+        <Alert variant="destructive">
+          <AlertDescription>{errorMessage}</AlertDescription>
+        </Alert>
+      )}
+
       <div className="space-y-2">
         <Label htmlFor="email">Email</Label>
         <Input

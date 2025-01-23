@@ -1,28 +1,22 @@
-import { useState } from "react";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/components/ui/use-toast";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 export function NotificationSettings() {
-  const [emailNotifications, setEmailNotifications] = useState(false);
-  const { toast } = useToast();
-
-  const handleNotificationChange = (checked: boolean) => {
-    setEmailNotifications(checked);
-    console.log("Email notifications:", checked);
-  };
+  const { t } = useLanguage();
 
   return (
     <div className="space-y-4">
-      <h3 className="text-lg font-semibold">Configuração de Notificações</h3>
-      <div className="flex items-center space-x-2">
-        <Switch
-          id="email-notifications"
-          checked={emailNotifications}
-          onCheckedChange={handleNotificationChange}
-        />
-        <Label htmlFor="email-notifications">Ativar notificações por e-mail</Label>
+      <h3 className="text-lg font-semibold">{t("notifications")}</h3>
+      <div className="space-y-4">
+        <div className="flex items-center space-x-2">
+          <Switch id="browser-notifications" />
+          <Label htmlFor="browser-notifications">{t("browserNotifications")}</Label>
+        </div>
+        <div className="flex items-center space-x-2">
+          <Switch id="sound-notifications" />
+          <Label htmlFor="sound-notifications">{t("soundNotifications")}</Label>
+        </div>
       </div>
     </div>
   );

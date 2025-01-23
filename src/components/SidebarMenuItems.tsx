@@ -1,4 +1,4 @@
-import { Database, Users, MapPin, Globe, Settings, CreditCard, PlusCircle, LayoutDashboard, Timer, ListChecks, Award, ChevronDown, BarChart } from "lucide-react";
+import { Database, Users, MapPin, Globe, Settings, Crown, PlusCircle, LayoutDashboard, Timer, ListChecks, Award, ChevronDown, BarChart } from "lucide-react";
 import {
   SidebarMenu,
   SidebarMenuItem,
@@ -75,7 +75,7 @@ export function SidebarMenuItems({ activeTab, setActiveTab }: SidebarMenuItemsPr
       ],
     },
     { id: "reports", icon: BarChart, label: t("reports") },
-    { id: "subscription", icon: CreditCard, label: t("subscription") },
+    { id: "subscription", icon: Crown, label: t("subscription") },
     { id: "config", icon: Settings, label: t("settings") },
   ];
 

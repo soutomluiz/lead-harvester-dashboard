@@ -32,12 +32,14 @@ export function AuthPage() {
     checkSession();
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      console.log("Auth state changed in AuthPage:", event);
+      console.log("Auth state changed:", event);
       
       if (event === 'SIGNED_IN' && session) {
         console.log("User signed in, redirecting to dashboard");
         navigate("/");
         setError(null);
+      } else if (event === 'SIGNED_OUT') {
+        console.log("User signed out, staying on login page");
       }
     });
 

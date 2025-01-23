@@ -55,26 +55,40 @@ const Index = () => {
   const { handleSignOut } = useAuth();
 
   useEffect(() => {
-    const fetchUserProfile = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('*')
-          .eq('id', user.id)
-          .single();
-        
-        if (profile) {
-          setUserName(profile.full_name || '');
-          setAvatarUrl(profile.avatar_url);
-          setUserProfile(profile);
-        }
-      } else {
+    const checkAuth = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        console.log("No active session found in Index, redirecting to login");
         navigate('/login');
+        return;
+      }
+
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', session.user.id)
+        .single();
+      
+      if (profile) {
+        setUserName(profile.full_name || '');
+        setAvatarUrl(profile.avatar_url);
+        setUserProfile(profile);
       }
     };
 
-    fetchUserProfile();
+    checkAuth();
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      console.log("Auth state changed in Index:", event);
+      if (event === 'SIGNED_OUT' || !session) {
+        console.log("User signed out or no session in Index, redirecting to login");
+        navigate('/login');
+      }
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
   }, [navigate]);
 
   const handleAddLead = (data: Omit<Lead, "id">) => {

@@ -92,6 +92,7 @@ export const translations = {
     "soundNotifications": "Notificações sonoras",
     
     // Auth translations
+    "logout": "Sair",
     "logoutSuccess": "Você foi desconectado com sucesso",
     "logoutError": "Erro ao tentar desconectar",
   },
@@ -185,6 +186,7 @@ export const translations = {
     "soundNotifications": "Sound notifications",
     
     // Auth translations
+    "logout": "Logout",
     "logoutSuccess": "You have been successfully logged out",
     "logoutError": "Error trying to log out",
   },
@@ -278,6 +280,7 @@ export const translations = {
     "soundNotifications": "Notificaciones sonoras",
     
     // Auth translations
+    "logout": "Cerrar sesión",
     "logoutSuccess": "Has cerrado sesión exitosamente",
     "logoutError": "Error al intentar cerrar sesión",
   }

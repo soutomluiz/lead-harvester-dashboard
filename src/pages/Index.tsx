@@ -59,14 +59,16 @@ const Index = () => {
 
   const fetchUserProfile = async (userId: string) => {
     try {
+      console.log("Fetching user profile for ID:", userId);
       const { data: profile, error } = await supabase
         .from('profiles')
         .select('*')
         .eq('id', userId)
-        .single();
+        .maybeSingle();
 
       if (error) {
         console.error("Error fetching profile:", error);
+        setIsLoading(false);
         return;
       }
 
@@ -84,29 +86,40 @@ const Index = () => {
   };
 
   useEffect(() => {
+    let mounted = true;
+
     const checkAuth = async () => {
       try {
+        console.log("Checking authentication status...");
         const { data: { session }, error: sessionError } = await supabase.auth.getSession();
         
         if (sessionError) {
           console.error("Error checking session:", sessionError);
-          setIsAuthenticated(false);
-          setIsLoading(false);
+          if (mounted) {
+            setIsAuthenticated(false);
+            setIsLoading(false);
+          }
           return;
         }
 
         if (!session) {
           console.log("No active session found");
-          setIsAuthenticated(false);
-          setIsLoading(false);
+          if (mounted) {
+            setIsAuthenticated(false);
+            setIsLoading(false);
+          }
           return;
         }
 
-        setIsAuthenticated(true);
-        await fetchUserProfile(session.user.id);
+        if (mounted) {
+          setIsAuthenticated(true);
+          await fetchUserProfile(session.user.id);
+        }
       } catch (error) {
         console.error("Error in checkAuth:", error);
-        setIsLoading(false);
+        if (mounted) {
+          setIsLoading(false);
+        }
       }
     };
 
@@ -116,17 +129,23 @@ const Index = () => {
       console.log("Auth state changed:", event);
       
       if (event === 'SIGNED_OUT' || !session) {
-        setIsAuthenticated(false);
-        setUserName('');
-        setAvatarUrl(null);
-        setUserProfile(null);
+        if (mounted) {
+          setIsAuthenticated(false);
+          setUserName('');
+          setAvatarUrl(null);
+          setUserProfile(null);
+          setIsLoading(false);
+        }
       } else if (event === 'SIGNED_IN' && session) {
-        setIsAuthenticated(true);
-        await fetchUserProfile(session.user.id);
+        if (mounted) {
+          setIsAuthenticated(true);
+          await fetchUserProfile(session.user.id);
+        }
       }
     });
 
     return () => {
+      mounted = false;
       subscription.unsubscribe();
     };
   }, []);
@@ -143,7 +162,7 @@ const Index = () => {
     setLeads([...leads, ...newLeads]);
   };
 
-  if (isAuthenticated === null || isLoading) {
+  if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>

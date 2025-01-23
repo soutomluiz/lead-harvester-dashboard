@@ -37,22 +37,28 @@ export function LoginForm() {
 
       if (error) {
         console.error("Login error:", error);
+        console.log("Error message:", error.message);
+        console.log("Error details:", JSON.stringify(error, null, 2));
         
-        let message = "Email ou senha incorretos. Por favor, verifique suas credenciais.";
-        let description = "";
+        let title = "Erro no login";
+        let description = "Email ou senha incorretos. Por favor, verifique suas credenciais.";
         
         if (error.message.includes("Email not confirmed")) {
-          message = "Email não confirmado";
+          title = "Email não confirmado";
           description = "Por favor, verifique sua caixa de entrada e confirme seu email antes de fazer login. Se não encontrar o email de confirmação, você pode solicitar um novo no processo de cadastro.";
+          
+          // Add a note about disabling email confirmation for testing
+          console.log("Note: For testing, you may want to disable email confirmation in the Supabase dashboard");
         } else if (error.message.includes("Invalid login credentials")) {
-          message = "Credenciais inválidas";
+          title = "Credenciais inválidas";
           description = "Por favor, verifique seu email e senha.";
         }
         
         toast({
-          title: message,
-          description: description,
+          title,
+          description,
           variant: "destructive",
+          duration: 6000, // Increased duration for email confirmation message
         });
         return;
       }

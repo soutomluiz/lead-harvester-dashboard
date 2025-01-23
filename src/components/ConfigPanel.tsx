@@ -14,7 +14,8 @@ export function ConfigPanel() {
   const { toast } = useToast();
   const { t } = useLanguage();
 
-  const handleApplySettings = async () => {
+  const handleApplySettings = async (e: React.FormEvent) => {
+    e.preventDefault();
     setIsLoading(true);
     try {
       // Save settings to localStorage or your preferred storage
@@ -38,31 +39,33 @@ export function ConfigPanel() {
     <div className="space-y-6">
       <h2 className="text-2xl font-bold">{t("settings")}</h2>
       
-      <Card className="p-6">
-        <div className="space-y-8">
-          <WebhookSettings />
-          <NotificationSettings />
-          <ThemeSettings />
-          <LanguageSettings />
-          
-          <div className="pt-4 border-t">
-            <Button 
-              className="w-full" 
-              onClick={handleApplySettings}
-              disabled={isLoading}
-            >
-              {isLoading ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  {t("loading")}
-                </>
-              ) : (
-                t("applySettings")
-              )}
-            </Button>
+      <form onSubmit={handleApplySettings} data-config-panel>
+        <Card className="p-6">
+          <div className="space-y-8">
+            <WebhookSettings />
+            <NotificationSettings />
+            <ThemeSettings />
+            <LanguageSettings />
+            
+            <div className="pt-4 border-t">
+              <Button 
+                type="submit"
+                className="w-full" 
+                disabled={isLoading}
+              >
+                {isLoading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    {t("loading")}
+                  </>
+                ) : (
+                  t("applySettings")
+                )}
+              </Button>
+            </div>
           </div>
-        </div>
-      </Card>
+        </Card>
+      </form>
     </div>
   );
 }

@@ -1,6 +1,4 @@
 export type Language = "pt-BR" | "en" | "es";
-
-// Create a union type of all possible translation keys
 export type TranslationKey = keyof typeof translations["pt-BR"];
 
 export const translations = {
@@ -58,18 +56,30 @@ export const translations = {
     "loading": "Carregando...",
     "applySettings": "Aplicar Configurações",
     
-    // Misc
-    "hello": "Olá",
-    "profile": "Perfil",
-    "success": "Sucesso",
-    "error": "Erro",
-    "settingsError": "Erro ao atualizar configurações",
-    "addLeads": "Adicionar Leads",
-    "leads": "Leads",
-    "support": "Suporte",
-    "version": "Versão"
+    // Export Settings
+    "exportSettings": "Configurações de Exportação",
+    "defaultExportFormat": "Formato padrão de exportação",
+    "selectFormat": "Selecione o formato",
+    
+    // Display Settings
+    "displaySettings": "Configurações de Visualização",
+    "itemsPerPage": "Itens por página",
+    "selectItemsPerPage": "Selecione a quantidade",
+    
+    // Email Notifications
+    "emailNotifications": "Notificações por Email",
+    "newLeadNotification": "Novos leads",
+    "leadStatusNotification": "Mudanças de status",
+    "dailySummaryNotification": "Resumo diário",
+    "weeklyReportNotification": "Relatório semanal",
+    
+    // Calendar Integration
+    "calendarIntegration": "Integração com Calendário",
+    "enableCalendarSync": "Ativar sincronização",
+    "calendarUrl": "URL do calendário"
   },
   "en": {
+    // Tour translations
     "welcomeTour": "Welcome to our system! Let's take a quick tour to show you the main features.",
     "sidebarTour": "This is the main menu, where you can navigate through all system features.",
     "prospectTour": "Here you can prospect leads automatically using Google Places or by extracting from websites.",
@@ -79,6 +89,8 @@ export const translations = {
     "profileTour": "Access your profile, settings and logout from the system.",
     "tourCompleted": "Tour completed!",
     "tourCompletedDesc": "Now you know the main features of the system. Good job!",
+    
+    // Dashboard translations
     "totalLeads": "Total Leads",
     "recentLeads": "Recent Leads",
     "withTags": "With Tags",
@@ -100,6 +112,8 @@ export const translations = {
     "uniqueDomains": "Unique Domains",
     "companiesFound": "Companies Found",
     "averageRating": "Average Rating",
+    
+    // Navigation and general
     "dashboard": "Dashboard",
     "manualInput": "Manual Input",
     "googleMaps": "Google Maps",
@@ -112,20 +126,36 @@ export const translations = {
     "settings": "Settings",
     "language": "Language",
     "selectLanguage": "Select Language",
+    
+    // Settings and configuration
     "settingsApplied": "Settings Applied",
     "loading": "Loading...",
     "applySettings": "Apply Settings",
-    "hello": "Hello",
-    "profile": "Profile",
-    "success": "Success",
-    "error": "Error",
-    "settingsError": "Error updating settings",
-    "addLeads": "Add Leads",
-    "leads": "Leads",
-    "support": "Support",
-    "version": "Version"
+    
+    // Export Settings
+    "exportSettings": "Export Settings",
+    "defaultExportFormat": "Default export format",
+    "selectFormat": "Select format",
+    
+    // Display Settings
+    "displaySettings": "Display Settings",
+    "itemsPerPage": "Items per page",
+    "selectItemsPerPage": "Select quantity",
+    
+    // Email Notifications
+    "emailNotifications": "Email Notifications",
+    "newLeadNotification": "New leads",
+    "leadStatusNotification": "Status changes",
+    "dailySummaryNotification": "Daily summary",
+    "weeklyReportNotification": "Weekly report",
+    
+    // Calendar Integration
+    "calendarIntegration": "Calendar Integration",
+    "enableCalendarSync": "Enable synchronization",
+    "calendarUrl": "Calendar URL"
   },
   "es": {
+    // Tour translations
     "welcomeTour": "¡Bienvenido a nuestro sistema! Hagamos un recorrido rápido para mostrarle las características principales.",
     "sidebarTour": "Este es el menú principal, donde puede navegar por todas las funciones del sistema.",
     "prospectTour": "Aquí puede prospectar leads automáticamente usando Google Places o extrayendo de sitios web.",
@@ -135,6 +165,8 @@ export const translations = {
     "profileTour": "Acceda a su perfil, configuración y cierre sesión en el sistema.",
     "tourCompleted": "¡Recorrido completado!",
     "tourCompletedDesc": "Ahora conoce las principales características del sistema. ¡Buen trabajo!",
+    
+    // Dashboard translations
     "totalLeads": "Total de Leads",
     "recentLeads": "Leads Recientes",
     "withTags": "Con Etiquetas",
@@ -156,6 +188,8 @@ export const translations = {
     "uniqueDomains": "Dominios Únicos",
     "companiesFound": "Empresas Encontradas",
     "averageRating": "Calificación Promedio",
+    
+    // Navigation and general
     "dashboard": "Tablero",
     "manualInput": "Entrada Manual",
     "googleMaps": "Google Maps",
@@ -168,17 +202,32 @@ export const translations = {
     "settings": "Configuraciones",
     "language": "Idioma",
     "selectLanguage": "Seleccione el idioma",
+    
+    // Settings and configuration
     "settingsApplied": "Configuraciones Aplicadas",
     "loading": "Cargando...",
     "applySettings": "Aplicar Configuraciones",
-    "hello": "Hola",
-    "profile": "Perfil",
-    "success": "Éxito",
-    "error": "Error",
-    "settingsError": "Error al actualizar configuraciones",
-    "addLeads": "Agregar Leads",
-    "leads": "Leads",
-    "support": "Soporte",
-    "version": "Versión"
+    
+    // Export Settings
+    "exportSettings": "Configuración de Exportación",
+    "defaultExportFormat": "Formato de exportación predeterminado",
+    "selectFormat": "Seleccionar formato",
+    
+    // Display Settings
+    "displaySettings": "Configuración de Visualización",
+    "itemsPerPage": "Elementos por página",
+    "selectItemsPerPage": "Seleccionar cantidad",
+    
+    // Email Notifications
+    "emailNotifications": "Notificaciones por Correo",
+    "newLeadNotification": "Nuevos leads",
+    "leadStatusNotification": "Cambios de estado",
+    "dailySummaryNotification": "Resumen diario",
+    "weeklyReportNotification": "Informe semanal",
+    
+    // Calendar Integration
+    "calendarIntegration": "Integración de Calendario",
+    "enableCalendarSync": "Activar sincronización",
+    "calendarUrl": "URL del calendario"
   }
 };

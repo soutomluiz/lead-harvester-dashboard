@@ -12,9 +12,53 @@ export function LoginForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [isResendingEmail, setIsResendingEmail] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const { toast } = useToast();
   const navigate = useNavigate();
+
+  const handleResendConfirmationEmail = async () => {
+    if (!email) {
+      toast({
+        title: "Email necessário",
+        description: "Por favor, insira seu email para reenviar a confirmação.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      setIsResendingEmail(true);
+      const { error } = await supabase.auth.resend({
+        type: 'signup',
+        email: email.trim(),
+      });
+
+      if (error) {
+        console.error("Erro ao reenviar email:", error);
+        toast({
+          title: "Erro ao reenviar email",
+          description: "Não foi possível reenviar o email de confirmação. Por favor, tente novamente.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      toast({
+        title: "Email reenviado",
+        description: "Por favor, verifique sua caixa de entrada e confirme seu email.",
+      });
+    } catch (error) {
+      console.error("Erro inesperado ao reenviar email:", error);
+      toast({
+        title: "Erro ao reenviar email",
+        description: "Ocorreu um erro inesperado. Por favor, tente novamente.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsResendingEmail(false);
+    }
+  };
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -41,10 +85,30 @@ export function LoginForm() {
         
         let message = "";
         
-        if (error.message.includes("Invalid login credentials")) {
+        if (error.message.includes("Email not confirmed")) {
+          message = (
+            <div>
+              <p>Por favor, confirme seu email antes de fazer login.</p>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleResendConfirmationEmail}
+                disabled={isResendingEmail}
+                className="mt-2"
+              >
+                {isResendingEmail ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Reenviando...
+                  </>
+                ) : (
+                  "Reenviar email de confirmação"
+                )}
+              </Button>
+            </div>
+          );
+        } else if (error.message.includes("Invalid login credentials")) {
           message = "Email ou senha incorretos. Por favor, verifique suas credenciais.";
-        } else if (error.message.includes("Email not confirmed")) {
-          message = "Por favor, verifique sua caixa de entrada e confirme seu email antes de fazer login. Se não encontrar o email de confirmação, você pode solicitar um novo no processo de cadastro.";
         } else {
           message = "Erro ao tentar fazer login. Por favor, tente novamente.";
         }
@@ -52,7 +116,7 @@ export function LoginForm() {
         setErrorMessage(message);
         toast({
           title: "Erro no login",
-          description: message,
+          description: typeof message === 'string' ? message : "Por favor, confirme seu email antes de fazer login.",
           variant: "destructive",
           duration: 6000,
         });
@@ -80,7 +144,9 @@ export function LoginForm() {
     <form onSubmit={handleLogin} className="space-y-4">
       {errorMessage && (
         <Alert variant="destructive">
-          <AlertDescription>{errorMessage}</AlertDescription>
+          <AlertDescription>
+            {typeof errorMessage === 'string' ? errorMessage : errorMessage}
+          </AlertDescription>
         </Alert>
       )}
 

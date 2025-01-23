@@ -68,7 +68,6 @@ const Index = () => {
 
       if (error) {
         console.error("Error fetching profile:", error);
-        setIsLoading(false);
         return;
       }
 
@@ -80,8 +79,6 @@ const Index = () => {
       }
     } catch (error) {
       console.error("Error in fetchUserProfile:", error);
-    } finally {
-      setIsLoading(false);
     }
   };
 
@@ -114,10 +111,12 @@ const Index = () => {
         if (mounted) {
           setIsAuthenticated(true);
           await fetchUserProfile(session.user.id);
+          setIsLoading(false);  // Move this here to ensure it's set after profile fetch
         }
       } catch (error) {
         console.error("Error in checkAuth:", error);
         if (mounted) {
+          setIsAuthenticated(false);
           setIsLoading(false);
         }
       }
@@ -140,6 +139,7 @@ const Index = () => {
         if (mounted) {
           setIsAuthenticated(true);
           await fetchUserProfile(session.user.id);
+          setIsLoading(false);  // Add this here too
         }
       }
     });

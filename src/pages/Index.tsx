@@ -16,6 +16,7 @@ import { NotificationBell } from "@/components/NotificationBell";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/hooks/useAuth";
+import { AuthPage } from "@/components/AuthPage";
 
 const getPageTitle = (tab: string) => {
   switch (tab) {
@@ -50,38 +51,28 @@ const Index = () => {
   const [userName, setUserName] = useState<string>("");
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [userProfile, setUserProfile] = useState<any>(null);
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
   const navigate = useNavigate();
   const { t } = useLanguage();
   const { handleSignOut } = useAuth();
 
   useEffect(() => {
     const checkAuth = async () => {
-      // Get and log the current session
       const { data: { session }, error: sessionError } = await supabase.auth.getSession();
       
       if (sessionError) {
         console.error("Error checking session:", sessionError);
-        navigate('/login');
+        setIsAuthenticated(false);
         return;
       }
 
       if (!session) {
-        console.log("No active session found in Index, redirecting to login");
-        navigate('/login');
+        console.log("No active session found in Index");
+        setIsAuthenticated(false);
         return;
       }
 
-      // Log detailed session information
-      console.log("Current session:", {
-        user: {
-          id: session.user.id,
-          email: session.user.email,
-          phone: session.user.phone,
-          created_at: session.user.created_at,
-          last_sign_in_at: session.user.last_sign_in_at
-        },
-        expires_at: session.expires_at
-      });
+      setIsAuthenticated(true);
 
       // Get and log user profile
       const { data: profile, error: profileError } = await supabase
@@ -105,15 +96,17 @@ const Index = () => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       console.log("Auth state changed in Index:", event);
       if (event === 'SIGNED_OUT' || !session) {
-        console.log("User signed out or no session in Index, redirecting to login");
-        navigate('/login');
+        console.log("User signed out or no session in Index");
+        setIsAuthenticated(false);
+      } else if (event === 'SIGNED_IN' && session) {
+        setIsAuthenticated(true);
       }
     });
 
     return () => {
       subscription.unsubscribe();
     };
-  }, [navigate]);
+  }, []);
 
   const handleAddLead = (data: Omit<Lead, "id">) => {
     const newLead = {
@@ -127,6 +120,21 @@ const Index = () => {
     setLeads([...leads, ...newLeads]);
   };
 
+  // Show loading state
+  if (isAuthenticated === null) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+
+  // Show login page if not authenticated
+  if (!isAuthenticated) {
+    return <AuthPage />;
+  }
+
+  // Show dashboard if authenticated
   return (
     <SidebarProvider>
       <div className="flex min-h-screen w-full bg-background">

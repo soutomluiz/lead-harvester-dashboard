@@ -10,6 +10,7 @@ import { Loader2 } from "lucide-react";
 export function SignUpForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [name, setName] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -17,7 +18,7 @@ export function SignUpForm() {
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!email || !password) {
+    if (!email || !password || !name) {
       toast({
         title: "Campos obrigatórios",
         description: "Por favor, preencha todos os campos.",
@@ -42,6 +43,11 @@ export function SignUpForm() {
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
+        options: {
+          data: {
+            full_name: name,
+          },
+        },
       });
 
       if (error) {
@@ -62,9 +68,31 @@ export function SignUpForm() {
 
       if (data.user) {
         console.log("Conta criada com sucesso para usuário:", data.user.id);
+        
+        // Enviar email de boas-vindas
+        try {
+          const response = await fetch("/functions/v1/send-welcome-email", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${process.env.SUPABASE_ANON_KEY}`,
+            },
+            body: JSON.stringify({
+              email,
+              name,
+            }),
+          });
+
+          if (!response.ok) {
+            console.error("Erro ao enviar email de boas-vindas:", await response.text());
+          }
+        } catch (emailError) {
+          console.error("Erro ao enviar email de boas-vindas:", emailError);
+        }
+
         toast({
           title: "Conta criada com sucesso",
-          description: "Verifique seu email para confirmar sua conta.",
+          description: "Bem-vindo ao sistema!",
         });
         navigate("/");
       }
@@ -82,6 +110,19 @@ export function SignUpForm() {
 
   return (
     <form onSubmit={handleSignUp} className="space-y-4">
+      <div className="space-y-2">
+        <Label htmlFor="name">Nome completo</Label>
+        <Input
+          id="name"
+          type="text"
+          placeholder="Seu nome completo"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          disabled={isLoading}
+          required
+        />
+      </div>
+
       <div className="space-y-2">
         <Label htmlFor="email">Email</Label>
         <Input

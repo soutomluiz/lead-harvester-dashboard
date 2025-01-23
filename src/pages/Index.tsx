@@ -82,25 +82,39 @@ const Index = () => {
           setAvatarUrl(profile.avatar_url);
           setUserProfile(profile);
         }
+      } else {
+        // If no user is found, redirect to login
+        navigate('/login');
       }
     };
 
     fetchUserProfile();
-  }, []);
+  }, [navigate]);
 
   const handleSignOut = async () => {
     try {
-      await supabase.auth.signOut();
+      const { error } = await supabase.auth.signOut();
+      if (error) throw error;
+      
+      // Clear local state
+      setUserName('');
+      setAvatarUrl(null);
+      setUserProfile(null);
+      
+      // Redirect to login page
       navigate('/login');
+      
       toast({
         title: t("success"),
-        description: "Você foi desconectado com sucesso.",
+        description: t("logoutSuccess"),
+        variant: "default",
       });
     } catch (error) {
+      console.error('Error signing out:', error);
       toast({
         variant: "destructive",
         title: t("error"),
-        description: t("settingsError"),
+        description: t("logoutError"),
       });
     }
   };

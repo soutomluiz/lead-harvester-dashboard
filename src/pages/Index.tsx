@@ -59,12 +59,11 @@ const Index = () => {
 
   const fetchUserProfile = async (userId: string) => {
     try {
-      console.log("Starting to fetch user profile for ID:", userId);
       const { data: profile, error } = await supabase
         .from('profiles')
         .select('*')
         .eq('id', userId)
-        .maybeSingle();
+        .single();
 
       if (error) {
         console.error("Error fetching profile:", error);
@@ -72,99 +71,63 @@ const Index = () => {
       }
 
       if (profile) {
-        console.log("Profile loaded successfully:", profile);
+        console.log("Profile loaded:", profile);
         setUserName(profile.full_name || '');
         setAvatarUrl(profile.avatar_url);
         setUserProfile(profile);
-      } else {
-        console.log("No profile found for user:", userId);
       }
     } catch (error) {
       console.error("Error in fetchUserProfile:", error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
   useEffect(() => {
-    let mounted = true;
-    let authSubscription: { unsubscribe: () => void } | null = null;
-
     const checkAuth = async () => {
       try {
-        console.log("Starting authentication check...");
         const { data: { session }, error: sessionError } = await supabase.auth.getSession();
         
         if (sessionError) {
-          console.error("Session check error:", sessionError);
-          if (mounted) {
-            setIsAuthenticated(false);
-            setIsLoading(false);
-          }
+          console.error("Error checking session:", sessionError);
+          setIsAuthenticated(false);
+          setIsLoading(false);
           return;
         }
 
         if (!session) {
           console.log("No active session found");
-          if (mounted) {
-            setIsAuthenticated(false);
-            setIsLoading(false);
-          }
+          setIsAuthenticated(false);
+          setIsLoading(false);
           return;
         }
 
-        console.log("Active session found, fetching user profile...");
-        if (mounted) {
-          setIsAuthenticated(true);
-          await fetchUserProfile(session.user.id);
-          setIsLoading(false);
-        }
+        setIsAuthenticated(true);
+        await fetchUserProfile(session.user.id);
       } catch (error) {
         console.error("Error in checkAuth:", error);
-        if (mounted) {
-          setIsAuthenticated(false);
-          setIsLoading(false);
-        }
+        setIsLoading(false);
       }
     };
 
     checkAuth();
 
-    try {
-      const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-        console.log("Auth state changed:", event, "Session:", session?.user?.id);
-        
-        if (event === 'SIGNED_OUT' || !session) {
-          console.log("User signed out or no session");
-          if (mounted) {
-            setIsAuthenticated(false);
-            setUserName('');
-            setAvatarUrl(null);
-            setUserProfile(null);
-            setIsLoading(false);
-          }
-        } else if (event === 'SIGNED_IN' && session) {
-          console.log("User signed in, fetching profile...");
-          if (mounted) {
-            setIsAuthenticated(true);
-            await fetchUserProfile(session.user.id);
-            setIsLoading(false);
-          }
-        }
-      });
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      console.log("Auth state changed:", event);
       
-      authSubscription = subscription;
-    } catch (error) {
-      console.error("Error setting up auth subscription:", error);
-      if (mounted) {
-        setIsLoading(false);
+      if (event === 'SIGNED_OUT' || !session) {
+        setIsAuthenticated(false);
+        setUserName('');
+        setAvatarUrl(null);
+        setUserProfile(null);
+      } else if (event === 'SIGNED_IN' && session) {
+        setIsAuthenticated(true);
+        await fetchUserProfile(session.user.id);
       }
-    }
+    });
 
     return () => {
-      console.log("Cleaning up auth subscriptions...");
-      mounted = false;
-      if (authSubscription) {
-        authSubscription.unsubscribe();
-      }
+      subscription.unsubscribe();
     };
   }, []);
 
@@ -180,8 +143,7 @@ const Index = () => {
     setLeads([...leads, ...newLeads]);
   };
 
-  if (isLoading) {
-    console.log("Rendering loading state...");
+  if (isAuthenticated === null || isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
@@ -190,11 +152,9 @@ const Index = () => {
   }
 
   if (!isAuthenticated) {
-    console.log("User not authenticated, rendering AuthPage...");
     return <AuthPage />;
   }
 
-  console.log("Rendering main dashboard...");
   return (
     <SidebarProvider>
       <div className="flex min-h-screen w-full bg-background">

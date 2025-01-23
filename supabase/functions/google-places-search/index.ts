@@ -7,7 +7,7 @@ serve(async (req) => {
   }
 
   try {
-    const { query, type, radius = 5000 } = await req.json()
+    const { query } = await req.json()
     const apiKey = Deno.env.get('GOOGLE_MAPS_API_KEY')
     
     if (!query) {
@@ -21,7 +21,7 @@ serve(async (req) => {
     }
 
     // First, search for places
-    const searchUrl = `https://maps.googleapis.com/maps/api/place/textsearch/json?query=${encodeURIComponent(query)}&radius=${radius}&key=${apiKey}`
+    const searchUrl = `https://maps.googleapis.com/maps/api/place/textsearch/json?query=${encodeURIComponent(query)}&key=${apiKey}`
     const searchResponse = await fetch(searchUrl)
     const searchData = await searchResponse.json()
 
@@ -32,7 +32,7 @@ serve(async (req) => {
     // For each place found, get additional details
     const detailedResults = await Promise.all(
       searchData.results.map(async (place: any) => {
-        const detailsUrl = `https://maps.googleapis.com/maps/api/place/details/json?place_id=${place.place_id}&fields=name,formatted_phone_number,formatted_address,website,rating,user_ratings_total,opening_hours,photos&key=${apiKey}`
+        const detailsUrl = `https://maps.googleapis.com/maps/api/place/details/json?place_id=${place.place_id}&fields=name,formatted_phone_number,formatted_address,website,rating,user_ratings_total,opening_hours&key=${apiKey}`
         const detailsResponse = await fetch(detailsUrl)
         const detailsData = await detailsResponse.json()
         
@@ -42,23 +42,12 @@ serve(async (req) => {
           website: detailsData.result?.website || '',
           opening_hours: detailsData.result?.opening_hours,
           rating: detailsData.result?.rating || 0,
-          user_ratings_total: detailsData.result?.user_ratings_total || 0,
-          photos: detailsData.result?.photos || []
+          user_ratings_total: detailsData.result?.user_ratings_total || 0
         }
       })
     )
 
-    // Filter results based on search type if specified
-    let filteredResults = detailedResults;
-    if (type === 'opportunities') {
-      filteredResults = detailedResults.filter((result: any) => {
-        const hasWebsite = !!result.website;
-        const hasRating = result.rating > 0;
-        return !hasWebsite && !hasRating;
-      });
-    }
-
-    searchData.results = filteredResults;
+    searchData.results = detailedResults
 
     return new Response(
       JSON.stringify(searchData),

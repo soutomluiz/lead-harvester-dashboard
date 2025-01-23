@@ -1,20 +1,8 @@
-import { useAuth } from "@/hooks/useAuth";
-import { Button } from "@/components/ui/button";
-import { LogOut } from "lucide-react";
-
 export function SidebarUserSection() {
-  const { handleSignOut } = useAuth();
-
   return (
-    <div className="mt-auto p-4">
-      <Button 
-        variant="ghost" 
-        className="w-full justify-start" 
-        onClick={handleSignOut}
-      >
-        <LogOut className="mr-2 h-4 w-4" />
-        Sair
-      </Button>
+    <div className="mt-auto p-4 text-sm text-muted-foreground">
+      <p>Versão 1.0.0</p>
+      <p>Contato: suporte@exemplo.com</p>
     </div>
   );
 }

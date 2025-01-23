@@ -2,7 +2,6 @@ import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
-import { NotificationSettings } from "./config/NotificationSettings";
 import { WebhookSettings } from "./config/WebhookSettings";
 import { ThemeSettings } from "./config/ThemeSettings";
 import { LanguageSettings } from "./config/LanguageSettings";
@@ -47,7 +46,6 @@ export function ConfigPanel() {
         <Card className="p-6">
           <div className="space-y-8">
             <WebhookSettings />
-            <NotificationSettings />
             <ExportSettings />
             <DisplaySettings />
             <ThemeSettings />

@@ -25,7 +25,7 @@ export function UserProfilePanel({ initialData }: UserProfilePanelProps) {
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
-  const { register, handleSubmit, formState: { errors }, reset } = useForm<ProfileFormData>();
+  const { register, handleSubmit, formState: { errors }, reset, setValue } = useForm<ProfileFormData>();
 
   useEffect(() => {
     if (initialData) {
@@ -43,6 +43,12 @@ export function UserProfilePanel({ initialData }: UserProfilePanelProps) {
         .eq('id', (await supabase.auth.getUser()).data.user?.id);
 
       if (error) throw error;
+
+      // Atualiza os valores do formulário e o avatar após o sucesso
+      setValue('full_name', data.full_name);
+      setValue('phone', data.phone);
+      setValue('location', data.location);
+      setValue('bio', data.bio);
 
       toast({
         title: "Perfil atualizado",
@@ -83,7 +89,9 @@ export function UserProfilePanel({ initialData }: UserProfilePanelProps) {
         .update({ avatar_url: publicUrl })
         .eq('id', (await supabase.auth.getUser()).data.user?.id);
 
+      // Atualiza o avatar imediatamente após o upload
       setAvatarUrl(publicUrl);
+      setValue('avatar_url', publicUrl);
 
       toast({
         title: "Avatar atualizado",

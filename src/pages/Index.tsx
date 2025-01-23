@@ -129,7 +129,7 @@ const Index = () => {
     checkAuth();
 
     try {
-      authSubscription = supabase.auth.onAuthStateChange(async (event, session) => {
+      const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
         console.log("Auth state changed:", event, "Session:", session?.user?.id);
         
         if (event === 'SIGNED_OUT' || !session) {
@@ -150,6 +150,8 @@ const Index = () => {
           }
         }
       });
+      
+      authSubscription = subscription;
     } catch (error) {
       console.error("Error setting up auth subscription:", error);
       if (mounted) {

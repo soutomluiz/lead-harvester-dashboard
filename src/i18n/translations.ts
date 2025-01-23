@@ -3,7 +3,6 @@ export type TranslationKey = keyof typeof translations["pt-BR"];
 
 export const translations = {
   "pt-BR": {
-    // Tour translations
     "welcomeTour": "Bem-vindo ao nosso sistema! Vamos fazer um tour rápido para você conhecer as principais funcionalidades.",
     "sidebarTour": "Este é o menu principal, onde você pode navegar entre todas as funcionalidades do sistema.",
     "prospectTour": "Aqui você pode prospectar leads de forma automática usando o Google Places ou extraindo de websites.",
@@ -53,6 +52,9 @@ export const translations = {
     
     // Settings and configuration
     "settingsApplied": "Configurações aplicadas",
+    "success": "Sucesso",
+    "error": "Erro",
+    "settingsError": "Erro ao aplicar configurações",
     "loading": "Carregando...",
     "applySettings": "Aplicar Configurações",
     
@@ -76,10 +78,17 @@ export const translations = {
     // Calendar Integration
     "calendarIntegration": "Integração com Calendário",
     "enableCalendarSync": "Ativar sincronização",
-    "calendarUrl": "URL do calendário"
+    "calendarUrl": "URL do calendário",
+
+    // Other
+    "addLeads": "Adicionar Leads",
+    "leads": "Leads",
+    "support": "Suporte",
+    "version": "Versão",
+    "hello": "Olá",
+    "profile": "Perfil"
   },
   "en": {
-    // Tour translations
     "welcomeTour": "Welcome to our system! Let's take a quick tour to show you the main features.",
     "sidebarTour": "This is the main menu, where you can navigate through all system features.",
     "prospectTour": "Here you can prospect leads automatically using Google Places or by extracting from websites.",
@@ -129,6 +138,9 @@ export const translations = {
     
     // Settings and configuration
     "settingsApplied": "Settings Applied",
+    "success": "Success",
+    "error": "Error",
+    "settingsError": "Error applying settings",
     "loading": "Loading...",
     "applySettings": "Apply Settings",
     
@@ -152,10 +164,17 @@ export const translations = {
     // Calendar Integration
     "calendarIntegration": "Calendar Integration",
     "enableCalendarSync": "Enable synchronization",
-    "calendarUrl": "Calendar URL"
+    "calendarUrl": "Calendar URL",
+
+    // Other
+    "addLeads": "Add Leads",
+    "leads": "Leads",
+    "support": "Support",
+    "version": "Version",
+    "hello": "Hello",
+    "profile": "Profile"
   },
   "es": {
-    // Tour translations
     "welcomeTour": "¡Bienvenido a nuestro sistema! Hagamos un recorrido rápido para mostrarle las características principales.",
     "sidebarTour": "Este es el menú principal, donde puede navegar por todas las funciones del sistema.",
     "prospectTour": "Aquí puede prospectar leads automáticamente usando Google Places o extrayendo de sitios web.",
@@ -176,7 +195,7 @@ export const translations = {
     "leadsRegistered": "Leads Registrados",
     "last30Days": "Últimos 30 Días",
     "leadsWithTags": "Leads con Etiquetas",
-    "contactsWithEmail": "Contactos con Correo Electrónico",
+    "contactsWithEmail": "Contactos con Correo",
     "contactsWithPhone": "Contactos con Teléfono",
     "withSite": "Con Sitio",
     "leadsOverTime": "Leads a lo Largo del Tiempo",
@@ -205,6 +224,9 @@ export const translations = {
     
     // Settings and configuration
     "settingsApplied": "Configuraciones Aplicadas",
+    "success": "Éxito",
+    "error": "Error",
+    "settingsError": "Error al aplicar configuraciones",
     "loading": "Cargando...",
     "applySettings": "Aplicar Configuraciones",
     
@@ -228,6 +250,14 @@ export const translations = {
     // Calendar Integration
     "calendarIntegration": "Integración de Calendario",
     "enableCalendarSync": "Activar sincronización",
-    "calendarUrl": "URL del calendario"
+    "calendarUrl": "URL del calendario",
+
+    // Other
+    "addLeads": "Agregar Leads",
+    "leads": "Leads",
+    "support": "Soporte",
+    "version": "Versión",
+    "hello": "Hola",
+    "profile": "Perfil"
   }
 };

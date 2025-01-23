@@ -29,9 +29,14 @@ export function LoginForm() {
 
     try {
       setIsResendingEmail(true);
+      console.log("Reenviando email de confirmação para:", email);
+      
       const { error } = await supabase.auth.resend({
         type: 'signup',
         email: email.trim(),
+        options: {
+          emailRedirectTo: 'https://extractleads.abbacreator.com.br'
+        }
       });
 
       if (error) {

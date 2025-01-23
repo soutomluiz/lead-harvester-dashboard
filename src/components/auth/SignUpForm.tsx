@@ -71,20 +71,17 @@ export function SignUpForm() {
         
         // Enviar email de boas-vindas
         try {
-          const response = await fetch("/functions/v1/send-welcome-email", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${process.env.SUPABASE_ANON_KEY}`,
-            },
-            body: JSON.stringify({
+          const response = await supabase.functions.invoke('send-welcome-email', {
+            body: {
               email,
               name,
-            }),
+            },
           });
 
-          if (!response.ok) {
-            console.error("Erro ao enviar email de boas-vindas:", await response.text());
+          if ('error' in response) {
+            console.error("Erro ao enviar email de boas-vindas:", response.error);
+          } else {
+            console.log("Email de boas-vindas enviado com sucesso");
           }
         } catch (emailError) {
           console.error("Erro ao enviar email de boas-vindas:", emailError);

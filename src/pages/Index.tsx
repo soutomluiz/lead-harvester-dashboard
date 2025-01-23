@@ -15,6 +15,7 @@ const Index = () => {
   const [userProfile, setUserProfile] = useState<any>(null);
 
   const handleAuthStateChange = (authenticated: boolean, profile?: any) => {
+    console.log("Auth state changed in Index:", authenticated, profile);
     setIsAuthenticated(authenticated);
     if (profile) {
       setUserName(profile.full_name || '');

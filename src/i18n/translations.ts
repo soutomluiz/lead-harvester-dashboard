@@ -89,7 +89,11 @@ export const translations = {
     "profile": "Perfil",
     "notifications": "Notificações",
     "browserNotifications": "Notificações do navegador",
-    "soundNotifications": "Notificações sonoras"
+    "soundNotifications": "Notificações sonoras",
+    
+    // Auth translations
+    "logoutSuccess": "Você foi desconectado com sucesso",
+    "logoutError": "Erro ao tentar desconectar",
   },
   "en": {
     "welcomeTour": "Welcome to our system! Let's take a quick tour to show you the main features.",
@@ -178,7 +182,11 @@ export const translations = {
     "profile": "Profile",
     "notifications": "Notifications",
     "browserNotifications": "Browser notifications",
-    "soundNotifications": "Sound notifications"
+    "soundNotifications": "Sound notifications",
+    
+    // Auth translations
+    "logoutSuccess": "You have been successfully logged out",
+    "logoutError": "Error trying to log out",
   },
   "es": {
     "welcomeTour": "¡Bienvenido a nuestro sistema! Hagamos un recorrido rápido para mostrarle las características principales.",
@@ -267,6 +275,10 @@ export const translations = {
     "profile": "Perfil",
     "notifications": "Notificaciones",
     "browserNotifications": "Notificaciones del navegador",
-    "soundNotifications": "Notificaciones sonoras"
+    "soundNotifications": "Notificaciones sonoras",
+    
+    // Auth translations
+    "logoutSuccess": "Has cerrado sesión exitosamente",
+    "logoutError": "Error al intentar cerrar sesión",
   }
 };

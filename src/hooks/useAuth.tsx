@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { useToast } from "@/hooks/use-toast";
+import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useEffect } from "react";
@@ -11,9 +11,7 @@ export const useAuth = () => {
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
-      console.log("Auth state changed:", event);
       if (event === 'SIGNED_OUT') {
-        console.log("User signed out, redirecting to login");
         navigate('/login');
       }
     });
@@ -23,20 +21,21 @@ export const useAuth = () => {
 
   const handleSignOut = async () => {
     try {
-      console.log("Starting logout process...");
+      console.log("Iniciando logout...");
       const { error } = await supabase.auth.signOut();
-      
       if (error) {
-        console.error("Logout error:", error);
+        console.error("Erro no logout:", error);
         throw error;
       }
       
-      console.log("Logout successful");
+      console.log("Logout realizado com sucesso");
       toast({
         title: t("success"),
         description: t("logoutSuccess"),
       });
 
+      // Forçar navegação após o logout
+      navigate('/login');
     } catch (error) {
       console.error('Error signing out:', error);
       toast({

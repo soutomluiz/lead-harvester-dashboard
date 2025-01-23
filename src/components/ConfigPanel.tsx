@@ -8,7 +8,6 @@ import { ThemeSettings } from "./config/ThemeSettings";
 import { LanguageSettings } from "./config/LanguageSettings";
 import { ExportSettings } from "./config/ExportSettings";
 import { DisplaySettings } from "./config/DisplaySettings";
-import { EmailNotificationSettings } from "./config/EmailNotificationSettings";
 import { CalendarSettings } from "./config/CalendarSettings";
 import { Loader2 } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -23,6 +22,8 @@ export function ConfigPanel() {
     setIsLoading(true);
     try {
       // Save settings to localStorage or your preferred storage
+      await new Promise(resolve => setTimeout(resolve, 500)); // Simula um delay para feedback visual
+      
       toast({
         title: t("settingsApplied"),
         description: t("success"),
@@ -48,7 +49,6 @@ export function ConfigPanel() {
           <div className="space-y-8">
             <WebhookSettings />
             <NotificationSettings />
-            <EmailNotificationSettings />
             <CalendarSettings />
             <ExportSettings />
             <DisplaySettings />

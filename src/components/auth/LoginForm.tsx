@@ -35,7 +35,7 @@ export function LoginForm() {
         type: 'signup',
         email: email.trim(),
         options: {
-          emailRedirectTo: 'https://extractleads.abbacreator.com.br'
+          emailRedirectTo: window.location.origin
         }
       });
 
@@ -114,7 +114,7 @@ export function LoginForm() {
             </div>
           );
         } else if (error.message.includes("Invalid login credentials")) {
-          message = "Email ou senha incorretos. Por favor, verifique suas credenciais.";
+          message = "Email ou senha incorretos. Por favor, verifique suas credenciais e tente novamente.";
         } else {
           message = "Erro ao tentar fazer login. Por favor, tente novamente.";
         }
@@ -146,7 +146,6 @@ export function LoginForm() {
     }
   };
 
-  // Verificar o estado da sessão e parâmetros da URL ao carregar
   useEffect(() => {
     const checkEmailVerification = async () => {
       const params = new URLSearchParams(window.location.search);

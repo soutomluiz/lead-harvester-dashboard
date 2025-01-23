@@ -106,7 +106,7 @@ const Index = () => {
 
     checkAuth();
 
-    const subscription = supabase.auth.onAuthStateChange(async (event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (event === 'SIGNED_OUT' || !session) {
         setIsAuthenticated(false);
         setUserName('');

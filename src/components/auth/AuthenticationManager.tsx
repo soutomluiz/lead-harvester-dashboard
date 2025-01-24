@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { Loader2 } from "lucide-react";
 
 interface AuthenticationManagerProps {
   onAuthStateChange: (isAuthenticated: boolean, userData?: any) => void;
@@ -97,8 +98,11 @@ export function AuthenticationManager({ onAuthStateChange, children }: Authentic
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      <div className="flex items-center justify-center min-h-screen bg-background">
+        <div className="text-center space-y-4">
+          <Loader2 className="h-8 w-8 animate-spin mx-auto text-primary" />
+          <p className="text-muted-foreground">Verificando autenticação...</p>
+        </div>
       </div>
     );
   }

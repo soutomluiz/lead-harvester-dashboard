@@ -7,6 +7,7 @@ import { AuthPage } from "@/components/AuthPage";
 import { AuthenticationManager } from "@/components/auth/AuthenticationManager";
 import { AuthenticatedLayout } from "@/components/layout/AuthenticatedLayout";
 import { useAuthState } from "@/hooks/useAuthState";
+import { Loader2 } from "lucide-react";
 
 const Index = () => {
   const [activeTab, setActiveTab] = useState("dashboard");
@@ -16,8 +17,11 @@ const Index = () => {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      <div className="flex items-center justify-center min-h-screen bg-background">
+        <div className="text-center space-y-4">
+          <Loader2 className="h-8 w-8 animate-spin mx-auto text-primary" />
+          <p className="text-muted-foreground">Carregando...</p>
+        </div>
       </div>
     );
   }
@@ -37,13 +41,15 @@ const Index = () => {
       <SidebarProvider>
         <div className="flex min-h-screen w-full bg-background">
           <AppSidebar activeTab={activeTab} setActiveTab={setActiveTab} />
-          <AuthenticatedLayout
-            userName={userName}
-            avatarUrl={avatarUrl}
-            userProfile={userProfile}
-            activeTab={activeTab}
-            setActiveTab={setActiveTab}
-          />
+          <div className="flex-1">
+            <AuthenticatedLayout
+              userName={userName}
+              avatarUrl={avatarUrl}
+              userProfile={userProfile}
+              activeTab={activeTab}
+              setActiveTab={setActiveTab}
+            />
+          </div>
           <AppFooter />
           <WelcomeTour />
         </div>

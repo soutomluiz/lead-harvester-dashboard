@@ -39,7 +39,7 @@ export const translations = {
     // Navigation and general
     "dashboard": "Dashboard",
     "manualInput": "Entrada Manual",
-    "urlExtraction": "Extrair de URL",
+    "urlInput": "Extrair de URL",
     "extractLeads": "Extrair Leads",
     "extractingLeads": "Extraindo Leads...",
     "websiteUrl": "URL do Website",
@@ -140,7 +140,7 @@ export const translations = {
     // Navigation and general
     "dashboard": "Dashboard",
     "manualInput": "Manual Input",
-    "urlExtraction": "Extract from URL",
+    "urlInput": "Extract from URL",
     "extractLeads": "Extract Leads",
     "extractingLeads": "Extracting Leads...",
     "websiteUrl": "Website URL",
@@ -241,7 +241,7 @@ export const translations = {
     // Navigation and general
     "dashboard": "Tablero",
     "manualInput": "Entrada Manual",
-    "urlExtraction": "Extraer de URL",
+    "urlInput": "Extraer de URL",
     "extractLeads": "Extraer Leads",
     "extractingLeads": "Extrayendo Leads...",
     "websiteUrl": "URL del Sitio Web",

@@ -107,7 +107,11 @@ serve(async (req) => {
     }
 
     return new Response(
-      JSON.stringify({ success: true, leadsExtracted: leads.length }),
+      JSON.stringify({ 
+        success: true, 
+        leadsExtracted: leads.length,
+        leads: leads 
+      }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     )
 

@@ -16,15 +16,22 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Loader2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { Lead } from "@/types/lead";
 
 const formSchema = z.object({
   url: z.string().url("Por favor insira uma URL válida"),
 });
 
-export const UrlExtractionForm = () => {
+interface UrlExtractionFormProps {
+  onAddLeads: (leads: Lead[]) => void;
+}
+
+export const UrlExtractionForm = ({ onAddLeads }: UrlExtractionFormProps) => {
   const { toast } = useToast();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
+  const { t } = useLanguage();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -47,7 +54,7 @@ export const UrlExtractionForm = () => {
       if (response.error === 'Free plan limit reached') {
         toast({
           title: "Limite atingido",
-          description: "Você atingiu o limite máximo de 50 leads no plano gratuito. Para continuar utilizando as funcionalidades, assine um dos nossos planos pagos.",
+          description: t("freePlanLimit"),
           variant: "destructive",
         });
         navigate("/subscription");
@@ -57,9 +64,12 @@ export const UrlExtractionForm = () => {
       if (response.success) {
         toast({
           title: "Sucesso!",
-          description: `${response.leadsExtracted} leads extraídos com sucesso!`,
+          description: `${response.leadsExtracted} ${t("leadsExtracted")}`,
         });
         form.reset();
+        if (response.leads) {
+          onAddLeads(response.leads);
+        }
       } else {
         throw new Error(response.error);
       }
@@ -67,7 +77,7 @@ export const UrlExtractionForm = () => {
       console.error('Error extracting leads:', error);
       toast({
         title: "Erro",
-        description: "Erro ao processar o link. Verifique se ele é válido.",
+        description: t("processingError"),
         variant: "destructive",
       });
     } finally {
@@ -83,7 +93,7 @@ export const UrlExtractionForm = () => {
           name="url"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>URL do Website</FormLabel>
+              <FormLabel>{t("websiteUrl")}</FormLabel>
               <FormControl>
                 <Input 
                   placeholder="https://exemplo.com" 
@@ -103,10 +113,10 @@ export const UrlExtractionForm = () => {
           {isLoading ? (
             <>
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              Extraindo Leads...
+              {t("extractingLeads")}
             </>
           ) : (
-            'Extrair Leads'
+            t("extractLeads")
           )}
         </Button>
       </form>

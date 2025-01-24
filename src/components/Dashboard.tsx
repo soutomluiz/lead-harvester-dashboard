@@ -33,6 +33,8 @@ export function Dashboard({ activeTab, leads, onSubmit, onAddLeads, setActiveTab
     : undefined;
 
   useEffect(() => {
+    let channel: ReturnType<typeof supabase.channel>;
+
     const fetchLeads = async () => {
       try {
         const { data, error } = await supabase
@@ -49,9 +51,9 @@ export function Dashboard({ activeTab, leads, onSubmit, onAddLeads, setActiveTab
         }));
 
         setDbLeads(typedLeads);
-        console.log("Fetched leads:", typedLeads);
+        console.log("Leads carregados com sucesso:", typedLeads);
       } catch (error) {
-        console.error("Error fetching leads:", error);
+        console.error("Erro ao carregar leads:", error);
         toast({
           title: "Erro ao carregar leads",
           description: "Não foi possível carregar seus leads. Por favor, tente novamente.",
@@ -60,26 +62,47 @@ export function Dashboard({ activeTab, leads, onSubmit, onAddLeads, setActiveTab
       }
     };
 
+    const setupRealtimeSubscription = async () => {
+      try {
+        channel = supabase
+          .channel('leads-changes')
+          .on(
+            'postgres_changes',
+            {
+              event: '*',
+              schema: 'public',
+              table: 'leads'
+            },
+            (payload) => {
+              console.log('Atualização em tempo real recebida:', payload);
+              fetchLeads();
+            }
+          )
+          .subscribe((status) => {
+            console.log('Status da inscrição do canal:', status);
+            if (status === 'SUBSCRIBED') {
+              console.log('Canal inscrito com sucesso');
+            }
+          });
+      } catch (error) {
+        console.error('Erro ao configurar inscrição em tempo real:', error);
+      }
+    };
+
+    // Inicializa
     fetchLeads();
+    setupRealtimeSubscription();
 
-    const channel = supabase
-      .channel('public:leads')
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'leads'
-        },
-        (payload) => {
-          console.log('Atualização em tempo real:', payload);
-          fetchLeads();
-        }
-      )
-      .subscribe();
-
+    // Cleanup
     return () => {
-      supabase.removeChannel(channel);
+      if (channel) {
+        console.log('Removendo inscrição do canal...');
+        supabase.removeChannel(channel).then(() => {
+          console.log('Canal removido com sucesso');
+        }).catch(error => {
+          console.error('Erro ao remover canal:', error);
+        });
+      }
     };
   }, [toast]);
 

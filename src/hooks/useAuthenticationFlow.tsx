@@ -27,7 +27,7 @@ export function useAuthenticationFlow({ onAuthStateChange }: UseAuthenticationFl
 
   const createUserProfile = async (userId: string): Promise<Profile | null> => {
     try {
-      console.log("Creating new profile for user:", userId);
+      console.log("Creating/fetching profile for user:", userId);
       const { data: existingProfile } = await supabase
         .from('profiles')
         .select('*')
@@ -39,6 +39,7 @@ export function useAuthenticationFlow({ onAuthStateChange }: UseAuthenticationFl
         return existingProfile;
       }
 
+      console.log("No existing profile found, creating new one...");
       const { data: newProfile, error: createError } = await supabase
         .from('profiles')
         .insert([{ id: userId }])
@@ -54,28 +55,6 @@ export function useAuthenticationFlow({ onAuthStateChange }: UseAuthenticationFl
       return newProfile;
     } catch (error) {
       console.error("Error in createUserProfile:", error);
-      throw error;
-    }
-  };
-
-  const fetchUserProfile = async (userId: string): Promise<Profile | null> => {
-    try {
-      console.log("Fetching profile for user:", userId);
-      const { data: profile, error: profileError } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', userId)
-        .maybeSingle();
-
-      if (profileError) {
-        console.error("Error fetching profile:", profileError);
-        throw profileError;
-      }
-
-      console.log("Profile fetch result:", profile);
-      return profile;
-    } catch (error) {
-      console.error("Error in fetchUserProfile:", error);
       throw error;
     }
   };

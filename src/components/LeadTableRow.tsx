@@ -2,8 +2,8 @@ import { Lead } from "@/types/lead";
 import { TableCell, TableRow } from "@/components/ui/table";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { LeadScore } from "./LeadScore";
-import { LeadNotes } from "./LeadNotes";
+import { LeadScore } from "@/components/leads/LeadScore";
+import { LeadNotes } from "@/components/leads/LeadNotes";
 import { TagInput } from "@/components/TagInput";
 
 interface LeadTableRowProps {

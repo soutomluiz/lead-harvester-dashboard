@@ -32,12 +32,11 @@ export function AuthStateManager({ onAuthStateChange, children }: AuthStateManag
           if (mounted) {
             onAuthStateChange(false);
             setIsLoading(false);
-            navigate('/login');
           }
           return;
         }
 
-        console.log("Active session found, redirecting...");
+        console.log("Active session found, fetching profile...");
         
         try {
           const { data: profile, error: profileError } = await supabase
@@ -51,7 +50,6 @@ export function AuthStateManager({ onAuthStateChange, children }: AuthStateManag
           if (mounted) {
             onAuthStateChange(true, profile);
             setIsLoading(false);
-            navigate('/');
           }
         } catch (error) {
           console.error("Error fetching profile:", error);
@@ -59,14 +57,12 @@ export function AuthStateManager({ onAuthStateChange, children }: AuthStateManag
             await supabase.auth.signOut();
             onAuthStateChange(false);
             setIsLoading(false);
-            navigate('/login');
           }
         }
       } catch (error) {
-        console.error("Error in checkAuth:", error);
+        console.error("Error in checkSession:", error);
         if (mounted) {
           setIsLoading(false);
-          navigate('/login');
         }
       }
     };
@@ -79,12 +75,11 @@ export function AuthStateManager({ onAuthStateChange, children }: AuthStateManag
       if (event === 'SIGNED_OUT' || !session) {
         console.log("User signed out or session ended");
         onAuthStateChange(false);
-        navigate('/login');
         return;
       }
 
       if (event === 'SIGNED_IN' && session) {
-        console.log("User signed in, redirecting...");
+        console.log("User signed in, fetching profile...");
         try {
           const { data: profile, error: profileError } = await supabase
             .from('profiles')
@@ -96,14 +91,12 @@ export function AuthStateManager({ onAuthStateChange, children }: AuthStateManag
 
           if (mounted) {
             onAuthStateChange(true, profile);
-            navigate('/');
           }
         } catch (error) {
           console.error("Error fetching profile after sign in:", error);
           if (mounted) {
             await supabase.auth.signOut();
             onAuthStateChange(false);
-            navigate('/login');
           }
         }
       }
@@ -115,7 +108,7 @@ export function AuthStateManager({ onAuthStateChange, children }: AuthStateManag
       mounted = false;
       subscription?.unsubscribe();
     };
-  }, [navigate, onAuthStateChange, toast]);
+  }, [navigate, onAuthStateChange]);
 
   if (isLoading) {
     return (

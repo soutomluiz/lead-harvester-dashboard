@@ -31,7 +31,7 @@ export function AuthPage() {
 
         if (session?.access_token && mounted) {
           console.log("Active session found in AuthPage, redirecting to dashboard");
-          navigate('/');
+          navigate('/', { replace: true });
         }
       } catch (error) {
         console.error("Error checking session:", error);
@@ -47,17 +47,17 @@ export function AuthPage() {
       }
     };
 
-    checkSession();
-
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       console.log("Auth state changed in AuthPage:", event, session);
       
       if (event === 'SIGNED_IN' && session && mounted) {
         console.log("User signed in in AuthPage, redirecting to dashboard");
-        navigate('/');
+        navigate('/', { replace: true });
         setError(null);
       }
     });
+
+    checkSession();
 
     return () => {
       mounted = false;

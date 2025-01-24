@@ -35,7 +35,7 @@ export function LoginForm() {
         type: 'signup',
         email: email.trim(),
         options: {
-          emailRedirectTo: window.location.origin
+          emailRedirectTo: `${window.location.origin}/login?email_confirm=true`
         }
       });
 
@@ -47,7 +47,6 @@ export function LoginForm() {
           variant: "destructive",
           duration: 4000,
         });
-        setIsResendingEmail(false);
         return;
       }
 

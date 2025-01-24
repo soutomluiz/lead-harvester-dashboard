@@ -18,6 +18,7 @@ export function AuthPage() {
 
   useEffect(() => {
     let mounted = true;
+    let authListener: any = null;
 
     const checkSession = async () => {
       try {
@@ -31,7 +32,8 @@ export function AuthPage() {
 
         if (session?.access_token && mounted) {
           console.log("Active session found in AuthPage, redirecting to dashboard");
-          navigate('/', { replace: true });
+          window.location.href = '/';
+          return;
         }
       } catch (error) {
         console.error("Error checking session:", error);
@@ -47,13 +49,14 @@ export function AuthPage() {
       }
     };
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+    authListener = supabase.auth.onAuthStateChange(async (event, session) => {
       console.log("Auth state changed in AuthPage:", event, session);
       
       if (event === 'SIGNED_IN' && session && mounted) {
         console.log("User signed in in AuthPage, redirecting to dashboard");
-        navigate('/', { replace: true });
+        window.location.href = '/';
         setError(null);
+        return;
       }
     });
 
@@ -61,9 +64,11 @@ export function AuthPage() {
 
     return () => {
       mounted = false;
-      subscription.unsubscribe();
+      if (authListener) {
+        authListener.subscription.unsubscribe();
+      }
     };
-  }, [navigate, toast]);
+  }, [toast]);
 
   if (isLoading) {
     return (

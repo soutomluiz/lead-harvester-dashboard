@@ -14,7 +14,7 @@ interface UserProfileButtonProps {
 }
 
 interface ProfileResponse {
-  subscription_status: string | null;
+  subscription_status?: string | null;
 }
 
 export function UserProfileButton({ avatarUrl, userProfile, onSignOut }: UserProfileButtonProps) {
@@ -38,8 +38,10 @@ export function UserProfileButton({ avatarUrl, userProfile, onSignOut }: UserPro
           return;
         }
 
-        const profile = data as ProfileResponse;
-        setHasSubscription(profile?.subscription_status === 'active');
+        if (data) {
+          const profile = data as ProfileResponse;
+          setHasSubscription(profile.subscription_status === 'active');
+        }
       } catch (error) {
         console.error('Error checking subscription:', error);
       }

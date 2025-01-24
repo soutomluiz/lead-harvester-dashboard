@@ -10,7 +10,14 @@ import { useAuthState } from "@/hooks/useAuthState";
 
 const Index = () => {
   const [activeTab, setActiveTab] = useState("dashboard");
-  const { isAuthenticated, userName, avatarUrl, userProfile, setIsAuthenticated, setUserProfile } = useAuthState();
+  const { 
+    isAuthenticated, 
+    userName, 
+    avatarUrl, 
+    userProfile, 
+    setIsAuthenticated, 
+    setUserProfile 
+  } = useAuthState();
 
   const handleAuthStateChange = (authenticated: boolean, profile: any) => {
     console.log("Auth state changed in Index:", { authenticated, profile });

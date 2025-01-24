@@ -16,9 +16,10 @@ export function AuthPage() {
   const { toast } = useToast();
 
   useEffect(() => {
+    let mounted = true;
+
     const checkSession = async () => {
       try {
-        setIsLoading(true);
         const { data: { session }, error: sessionError } = await supabase.auth.getSession();
         
         if (sessionError) {
@@ -26,13 +27,16 @@ export function AuthPage() {
           return;
         }
 
-        if (session?.access_token) {
+        if (session?.access_token && mounted) {
+          console.log("Active session found, redirecting to dashboard");
           navigate("/");
         }
       } catch (error) {
         console.error("Error checking session:", error);
       } finally {
-        setIsLoading(false);
+        if (mounted) {
+          setIsLoading(false);
+        }
       }
     };
     
@@ -41,15 +45,15 @@ export function AuthPage() {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       console.log("Auth state changed:", event, session);
       
-      if (event === 'SIGNED_IN' && session) {
+      if (event === 'SIGNED_IN' && session && mounted) {
+        console.log("User signed in, redirecting to dashboard");
         navigate("/");
         setError(null);
-      } else if (event === 'SIGNED_OUT') {
-        navigate("/login");
       }
     });
 
     return () => {
+      mounted = false;
       subscription.unsubscribe();
     };
   }, [navigate]);

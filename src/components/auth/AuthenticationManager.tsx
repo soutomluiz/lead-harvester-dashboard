@@ -10,11 +10,26 @@ interface AuthenticationManagerProps {
 export function AuthenticationManager({ onAuthStateChange, children }: AuthenticationManagerProps) {
   const [isLoading, setIsLoading] = useState(true);
 
+  // Função para fazer logout
+  const forceLogout = async () => {
+    try {
+      console.log("Forcing logout...");
+      const { error } = await supabase.auth.signOut();
+      if (error) {
+        console.error("Error during forced logout:", error);
+      } else {
+        console.log("Forced logout successful");
+        window.location.href = '/login';
+      }
+    } catch (error) {
+      console.error("Error in forceLogout:", error);
+    }
+  };
+
   const fetchUserProfile = async (userId: string) => {
     try {
       console.log("AuthenticationManager: Fetching profile for user:", userId);
       
-      // Primeiro, verifica se o perfil existe
       const { data: profile, error } = await supabase
         .from('profiles')
         .select('*')
@@ -23,17 +38,18 @@ export function AuthenticationManager({ onAuthStateChange, children }: Authentic
 
       if (error) {
         console.error("AuthenticationManager: Error fetching profile:", error);
-        throw error;
+        await forceLogout();
+        return null;
       }
 
-      // Se não encontrou perfil, cria um novo
       if (!profile) {
-        console.log("AuthenticationManager: Creating new profile for user");
+        console.log("AuthenticationManager: No profile found, creating new one");
         const { data: session } = await supabase.auth.getSession();
         const user = session?.session?.user;
         
         if (!user) {
           console.error("AuthenticationManager: No user session found");
+          await forceLogout();
           return null;
         }
 
@@ -51,7 +67,8 @@ export function AuthenticationManager({ onAuthStateChange, children }: Authentic
 
         if (createError) {
           console.error("AuthenticationManager: Error creating profile:", createError);
-          throw createError;
+          await forceLogout();
+          return null;
         }
 
         console.log("AuthenticationManager: New profile created:", newProfile);
@@ -62,6 +79,7 @@ export function AuthenticationManager({ onAuthStateChange, children }: Authentic
       return profile;
     } catch (error) {
       console.error("AuthenticationManager: Error in fetchUserProfile:", error);
+      await forceLogout();
       return null;
     }
   };
@@ -76,7 +94,8 @@ export function AuthenticationManager({ onAuthStateChange, children }: Authentic
         
         if (sessionError) {
           console.error("AuthenticationManager: Session error:", sessionError);
-          throw sessionError;
+          await forceLogout();
+          return;
         }
 
         if (!session) {
@@ -92,19 +111,23 @@ export function AuthenticationManager({ onAuthStateChange, children }: Authentic
         const profile = await fetchUserProfile(session.user.id);
         
         if (mounted) {
+          if (!profile) {
+            await forceLogout();
+            return;
+          }
           onAuthStateChange(true, profile);
           setIsLoading(false);
         }
       } catch (error) {
         console.error("AuthenticationManager: Error in checkAuth:", error);
         if (mounted) {
-          onAuthStateChange(false);
-          setIsLoading(false);
+          await forceLogout();
         }
       }
     };
 
-    checkAuth();
+    // Executar o logout forçado imediatamente
+    forceLogout();
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       console.log("AuthenticationManager: Auth state changed:", event, session);
@@ -120,6 +143,10 @@ export function AuthenticationManager({ onAuthStateChange, children }: Authentic
       if (event === 'SIGNED_IN' && session) {
         console.log("AuthenticationManager: User signed in, fetching profile...");
         const profile = await fetchUserProfile(session.user.id);
+        if (!profile) {
+          await forceLogout();
+          return;
+        }
         onAuthStateChange(true, profile);
       }
     });

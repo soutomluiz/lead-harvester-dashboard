@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -9,6 +9,9 @@ import { SearchResult } from "@/types/search";
 import { useNavigate } from "react-router-dom";
 import { AdvancedSearchForm } from "./search/AdvancedSearchForm";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { AlertCircle } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 export const ProspectingForm = ({
   onAddLeads,
@@ -21,8 +24,31 @@ export const ProspectingForm = ({
   const [location, setLocation] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [results, setResults] = useState<SearchResult[]>([]);
+  const [userProfile, setUserProfile] = useState<any>(null);
   const { toast } = useToast();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', user.id)
+          .single();
+        
+        setUserProfile(profile);
+      }
+    };
+
+    fetchUserProfile();
+  }, []);
+
+  const isExtractionLimitReached = () => {
+    if (!userProfile) return true;
+    return userProfile.subscription_type === 'free' && userProfile.extracted_leads_count >= 50;
+  };
 
   const capitalizeFirstLetter = (string: string) => {
     return string.split(' ').map(word => 
@@ -36,6 +62,15 @@ export const ProspectingForm = ({
     location?: string,
     radius?: number
   }) => {
+    if (isExtractionLimitReached()) {
+      toast({
+        title: "Limite de extração atingido",
+        description: "Você atingiu o limite máximo de 50 leads no plano gratuito. Para continuar utilizando as funcionalidades, assine um dos nossos planos pagos.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setIsLoading(true);
     const capitalizedLocation = params.location ? capitalizeFirstLetter(params.location) : '';
     const searchQuery = `${params.industry} em ${capitalizedLocation}`;
@@ -120,6 +155,16 @@ export const ProspectingForm = ({
 
   const handleBasicSearch = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (isExtractionLimitReached()) {
+      toast({
+        title: "Limite de extração atingido",
+        description: "Você atingiu o limite máximo de 50 leads no plano gratuito. Para continuar utilizando as funcionalidades, assine um dos nossos planos pagos.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setIsLoading(true);
 
     const capitalizedLocation = capitalizeFirstLetter(location);
@@ -160,7 +205,7 @@ export const ProspectingForm = ({
             description: result.formatted_address || "Endereço não disponível",
             companyName: result.name,
             address: result.formatted_address || "",
-            phone: result.formatted_phone_number || "",
+            phone: result.formatted_phone_number,
             email: "",
             keyword: industry,
             city: capitalizedLocation,
@@ -231,6 +276,29 @@ export const ProspectingForm = ({
         return;
       }
 
+      if (isExtractionLimitReached()) {
+        toast({
+          title: "Limite de extração atingido",
+          description: "Você atingiu o limite máximo de 50 leads no plano gratuito. Para continuar utilizando as funcionalidades, assine um dos nossos planos pagos.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Calculate if adding these leads would exceed the limit
+      const remainingLeads = userProfile.subscription_type === 'free' ? 
+        50 - userProfile.extracted_leads_count : 
+        Number.MAX_SAFE_INTEGER;
+
+      if (remainingLeads < selectedResults.length) {
+        toast({
+          title: "Limite excedido",
+          description: `Você só pode adicionar mais ${remainingLeads} leads no plano gratuito.`,
+          variant: "destructive",
+        });
+        return;
+      }
+
       const newLeads = selectedResults.map((result) => ({
         company_name: result.companyName,
         industry: result.keyword,
@@ -248,11 +316,27 @@ export const ProspectingForm = ({
         user_id: user.id
       }));
 
-      const { error } = await supabase
+      const { error: leadsError } = await supabase
         .from('leads')
         .insert(newLeads);
 
-      if (error) throw error;
+      if (leadsError) throw leadsError;
+
+      // Update the extracted_leads_count in the user's profile
+      const { error: profileError } = await supabase
+        .from('profiles')
+        .update({ 
+          extracted_leads_count: userProfile.extracted_leads_count + newLeads.length 
+        })
+        .eq('id', user.id);
+
+      if (profileError) throw profileError;
+
+      // Update local state
+      setUserProfile({
+        ...userProfile,
+        extracted_leads_count: userProfile.extracted_leads_count + newLeads.length
+      });
 
       onAddLeads(newLeads);
       toast({
@@ -271,6 +355,22 @@ export const ProspectingForm = ({
 
   return (
     <Card className="w-full p-6 animate-fadeIn">
+      {isExtractionLimitReached() && (
+        <Alert variant="destructive" className="mb-6">
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>
+            Você atingiu o limite máximo de 50 leads no plano gratuito. 
+            <Button 
+              variant="link" 
+              className="px-2 text-destructive underline" 
+              onClick={() => navigate('/subscription')}
+            >
+              Assine um plano pago para continuar.
+            </Button>
+          </AlertDescription>
+        </Alert>
+      )}
+      
       <DashboardStats results={results} searchType={searchType} />
       <div className="mt-6">
         <Tabs defaultValue="basic">

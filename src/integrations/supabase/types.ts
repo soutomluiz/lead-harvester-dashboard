@@ -97,11 +97,13 @@ export type Database = {
           company_name: string | null
           crm_type: string | null
           email: string | null
+          extracted_leads_count: number | null
           full_name: string | null
           id: string
           industry: string | null
           location: string | null
           phone: string | null
+          subscription_type: string | null
           updated_at: string | null
           webhook_url: string | null
           website: string | null
@@ -112,11 +114,13 @@ export type Database = {
           company_name?: string | null
           crm_type?: string | null
           email?: string | null
+          extracted_leads_count?: number | null
           full_name?: string | null
           id: string
           industry?: string | null
           location?: string | null
           phone?: string | null
+          subscription_type?: string | null
           updated_at?: string | null
           webhook_url?: string | null
           website?: string | null
@@ -127,11 +131,13 @@ export type Database = {
           company_name?: string | null
           crm_type?: string | null
           email?: string | null
+          extracted_leads_count?: number | null
           full_name?: string | null
           id?: string
           industry?: string | null
           location?: string | null
           phone?: string | null
+          subscription_type?: string | null
           updated_at?: string | null
           webhook_url?: string | null
           website?: string | null

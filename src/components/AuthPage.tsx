@@ -11,23 +11,41 @@ import { AuthError } from "./auth/AuthError";
 export function AuthPage() {
   const [error, setError] = useState<string | null>(null);
   const [isSignUp, setIsSignUp] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
   const { toast } = useToast();
 
   useEffect(() => {
     const checkSession = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session) {
-        navigate("/");
+      try {
+        setIsLoading(true);
+        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+        
+        if (sessionError) {
+          console.error("Session error:", sessionError);
+          return;
+        }
+
+        if (session?.access_token) {
+          navigate("/");
+        }
+      } catch (error) {
+        console.error("Error checking session:", error);
+      } finally {
+        setIsLoading(false);
       }
     };
     
     checkSession();
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      console.log("Auth state changed:", event, session);
+      
       if (event === 'SIGNED_IN' && session) {
         navigate("/");
         setError(null);
+      } else if (event === 'SIGNED_OUT') {
+        navigate("/login");
       }
     });
 
@@ -35,6 +53,14 @@ export function AuthPage() {
       subscription.unsubscribe();
     };
   }, [navigate]);
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="container max-w-lg mx-auto py-8">

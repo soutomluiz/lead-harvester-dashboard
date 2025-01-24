@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2 } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { useNavigate } from "react-router-dom";
 
 export function LoginForm() {
   const [email, setEmail] = useState("");
@@ -13,6 +14,7 @@ export function LoginForm() {
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -25,13 +27,16 @@ export function LoginForm() {
 
     try {
       setIsLoading(true);
+      console.log("Attempting login...");
 
-      const { error } = await supabase.auth.signInWithPassword({
+      const { data, error } = await supabase.auth.signInWithPassword({
         email: email.trim(),
         password: password.trim(),
       });
 
       if (error) {
+        console.error("Login error:", error);
+        
         if (error.message.includes("Invalid login credentials")) {
           setErrorMessage("Email ou senha incorretos. Por favor, verifique suas credenciais e tente novamente.");
         } else {
@@ -46,12 +51,16 @@ export function LoginForm() {
         return;
       }
 
-      toast({
-        title: "Login realizado com sucesso",
-        description: "Você será redirecionado para o dashboard.",
-      });
+      if (data.session) {
+        console.log("Login successful, session created");
+        toast({
+          title: "Login realizado com sucesso",
+          description: "Você será redirecionado para o dashboard.",
+        });
+        navigate("/");
+      }
     } catch (error) {
-      console.error("Erro inesperado durante login:", error);
+      console.error("Unexpected error during login:", error);
       setErrorMessage("Ocorreu um erro inesperado. Por favor, tente novamente.");
     } finally {
       setIsLoading(false);

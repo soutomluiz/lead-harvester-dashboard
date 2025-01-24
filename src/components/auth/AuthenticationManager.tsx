@@ -17,10 +17,13 @@ export function AuthenticationManager({ onAuthStateChange, children }: Authentic
         .eq('id', userId)
         .single();
 
-      if (error) throw error;
+      if (error) {
+        console.error("Error fetching profile:", error);
+        throw error;
+      }
       return profile;
     } catch (error) {
-      console.error("Error fetching profile:", error);
+      console.error("Error in fetchUserProfile:", error);
       return null;
     }
   };
@@ -30,9 +33,16 @@ export function AuthenticationManager({ onAuthStateChange, children }: Authentic
 
     const checkAuth = async () => {
       try {
-        const { data: { session } } = await supabase.auth.getSession();
+        console.log("Checking authentication status...");
+        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
         
+        if (sessionError) {
+          console.error("Session error:", sessionError);
+          throw sessionError;
+        }
+
         if (!session) {
+          console.log("No active session found");
           if (mounted) {
             onAuthStateChange(false);
             setIsLoading(false);
@@ -40,13 +50,15 @@ export function AuthenticationManager({ onAuthStateChange, children }: Authentic
           return;
         }
 
+        console.log("Active session found, fetching profile...");
         const profile = await fetchUserProfile(session.user.id);
+        
         if (mounted) {
           onAuthStateChange(true, profile);
           setIsLoading(false);
         }
       } catch (error) {
-        console.error("Error checking auth:", error);
+        console.error("Error in checkAuth:", error);
         if (mounted) {
           onAuthStateChange(false);
           setIsLoading(false);
@@ -57,14 +69,18 @@ export function AuthenticationManager({ onAuthStateChange, children }: Authentic
     checkAuth();
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      console.log("Auth state changed:", event);
+      
       if (!mounted) return;
 
       if (event === 'SIGNED_OUT' || !session) {
+        console.log("User signed out or session ended");
         onAuthStateChange(false);
         return;
       }
 
       if (event === 'SIGNED_IN' && session) {
+        console.log("User signed in, fetching profile...");
         const profile = await fetchUserProfile(session.user.id);
         onAuthStateChange(true, profile);
       }

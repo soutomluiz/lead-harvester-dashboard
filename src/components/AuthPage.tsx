@@ -25,7 +25,7 @@ export function AuthPage() {
         
         if (sessionError) {
           console.error("Session error:", sessionError);
-          return;
+          throw sessionError;
         }
 
         if (session?.access_token && mounted) {
@@ -34,6 +34,11 @@ export function AuthPage() {
         }
       } catch (error) {
         console.error("Error checking session:", error);
+        toast({
+          variant: "destructive",
+          title: "Erro de autenticação",
+          description: "Ocorreu um erro ao verificar sua sessão. Por favor, tente novamente.",
+        });
       } finally {
         if (mounted) {
           setIsLoading(false);
@@ -57,7 +62,7 @@ export function AuthPage() {
       mounted = false;
       subscription.unsubscribe();
     };
-  }, [navigate]);
+  }, [navigate, toast]);
 
   if (isLoading) {
     return (

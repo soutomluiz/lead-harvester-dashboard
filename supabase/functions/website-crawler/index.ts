@@ -7,12 +7,6 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
 
-const BLOCKED_DOMAINS = ['linkedin.com', 'facebook.com', 'instagram.com'];
-
-function isBlockedDomain(url: string): boolean {
-  return BLOCKED_DOMAINS.some(domain => url.includes(domain));
-}
-
 serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
@@ -24,22 +18,9 @@ serve(async (req) => {
     const authHeader = req.headers.get('Authorization')
     
     if (!authHeader) {
-      console.error('No authorization header provided');
       return new Response(
         JSON.stringify({ error: 'No authorization header' }),
         { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      )
-    }
-
-    // Check for blocked domains
-    if (isBlockedDomain(url)) {
-      console.error('Attempted to crawl blocked domain:', url);
-      return new Response(
-        JSON.stringify({ 
-          success: false, 
-          error: 'Este site não permite extração automática de dados. Por favor, tente um site diferente.' 
-        }),
-        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       )
     }
 
@@ -55,7 +36,6 @@ serve(async (req) => {
     // Get user profile to check subscription and lead count
     const { data: { user }, error: userError } = await supabase.auth.getUser()
     if (userError || !user) {
-      console.error('Error getting user:', userError);
       throw new Error('Error getting user')
     }
 
@@ -66,7 +46,6 @@ serve(async (req) => {
       .single()
 
     if (profileError || !profile) {
-      console.error('Error getting profile:', profileError);
       throw new Error('Error getting profile')
     }
 
@@ -91,10 +70,7 @@ serve(async (req) => {
       }
     })
 
-    console.log('Crawl response:', crawlResponse)
-
     if (!crawlResponse.success) {
-      console.error('Crawl failed:', crawlResponse);
       throw new Error('Crawl failed')
     }
 
@@ -109,25 +85,12 @@ serve(async (req) => {
       tags: ['auto-extracted']
     }))
 
-    if (leads.length === 0) {
-      console.log('No leads found in crawl response');
-      return new Response(
-        JSON.stringify({ 
-          success: true, 
-          leadsExtracted: 0,
-          leads: [] 
-        }),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      )
-    }
-
     // Insert leads into database
     const { error: insertError } = await supabase
       .from('leads')
       .insert(leads)
 
     if (insertError) {
-      console.error('Error inserting leads:', insertError);
       throw new Error('Error inserting leads')
     }
 
@@ -140,26 +103,18 @@ serve(async (req) => {
       .eq('id', user.id)
 
     if (updateError) {
-      console.error('Error updating profile:', updateError);
       throw new Error('Error updating profile')
     }
 
     return new Response(
-      JSON.stringify({ 
-        success: true, 
-        leadsExtracted: leads.length,
-        leads: leads 
-      }),
+      JSON.stringify({ success: true, leadsExtracted: leads.length }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     )
 
   } catch (error) {
     console.error('Error:', error)
     return new Response(
-      JSON.stringify({ 
-        success: false, 
-        error: error instanceof Error ? error.message : 'An unexpected error occurred' 
-      }),
+      JSON.stringify({ error: error.message }),
       { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     )
   }

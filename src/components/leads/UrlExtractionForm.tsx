@@ -16,17 +16,12 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Loader2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { Lead } from "@/types/lead";
 
 const formSchema = z.object({
   url: z.string().url("Por favor insira uma URL válida"),
 });
 
-interface UrlExtractionFormProps {
-  onAddLeads: (leads: Lead[]) => void;
-}
-
-export const UrlExtractionForm = ({ onAddLeads }: UrlExtractionFormProps) => {
+export const UrlExtractionForm = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
@@ -41,16 +36,11 @@ export const UrlExtractionForm = ({ onAddLeads }: UrlExtractionFormProps) => {
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     setIsLoading(true);
     try {
-      console.log('Starting website crawl for URL:', values.url);
-      
       const { data: response, error } = await supabase.functions.invoke('website-crawler', {
         body: { url: values.url }
       });
 
-      console.log('Crawler response:', response);
-
       if (error) {
-        console.error('Crawler error:', error);
         throw error;
       }
 
@@ -64,32 +54,20 @@ export const UrlExtractionForm = ({ onAddLeads }: UrlExtractionFormProps) => {
         return;
       }
 
-      if (!response.success || !response.leads || !Array.isArray(response.leads)) {
-        throw new Error('Formato de resposta inválido');
-      }
-
-      if (response.leads.length === 0) {
+      if (response.success) {
         toast({
-          title: "Nenhum lead encontrado",
-          description: "Não foi possível encontrar leads neste website. Tente outro URL.",
-          variant: "destructive",
+          title: "Sucesso!",
+          description: `${response.leadsExtracted} leads extraídos com sucesso!`,
         });
-        return;
+        form.reset();
+      } else {
+        throw new Error(response.error);
       }
-
-      toast({
-        title: "Sucesso!",
-        description: `${response.leadsExtracted} leads extraídos com sucesso!`,
-      });
-      
-      form.reset();
-      onAddLeads(response.leads);
-      
     } catch (error) {
       console.error('Error extracting leads:', error);
       toast({
         title: "Erro",
-        description: "Erro ao processar o link. Verifique se ele é válido e tente novamente.",
+        description: "Erro ao processar o link. Verifique se ele é válido.",
         variant: "destructive",
       });
     } finally {

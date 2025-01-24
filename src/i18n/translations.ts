@@ -39,7 +39,7 @@ export const translations = {
     // Navigation and general
     "dashboard": "Dashboard",
     "manualInput": "Entrada Manual",
-    "urlInput": "Extrair de URL",
+    "urlExtraction": "Extrair de URL",
     "extractLeads": "Extrair Leads",
     "extractingLeads": "Extraindo Leads...",
     "websiteUrl": "URL do Website",
@@ -97,11 +97,6 @@ export const translations = {
     // Auth translations
     "logoutSuccess": "Você foi desconectado com sucesso",
     "logoutError": "Erro ao tentar desconectar",
-    "googleMaps": "Google Maps",
-    "websites": "Websites",
-    "leadsList": "Lista de Leads",
-    "leadScore": "Pontuação de Leads",
-    "timeline": "Linha do Tempo",
   },
   "en": {
     "welcomeTour": "Welcome to our system! Let's take a quick tour to show you the main features.",
@@ -140,7 +135,7 @@ export const translations = {
     // Navigation and general
     "dashboard": "Dashboard",
     "manualInput": "Manual Input",
-    "urlInput": "Extract from URL",
+    "urlExtraction": "Extract from URL",
     "extractLeads": "Extract Leads",
     "extractingLeads": "Extracting Leads...",
     "websiteUrl": "Website URL",
@@ -198,11 +193,6 @@ export const translations = {
     // Auth translations
     "logoutSuccess": "You have been successfully logged out",
     "logoutError": "Error trying to log out",
-    "googleMaps": "Google Maps",
-    "websites": "Websites", 
-    "leadsList": "Leads List",
-    "leadScore": "Lead Score",
-    "timeline": "Timeline",
   },
   "es": {
     "welcomeTour": "¡Bienvenido a nuestro sistema! Hagamos un recorrido rápido para mostrarle las características principales.",
@@ -241,7 +231,7 @@ export const translations = {
     // Navigation and general
     "dashboard": "Tablero",
     "manualInput": "Entrada Manual",
-    "urlInput": "Extraer de URL",
+    "urlExtraction": "Extraer de URL",
     "extractLeads": "Extraer Leads",
     "extractingLeads": "Extrayendo Leads...",
     "websiteUrl": "URL del Sitio Web",
@@ -299,10 +289,5 @@ export const translations = {
     // Auth translations
     "logoutSuccess": "Has cerrado sesión exitosamente",
     "logoutError": "Error al intentar cerrar sesión",
-    "googleMaps": "Google Maps",
-    "websites": "Sitios Web",
-    "leadsList": "Lista de Leads",
-    "leadScore": "Puntuación de Leads",
-    "timeline": "Línea de Tiempo",
   }
 };

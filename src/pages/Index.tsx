@@ -48,7 +48,6 @@ const getPageTitle = (tab: string) => {
 
 const Index = () => {
   const [leads, setLeads] = useState<Lead[]>([]);
-  // Definindo explicitamente o estado inicial como "dashboard"
   const [activeTab, setActiveTab] = useState("dashboard");
   const [userName, setUserName] = useState<string>("");
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
@@ -151,8 +150,6 @@ const Index = () => {
           if (mounted) {
             setIsAuthenticated(true);
             await fetchUserProfile(session.user.id);
-            // Garantir que o activeTab seja "dashboard" após o login
-            setActiveTab("dashboard");
           }
         }
       });

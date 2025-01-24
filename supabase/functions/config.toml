@@ -1,5 +1,0 @@
-project_id = "pvkzcewudzvlqiwszzwi"
-
-[global]
-[global.env]
-FIRECRAWL_API_KEY = "your-api-key"

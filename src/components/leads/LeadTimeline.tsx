@@ -1,105 +1,141 @@
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 import { Lead } from "@/types/lead";
 import { Card } from "@/components/ui/card";
+import { Timer, Loader2, Building2, Mail, Phone, Globe } from "lucide-react";
+import { useToast } from "@/components/ui/use-toast";
 import { format, parseISO } from "date-fns";
-import { CalendarDays, Mail, Phone, Globe, Building2, MapPin, Tags, DollarSign } from "lucide-react";
-import { Separator } from "@/components/ui/separator";
+import { ptBR } from "date-fns/locale";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
-interface LeadTimelineProps {
-  leads: Lead[];
-}
+const fetchLeads = async () => {
+  console.log("Fetching leads for LeadTimeline...");
+  
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session) {
+    throw new Error("No active session");
+  }
 
-export function LeadTimeline({ leads }: LeadTimelineProps) {
-  const sortedLeads = [...leads].sort((a, b) => {
-    const dateA = a.created_at ? new Date(a.created_at) : new Date(0);
-    const dateB = b.created_at ? new Date(b.created_at) : new Date(0);
-    return dateB.getTime() - dateA.getTime();
+  const { data, error } = await supabase
+    .from('leads')
+    .select('*')
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    console.error("Error fetching leads:", error);
+    throw error;
+  }
+
+  console.log("Leads fetched:", data);
+  return (data || []).map(lead => ({
+    ...lead,
+    type: (lead.type || 'manual') as 'website' | 'place' | 'manual',
+    status: (lead.status || 'new') as 'new' | 'qualified' | 'unqualified' | 'open',
+    deal_value: lead.deal_value || 0,
+    tags: lead.tags || []
+  }));
+};
+
+export function LeadTimeline() {
+  const { toast } = useToast();
+  const navigate = useNavigate();
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      setIsAuthenticated(!!session);
+      if (!session) {
+        navigate('/login');
+      }
+    };
+    checkAuth();
+  }, [navigate]);
+
+  const { data: leads = [], isLoading, error } = useQuery({
+    queryKey: ['leads-timeline'],
+    queryFn: fetchLeads,
+    retry: 1,
+    enabled: isAuthenticated === true
   });
 
-  const getIcon = (field: string) => {
-    switch (field) {
-      case "email":
-        return <Mail className="h-4 w-4" />;
-      case "phone":
-        return <Phone className="h-4 w-4" />;
-      case "website":
-        return <Globe className="h-4 w-4" />;
-      case "company_name":
-        return <Building2 className="h-4 w-4" />;
-      case "location":
-        return <MapPin className="h-4 w-4" />;
-      case "tags":
-        return <Tags className="h-4 w-4" />;
-      case "deal_value":
-        return <DollarSign className="h-4 w-4" />;
-      default:
-        return <CalendarDays className="h-4 w-4" />;
+  console.log("LeadTimeline render:", { leads, isLoading, error, isAuthenticated });
+
+  if (error) {
+    console.error("Error in LeadTimeline:", error);
+    const errorMessage = error instanceof Error ? error.message : "Erro ao carregar leads";
+    toast({
+      title: "Erro ao carregar leads",
+      description: errorMessage,
+      variant: "destructive",
+    });
+    if (errorMessage.includes("No active session")) {
+      navigate('/login');
+      return null;
     }
-  };
+    return (
+      <div className="flex flex-col items-center justify-center h-64 text-muted-foreground">
+        <Timer className="h-12 w-12 mb-4" />
+        <p>Erro ao carregar timeline</p>
+      </div>
+    );
+  }
+
+  if (isLoading || isAuthenticated === null) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <Loader2 className="h-8 w-8 animate-spin" />
+      </div>
+    );
+  }
+
+  if (!leads.length) {
+    return (
+      <div className="flex flex-col items-center justify-center h-64 text-muted-foreground">
+        <Timer className="h-12 w-12 mb-4" />
+        <p>Nenhuma atividade encontrada</p>
+      </div>
+    );
+  }
 
   return (
-    <Card className="p-6">
-      <h2 className="text-2xl font-bold mb-6">Timeline de Leads</h2>
-      <div className="space-y-8">
-        {sortedLeads.map((lead, index) => (
-          <div key={lead.id} className="relative">
-            <div className="flex items-start gap-4">
-              <div className="min-w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
-                {getIcon("company_name")}
-              </div>
-              <div className="flex-1">
-                <div className="mb-4">
-                  <h3 className="font-semibold">{lead.company_name}</h3>
-                  <p className="text-sm text-muted-foreground">
-                    {lead.created_at && format(parseISO(lead.created_at), "dd/MM/yyyy HH:mm")}
-                  </p>
-                  <div className="mt-2 space-y-1">
-                    {lead.email && (
-                      <div className="flex items-center gap-2 text-sm">
-                        <Mail className="h-4 w-4" />
-                        {lead.email}
-                      </div>
-                    )}
-                    {lead.phone && (
-                      <div className="flex items-center gap-2 text-sm">
-                        <Phone className="h-4 w-4" />
-                        {lead.phone}
-                      </div>
-                    )}
-                    {lead.website && (
-                      <div className="flex items-center gap-2 text-sm">
-                        <Globe className="h-4 w-4" />
-                        {lead.website}
-                      </div>
-                    )}
-                    {lead.location && (
-                      <div className="flex items-center gap-2 text-sm">
-                        <MapPin className="h-4 w-4" />
-                        {lead.location}
-                      </div>
-                    )}
-                    {lead.deal_value > 0 && (
-                      <div className="flex items-center gap-2 text-sm">
-                        <DollarSign className="h-4 w-4" />
-                        {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' })
-                          .format(lead.deal_value)}
-                      </div>
-                    )}
-                    {lead.tags && lead.tags.length > 0 && (
-                      <div className="flex items-center gap-2 text-sm">
-                        <Tags className="h-4 w-4" />
-                        {lead.tags.join(", ")}
-                      </div>
-                    )}
-                  </div>
-                </div>
+    <div className="space-y-4">
+      {leads.map((lead) => (
+        <Card key={lead.id} className="p-4">
+          <div className="flex items-start gap-4">
+            <div className="bg-primary/10 p-2 rounded-full">
+              <Building2 className="h-5 w-5 text-primary" />
+            </div>
+            <div className="flex-1">
+              <h3 className="font-medium">{lead.company_name}</h3>
+              <p className="text-sm text-muted-foreground">
+                {lead.created_at ? format(new Date(lead.created_at), "PPP 'às' p", { locale: ptBR }) : 'Data não disponível'}
+              </p>
+              <div className="mt-2 flex flex-wrap gap-2">
+                {lead.email && (
+                  <span className="inline-flex items-center text-sm text-muted-foreground">
+                    <Mail className="h-4 w-4 mr-1" />
+                    {lead.email}
+                  </span>
+                )}
+                {lead.phone && (
+                  <span className="inline-flex items-center text-sm text-muted-foreground">
+                    <Phone className="h-4 w-4 mr-1" />
+                    {lead.phone}
+                  </span>
+                )}
+                {lead.website && (
+                  <span className="inline-flex items-center text-sm text-muted-foreground">
+                    <Globe className="h-4 w-4 mr-1" />
+                    {lead.website}
+                  </span>
+                )}
               </div>
             </div>
-            {index < sortedLeads.length - 1 && (
-              <Separator className="my-4" />
-            )}
           </div>
-        ))}
-      </div>
-    </Card>
+        </Card>
+      ))}
+    </div>
   );
 }

@@ -97,6 +97,23 @@ export const translations = {
     // Auth translations
     "logoutSuccess": "Você foi desconectado com sucesso",
     "logoutError": "Erro ao tentar desconectar",
+    
+    // Search related translations
+    "searchTermRequired": "Por favor insira um termo de busca",
+    "noResults": "Nenhum resultado encontrado",
+    "tryDifferentSearch": "Tente uma busca diferente",
+    "searchError": "Erro ao realizar a busca",
+    "searchTerm": "Termo de busca",
+    "searchPlaceholder": "Digite o termo de busca",
+    "locationPlaceholder": "Digite a localização",
+    "search": "Buscar",
+    "addToLeads": "Adicionar aos Leads",
+    "places": "Google Places",
+    "websiteSearch": "Busca em Websites",
+    "score": "Pontuação",
+    "timeline": "Linha do tempo",
+    "resultsFound": "{{count}} resultados encontrados",
+    "leadsAdded": "{{count}} leads adicionados",
   },
   "en": {
     "welcomeTour": "Welcome to our system! Let's take a quick tour to show you the main features.",
@@ -193,6 +210,23 @@ export const translations = {
     // Auth translations
     "logoutSuccess": "You have been successfully logged out",
     "logoutError": "Error trying to log out",
+    
+    // Search related translations
+    "searchTermRequired": "Please enter a search term",
+    "noResults": "No results found",
+    "tryDifferentSearch": "Try a different search",
+    "searchError": "Error performing search",
+    "searchTerm": "Search term",
+    "searchPlaceholder": "Enter search term",
+    "locationPlaceholder": "Enter location",
+    "search": "Search",
+    "addToLeads": "Add to Leads",
+    "places": "Google Places",
+    "websiteSearch": "Website Search",
+    "score": "Score",
+    "timeline": "Timeline",
+    "resultsFound": "{{count}} results found",
+    "leadsAdded": "{{count}} leads added",
   },
   "es": {
     "welcomeTour": "¡Bienvenido a nuestro sistema! Hagamos un recorrido rápido para mostrarle las características principales.",
@@ -221,10 +255,10 @@ export const translations = {
     "leadsOverTime": "Leads a lo Largo del Tiempo",
     "leadsStatus": "Estado de los Leads",
     "leadsOrigin": "Origen de los Leads",
-    "topIndustries": "Principales Industrias",
+    "topIndustries": "Principales Indústrias",
     "websitesFound": "Sitios Web Encontrados",
     "withContactInfo": "Con Información de Contacto",
-    "uniqueDomains": "Dominios Únicos",
+    "uniqueDomains": "Domínios Únicos",
     "companiesFound": "Empresas Encontradas",
     "averageRating": "Calificación Promedio",
     
@@ -289,5 +323,22 @@ export const translations = {
     // Auth translations
     "logoutSuccess": "Has cerrado sesión exitosamente",
     "logoutError": "Error al intentar cerrar sesión",
+    
+    // Search related translations
+    "searchTermRequired": "Por favor ingrese un término de búsqueda",
+    "noResults": "No se encontraron resultados",
+    "tryDifferentSearch": "Intente una búsqueda diferente",
+    "searchError": "Error al realizar la búsqueda",
+    "searchTerm": "Término de búsqueda",
+    "searchPlaceholder": "Ingrese término de búsqueda",
+    "locationPlaceholder": "Ingrese ubicación",
+    "search": "Buscar",
+    "addToLeads": "Agregar a Leads",
+    "places": "Google Places",
+    "websiteSearch": "Búsqueda en Sitios Web",
+    "score": "Puntuación",
+    "timeline": "Línea de tiempo",
+    "resultsFound": "{{count}} resultados encontrados",
+    "leadsAdded": "{{count}} leads agregados",
   }
 };

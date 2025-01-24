@@ -1,18 +1,12 @@
 export interface SearchResult {
-  title?: string;
-  link: string;
-  description?: string;
-  companyName: string;
-  address?: string;
-  phone?: string;
+  name: string;
+  category?: string;
+  location?: string;
   email?: string;
-  keyword: string;
-  city: string;
-  extractionDate: string;
+  phone?: string;
+  website?: string;
+  address?: string;
   rating?: number;
   user_ratings_total?: number;
-  opening_date?: string;
-  website?: string;
-  source?: string;
-  type?: 'website' | 'place';
+  type?: 'place' | 'website';
 }

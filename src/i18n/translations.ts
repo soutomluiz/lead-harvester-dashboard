@@ -114,6 +114,7 @@ export const translations = {
     "timeline": "Linha do tempo",
     "resultsFound": "{{count}} resultados encontrados",
     "leadsAdded": "{{count}} leads adicionados",
+    "locationLabel": "Localização",
   },
   "en": {
     "welcomeTour": "Welcome to our system! Let's take a quick tour to show you the main features.",
@@ -227,6 +228,7 @@ export const translations = {
     "timeline": "Timeline",
     "resultsFound": "{{count}} results found",
     "leadsAdded": "{{count}} leads added",
+    "locationLabel": "Location",
   },
   "es": {
     "welcomeTour": "¡Bienvenido a nuestro sistema! Hagamos un recorrido rápido para mostrarle las características principales.",
@@ -340,5 +342,6 @@ export const translations = {
     "timeline": "Línea de tiempo",
     "resultsFound": "{{count}} resultados encontrados",
     "leadsAdded": "{{count}} leads agregados",
+    "locationLabel": "Ubicación",
   }
 };

@@ -17,6 +17,7 @@ const Index = () => {
 
   const handleAuthStateChange = (authenticated: boolean, profile: any) => {
     console.log("Auth state changed in Index:", { authenticated, profile });
+    // O estado será atualizado automaticamente pelo useAuthState
   };
 
   // Se estiver carregando, mostra o loader

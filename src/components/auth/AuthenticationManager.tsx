@@ -13,6 +13,8 @@ export function AuthenticationManager({ onAuthStateChange, children }: Authentic
   const fetchUserProfile = async (userId: string) => {
     try {
       console.log("AuthenticationManager: Fetching profile for user:", userId);
+      
+      // Primeiro, verifica se o perfil existe
       const { data: profile, error } = await supabase
         .from('profiles')
         .select('*')
@@ -23,10 +25,37 @@ export function AuthenticationManager({ onAuthStateChange, children }: Authentic
         console.error("AuthenticationManager: Error fetching profile:", error);
         throw error;
       }
-      
+
+      // Se não encontrou perfil, cria um novo
       if (!profile) {
-        console.log("AuthenticationManager: No profile found for user");
-        return null;
+        console.log("AuthenticationManager: Creating new profile for user");
+        const { data: session } = await supabase.auth.getSession();
+        const user = session?.session?.user;
+        
+        if (!user) {
+          console.error("AuthenticationManager: No user session found");
+          return null;
+        }
+
+        const { data: newProfile, error: createError } = await supabase
+          .from('profiles')
+          .insert([
+            { 
+              id: userId,
+              email: user.email,
+              full_name: user.user_metadata?.full_name || user.email
+            }
+          ])
+          .select()
+          .single();
+
+        if (createError) {
+          console.error("AuthenticationManager: Error creating profile:", createError);
+          throw createError;
+        }
+
+        console.log("AuthenticationManager: New profile created:", newProfile);
+        return newProfile;
       }
       
       console.log("AuthenticationManager: Profile fetched successfully:", profile);

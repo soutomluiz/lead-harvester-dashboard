@@ -28,6 +28,17 @@ export function useAuthenticationFlow({ onAuthStateChange }: UseAuthenticationFl
   const createUserProfile = async (userId: string): Promise<Profile | null> => {
     try {
       console.log("Creating new profile for user:", userId);
+      const { data: existingProfile } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', userId)
+        .maybeSingle();
+
+      if (existingProfile) {
+        console.log("Profile already exists:", existingProfile);
+        return existingProfile;
+      }
+
       const { data: newProfile, error: createError } = await supabase
         .from('profiles')
         .insert([{ id: userId }])
@@ -79,12 +90,7 @@ export function useAuthenticationFlow({ onAuthStateChange }: UseAuthenticationFl
 
     try {
       console.log("Handling session for user:", session.user.id);
-      let profile = await fetchUserProfile(session.user.id);
-      
-      if (!profile) {
-        console.log("Profile not found, creating new profile...");
-        profile = await createUserProfile(session.user.id);
-      }
+      let profile = await createUserProfile(session.user.id);
 
       if (!profile) {
         console.error("Failed to create or fetch profile");

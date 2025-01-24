@@ -14,6 +14,18 @@ export function useAuthState() {
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
+  const updateUserState = (profile: UserProfile | null) => {
+    if (profile) {
+      setUserName(profile.full_name || '');
+      setAvatarUrl(profile.avatar_url);
+      setUserProfile(profile);
+    } else {
+      setUserName('');
+      setAvatarUrl(null);
+      setUserProfile(null);
+    }
+  };
+
   const fetchUserProfile = async (userId: string) => {
     try {
       console.log("Fetching user profile for ID:", userId);
@@ -36,37 +48,27 @@ export function useAuthState() {
     }
   };
 
-  const updateUserState = (profile: UserProfile | null) => {
-    if (profile) {
-      setUserName(profile.full_name || '');
-      setAvatarUrl(profile.avatar_url);
-      setUserProfile(profile);
-    } else {
-      setUserName('');
-      setAvatarUrl(null);
-      setUserProfile(null);
-    }
-  };
-
   useEffect(() => {
     let mounted = true;
 
-    const checkSession = async () => {
+    const initializeAuth = async () => {
       try {
-        console.log("Checking session...");
+        console.log("Initializing auth state...");
+        setIsLoading(true);
+
         const { data: { session }, error } = await supabase.auth.getSession();
 
         if (error) {
           console.error("Session error:", error);
           if (mounted) {
-            setIsLoading(false);
             setIsAuthenticated(false);
+            updateUserState(null);
           }
           return;
         }
 
-        if (session) {
-          console.log("Active session found:", session);
+        if (session?.user) {
+          console.log("Active session found, fetching profile...");
           const profile = await fetchUserProfile(session.user.id);
           
           if (mounted) {
@@ -81,7 +83,7 @@ export function useAuthState() {
           }
         }
       } catch (error) {
-        console.error("Error in checkSession:", error);
+        console.error("Error in initializeAuth:", error);
       } finally {
         if (mounted) {
           setIsLoading(false);
@@ -89,22 +91,26 @@ export function useAuthState() {
       }
     };
 
-    checkSession();
+    initializeAuth();
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      console.log("Auth state changed:", event, session);
+      console.log("Auth state changed:", event);
 
       if (!mounted) return;
 
-      if (event === 'SIGNED_IN' && session) {
+      if (event === 'SIGNED_IN' && session?.user) {
         setIsLoading(true);
         const profile = await fetchUserProfile(session.user.id);
-        setIsAuthenticated(true);
-        updateUserState(profile);
-        setIsLoading(false);
+        if (mounted) {
+          setIsAuthenticated(true);
+          updateUserState(profile);
+          setIsLoading(false);
+        }
       } else if (event === 'SIGNED_OUT') {
-        setIsAuthenticated(false);
-        updateUserState(null);
+        if (mounted) {
+          setIsAuthenticated(false);
+          updateUserState(null);
+        }
       }
     });
 

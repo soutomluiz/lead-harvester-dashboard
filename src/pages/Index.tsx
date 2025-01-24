@@ -6,11 +6,18 @@ import { AppFooter } from "@/components/AppFooter";
 import { WelcomeTour } from "@/components/WelcomeTour";
 import { Lead } from "@/types/lead";
 import { supabase } from "@/integrations/supabase/client";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { UserRound, LogOut } from "lucide-react";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { UserProfilePanel } from "@/components/UserProfilePanel";
+import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
+import { NotificationBell } from "@/components/NotificationBell";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/hooks/useAuth";
 import { AuthPage } from "@/components/AuthPage";
-import { PageHeader } from "@/components/header/PageHeader";
+import { UserCredits } from "@/components/UserCredits";
 
 const getPageTitle = (tab: string) => {
   switch (tab) {
@@ -65,6 +72,7 @@ const Index = () => {
       }
 
       if (profile) {
+        console.log("Profile loaded:", profile);
         setUserName(profile.full_name || '');
         setAvatarUrl(profile.avatar_url);
         setUserProfile(profile);
@@ -81,7 +89,15 @@ const Index = () => {
       try {
         const { data: { session }, error: sessionError } = await supabase.auth.getSession();
         
-        if (sessionError || !session) {
+        if (sessionError) {
+          console.error("Error checking session:", sessionError);
+          setIsAuthenticated(false);
+          setIsLoading(false);
+          return;
+        }
+
+        if (!session) {
+          console.log("No active session found");
           setIsAuthenticated(false);
           setIsLoading(false);
           return;
@@ -98,6 +114,8 @@ const Index = () => {
     checkAuth();
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      console.log("Auth state changed:", event);
+      
       if (event === 'SIGNED_OUT' || !session) {
         setIsAuthenticated(false);
         setUserName('');
@@ -147,12 +165,40 @@ const Index = () => {
             <h1 className="text-2xl font-bold">
               {getPageTitle(activeTab)}
             </h1>
-            <PageHeader 
-              userName={userName}
-              avatarUrl={avatarUrl}
-              userProfile={userProfile}
-              onSignOut={handleSignOut}
-            />
+            <div className="flex items-center gap-4">
+              {userName && (
+                <span className="text-sm font-medium">
+                  {t("hello")}, {userName}
+                </span>
+              )}
+              <NotificationBell />
+              <UserCredits />
+              <ThemeToggle />
+              <Sheet>
+                <SheetTrigger asChild>
+                  <Avatar className="h-16 w-16 cursor-pointer hover:opacity-80 transition-opacity">
+                    <AvatarImage src={avatarUrl || ""} />
+                    <AvatarFallback>
+                      <UserRound className="h-8 w-8" />
+                    </AvatarFallback>
+                  </Avatar>
+                </SheetTrigger>
+                <SheetContent className="w-[400px] sm:w-[540px]">
+                  <SheetHeader>
+                    <SheetTitle>{t("profile")}</SheetTitle>
+                  </SheetHeader>
+                  <UserProfilePanel initialData={userProfile} />
+                </SheetContent>
+              </Sheet>
+              <Button 
+                variant="outline" 
+                size="icon"
+                onClick={handleSignOut}
+                className="hover:bg-destructive hover:text-destructive-foreground"
+              >
+                <LogOut className="h-5 w-5" />
+              </Button>
+            </div>
           </div>
 
           <div className="mt-6 animate-fadeIn">

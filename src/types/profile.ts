@@ -10,7 +10,6 @@ export interface Profile {
   email: string;
   website: string;
   industry: string;
-  subscription_status?: 'active' | 'inactive' | null;
 }
 
 export interface ProfileFormData {

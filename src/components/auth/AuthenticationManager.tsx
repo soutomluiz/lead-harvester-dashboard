@@ -36,7 +36,7 @@ export function AuthenticationManager({ onAuthStateChange, children }: Authentic
 
     const checkAuth = async () => {
       try {
-        console.log("AuthenticationManager: Checking authentication status...");
+        console.log("AuthenticationManager: Starting authentication check...");
         const { data: { session }, error: sessionError } = await supabase.auth.getSession();
         
         if (sessionError) {
@@ -53,7 +53,7 @@ export function AuthenticationManager({ onAuthStateChange, children }: Authentic
           return;
         }
 
-        console.log("AuthenticationManager: Active session found, fetching profile...");
+        console.log("AuthenticationManager: Active session found:", session);
         const profile = await fetchUserProfile(session.user.id);
         
         if (mounted) {
@@ -79,7 +79,6 @@ export function AuthenticationManager({ onAuthStateChange, children }: Authentic
       if (event === 'SIGNED_OUT' || !session) {
         console.log("AuthenticationManager: User signed out or session ended");
         onAuthStateChange(false);
-        window.location.href = '/login';
         return;
       }
 

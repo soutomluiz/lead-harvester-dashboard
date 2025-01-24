@@ -11,6 +11,8 @@ import { Reports } from "@/components/reports/Reports";
 import { Subscription } from "@/components/subscription/Subscription";
 import { ConfigPanel } from "@/components/config/ConfigPanel";
 import { ProspectingForm } from "@/components/ProspectingForm";
+import { DashboardStats } from "@/components/DashboardStats";
+import { KanbanBoard } from "@/components/KanbanBoard";
 
 interface DashboardProps {
   activeTab: string;
@@ -26,7 +28,12 @@ export function Dashboard({ activeTab, leads, onSubmit, onAddLeads, setActiveTab
   const renderContent = () => {
     switch (activeTab) {
       case "dashboard":
-        return <ExtractionCards setActiveTab={setActiveTab} />;
+        return (
+          <div className="space-y-6">
+            <DashboardStats leads={leads} />
+            <KanbanBoard />
+          </div>
+        );
       case "prospect-form":
         return (
           <Tabs defaultValue="manual" className="w-full">
@@ -59,7 +66,7 @@ export function Dashboard({ activeTab, leads, onSubmit, onAddLeads, setActiveTab
       case "config":
         return <ConfigPanel />;
       default:
-        return null;
+        return <ExtractionCards setActiveTab={setActiveTab} />;
     }
   };
 

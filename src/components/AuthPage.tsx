@@ -32,8 +32,7 @@ export function AuthPage() {
 
         if (session?.access_token && mounted) {
           console.log("Active session found in AuthPage, redirecting to dashboard");
-          window.location.href = '/';
-          return;
+          navigate('/', { replace: true });
         }
       } catch (error) {
         console.error("Error checking session:", error);
@@ -54,9 +53,8 @@ export function AuthPage() {
       
       if (event === 'SIGNED_IN' && session && mounted) {
         console.log("User signed in in AuthPage, redirecting to dashboard");
-        window.location.href = '/';
+        navigate('/', { replace: true });
         setError(null);
-        return;
       }
     });
 
@@ -68,7 +66,7 @@ export function AuthPage() {
         authListener.subscription.unsubscribe();
       }
     };
-  }, [toast]);
+  }, [navigate, toast]);
 
   if (isLoading) {
     return (

@@ -25,62 +25,68 @@ export function useAuthenticationFlow({ onAuthStateChange }: UseAuthenticationFl
     });
   };
 
-  const createUserProfile = async (userId: string): Promise<Profile | null> => {
+  const getOrCreateProfile = async (userId: string): Promise<Profile | null> => {
     try {
-      console.log("Creating/fetching profile for user:", userId);
-      const { data: existingProfile } = await supabase
+      console.log("Buscando ou criando perfil para usuário:", userId);
+      
+      // Primeiro, tentamos buscar o perfil existente
+      const { data: profile, error: fetchError } = await supabase
         .from('profiles')
         .select('*')
         .eq('id', userId)
-        .maybeSingle();
-
-      if (existingProfile) {
-        console.log("Profile already exists:", existingProfile);
-        return existingProfile;
-      }
-
-      console.log("No existing profile found, creating new one...");
-      const { data: newProfile, error: createError } = await supabase
-        .from('profiles')
-        .insert([{ id: userId }])
-        .select()
         .single();
 
-      if (createError) {
-        console.error("Error creating profile:", createError);
-        throw createError;
+      if (fetchError) {
+        if (fetchError.code === 'PGRST116') {
+          console.log("Perfil não encontrado, criando novo...");
+          // Se o perfil não existe, criamos um novo
+          const { data: newProfile, error: createError } = await supabase
+            .from('profiles')
+            .insert([{ id: userId }])
+            .select()
+            .single();
+
+          if (createError) {
+            console.error("Erro ao criar perfil:", createError);
+            throw createError;
+          }
+
+          console.log("Novo perfil criado com sucesso:", newProfile);
+          return newProfile;
+        }
+        throw fetchError;
       }
-      
-      console.log("New profile created successfully:", newProfile);
-      return newProfile;
+
+      console.log("Perfil encontrado:", profile);
+      return profile;
     } catch (error) {
-      console.error("Error in createUserProfile:", error);
+      console.error("Erro ao buscar/criar perfil:", error);
       throw error;
     }
   };
 
   const handleSession = async (session: any) => {
     if (!session) {
-      console.log("No session found, redirecting to login");
+      console.log("Sessão não encontrada, redirecionando para login");
       onAuthStateChange(false);
       navigate('/login');
       return;
     }
 
     try {
-      console.log("Handling session for user:", session.user.id);
-      let profile = await createUserProfile(session.user.id);
+      console.log("Processando sessão para usuário:", session.user.id);
+      const profile = await getOrCreateProfile(session.user.id);
 
       if (!profile) {
-        console.error("Failed to create or fetch profile");
-        throw new Error("Failed to create or fetch profile");
+        console.error("Falha ao buscar ou criar perfil");
+        throw new Error("Falha ao buscar ou criar perfil");
       }
 
-      console.log("Profile handled successfully:", profile);
+      console.log("Perfil processado com sucesso:", profile);
       onAuthStateChange(true, profile);
       navigate('/');
     } catch (error) {
-      console.error("Error handling session:", error);
+      console.error("Erro ao processar sessão:", error);
       await handleProfileError();
     }
   };
@@ -90,11 +96,11 @@ export function useAuthenticationFlow({ onAuthStateChange }: UseAuthenticationFl
 
     const checkSession = async () => {
       try {
-        console.log("Checking current session...");
+        console.log("Verificando sessão atual...");
         const { data: { session }, error: sessionError } = await supabase.auth.getSession();
         
         if (sessionError) {
-          console.error("Session error:", sessionError);
+          console.error("Erro na sessão:", sessionError);
           throw sessionError;
         }
         
@@ -103,7 +109,7 @@ export function useAuthenticationFlow({ onAuthStateChange }: UseAuthenticationFl
           setIsLoading(false);
         }
       } catch (error) {
-        console.error("Error in checkSession:", error);
+        console.error("Erro ao verificar sessão:", error);
         if (mounted) {
           setIsLoading(false);
           navigate('/login');
@@ -112,19 +118,19 @@ export function useAuthenticationFlow({ onAuthStateChange }: UseAuthenticationFl
     };
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      console.log("Auth state changed:", event, session);
+      console.log("Estado de autenticação alterado:", event, session);
       
       if (!mounted) return;
 
       if (event === 'SIGNED_OUT' || !session) {
-        console.log("User signed out or session ended");
+        console.log("Usuário desconectado ou sessão encerrada");
         onAuthStateChange(false);
         navigate('/login');
         return;
       }
 
       if (event === 'SIGNED_IN' && session) {
-        console.log("User signed in, handling session...");
+        console.log("Usuário conectado, processando sessão...");
         await handleSession(session);
       }
     });

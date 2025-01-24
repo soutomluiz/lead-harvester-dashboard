@@ -12,7 +12,7 @@ const Index = () => {
   const [activeTab, setActiveTab] = useState("dashboard");
   const { isAuthenticated, userName, avatarUrl, userProfile, isLoading } = useAuthState();
 
-  console.log("Index render state:", { isAuthenticated, isLoading, userName });
+  console.log("Index render state:", { isAuthenticated, isLoading, userName, userProfile });
 
   if (isLoading) {
     return (

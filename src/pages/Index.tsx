@@ -7,6 +7,8 @@ import { AuthPage } from "@/components/AuthPage";
 import { AuthStateManager } from "@/components/auth/AuthStateManager";
 import { AuthenticatedLayout } from "@/components/layout/AuthenticatedLayout";
 import { useAuthState } from "@/hooks/useAuthState";
+import { useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
 
 const Index = () => {
   const [activeTab, setActiveTab] = useState("dashboard");
@@ -20,12 +22,26 @@ const Index = () => {
   } = useAuthState();
 
   const handleAuthStateChange = (authenticated: boolean, profile: any) => {
-    console.log("Auth state changed in Index:", { authenticated, profile });
+    console.log("Estado de autenticação alterado em Index:", { authenticated, profile });
     setIsAuthenticated(authenticated);
     if (profile) {
       setUserProfile(profile);
     }
   };
+
+  // Verificar sessão ao montar o componente
+  useEffect(() => {
+    const checkSession = async () => {
+      const { data: { session }, error } = await supabase.auth.getSession();
+      if (error || !session) {
+        console.log("Sessão inválida ou erro:", error);
+        await supabase.auth.signOut();
+        setIsAuthenticated(false);
+      }
+    };
+    
+    checkSession();
+  }, [setIsAuthenticated]);
 
   return (
     <AuthStateManager onAuthStateChange={handleAuthStateChange}>

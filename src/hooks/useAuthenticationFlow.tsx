@@ -14,22 +14,21 @@ export function useAuthenticationFlow({ onAuthStateChange }: UseAuthenticationFl
   const { toast } = useToast();
 
   const handleProfileError = async () => {
-    console.error("Profile error occurred, signing out...");
+    console.error("Erro no perfil, realizando logout...");
     await supabase.auth.signOut();
     onAuthStateChange(false);
     navigate('/login');
     toast({
       title: "Erro ao carregar perfil",
-      description: "Houve um problema ao carregar seu perfil. Por favor, tente novamente.",
+      description: "Houve um problema ao carregar seu perfil. Por favor, faça login novamente.",
       variant: "destructive",
     });
   };
 
   const getOrCreateProfile = async (userId: string): Promise<Profile | null> => {
     try {
-      console.log("Buscando ou criando perfil para usuário:", userId);
+      console.log("Buscando perfil para usuário:", userId);
       
-      // Primeiro, tentamos buscar o perfil existente
       const { data: profile, error: fetchError } = await supabase
         .from('profiles')
         .select('*')
@@ -39,7 +38,7 @@ export function useAuthenticationFlow({ onAuthStateChange }: UseAuthenticationFl
       if (fetchError) {
         if (fetchError.code === 'PGRST116') {
           console.log("Perfil não encontrado, criando novo...");
-          // Se o perfil não existe, criamos um novo
+          
           const { data: newProfile, error: createError } = await supabase
             .from('profiles')
             .insert([{ id: userId }])
@@ -61,7 +60,8 @@ export function useAuthenticationFlow({ onAuthStateChange }: UseAuthenticationFl
       return profile;
     } catch (error) {
       console.error("Erro ao buscar/criar perfil:", error);
-      throw error;
+      await handleProfileError();
+      return null;
     }
   };
 
@@ -91,6 +91,29 @@ export function useAuthenticationFlow({ onAuthStateChange }: UseAuthenticationFl
     }
   };
 
+  // Force logout for the current user
+  const forceLogout = async () => {
+    try {
+      const { error } = await supabase.auth.signOut();
+      if (error) throw error;
+      
+      console.log("Logout forçado realizado com sucesso");
+      onAuthStateChange(false);
+      navigate('/login');
+      toast({
+        title: "Logout realizado",
+        description: "Você foi desconectado do sistema.",
+      });
+    } catch (error) {
+      console.error("Erro ao forçar logout:", error);
+      toast({
+        title: "Erro ao realizar logout",
+        description: "Tente novamente em alguns instantes.",
+        variant: "destructive",
+      });
+    }
+  };
+
   useEffect(() => {
     let mounted = true;
 
@@ -105,14 +128,20 @@ export function useAuthenticationFlow({ onAuthStateChange }: UseAuthenticationFl
         }
         
         if (mounted) {
-          await handleSession(session);
+          if (!session) {
+            console.log("Nenhuma sessão encontrada");
+            onAuthStateChange(false);
+            navigate('/login');
+          } else {
+            await handleSession(session);
+          }
           setIsLoading(false);
         }
       } catch (error) {
         console.error("Erro ao verificar sessão:", error);
         if (mounted) {
           setIsLoading(false);
-          navigate('/login');
+          await forceLogout();
         }
       }
     };
@@ -143,5 +172,5 @@ export function useAuthenticationFlow({ onAuthStateChange }: UseAuthenticationFl
     };
   }, [navigate, onAuthStateChange, toast]);
 
-  return { isLoading };
+  return { isLoading, forceLogout };
 }

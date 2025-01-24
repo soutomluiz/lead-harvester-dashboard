@@ -96,7 +96,9 @@ export function AuthenticationManager({ onAuthStateChange, children }: Authentic
         
         if (sessionError) {
           console.error("Session error:", sessionError);
-          await handleLogout();
+          if (mounted) {
+            await handleLogout();
+          }
           return;
         }
 
@@ -120,10 +122,18 @@ export function AuthenticationManager({ onAuthStateChange, children }: Authentic
           onAuthStateChange(true, profile);
           setIsLoading(false);
         }
-      } catch (error) {
+      } catch (error: any) {
         console.error("Error in checkAuth:", error);
+        // Check for refresh token error
+        if (error.message?.includes('Invalid Refresh Token') || 
+            error.error?.message?.includes('Invalid Refresh Token')) {
+          console.log("Invalid refresh token detected, logging out...");
+          if (mounted) {
+            await handleLogout();
+          }
+        }
         if (mounted) {
-          await handleLogout();
+          setIsLoading(false);
         }
       }
     };

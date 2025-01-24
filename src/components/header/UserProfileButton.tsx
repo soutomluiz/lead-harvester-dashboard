@@ -13,6 +13,10 @@ interface UserProfileButtonProps {
   onSignOut: () => void;
 }
 
+interface ProfileResponse {
+  subscription_status: string | null;
+}
+
 export function UserProfileButton({ avatarUrl, userProfile, onSignOut }: UserProfileButtonProps) {
   const { t } = useLanguage();
   const [hasSubscription, setHasSubscription] = useState(false);
@@ -23,7 +27,7 @@ export function UserProfileButton({ avatarUrl, userProfile, onSignOut }: UserPro
         const { data: { user } } = await supabase.auth.getUser();
         if (!user) return;
 
-        const { data: profile, error } = await supabase
+        const { data, error } = await supabase
           .from('profiles')
           .select('subscription_status')
           .eq('id', user.id)
@@ -34,6 +38,7 @@ export function UserProfileButton({ avatarUrl, userProfile, onSignOut }: UserPro
           return;
         }
 
+        const profile = data as ProfileResponse;
         setHasSubscription(profile?.subscription_status === 'active');
       } catch (error) {
         console.error('Error checking subscription:', error);

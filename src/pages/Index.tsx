@@ -10,21 +10,23 @@ import { useAuthState } from "@/hooks/useAuthState";
 
 const Index = () => {
   const [activeTab, setActiveTab] = useState("dashboard");
-  const { isAuthenticated, userName, avatarUrl, userProfile } = useAuthState();
+  const { isAuthenticated, userName, avatarUrl, userProfile, setIsAuthenticated, setUserProfile } = useAuthState();
 
   console.log("Index render state:", { isAuthenticated, userName, userProfile });
 
   const handleAuthStateChange = (authenticated: boolean, profile: any) => {
     console.log("Auth state changed in Index:", { authenticated, profile });
+    setIsAuthenticated(authenticated);
+    if (profile) {
+      setUserProfile(profile);
+    }
   };
 
-  // Se não estiver autenticado, mostra a página de login
   if (!isAuthenticated) {
     console.log("User not authenticated, showing AuthPage");
     return <AuthPage />;
   }
 
-  // Se estiver autenticado, mostra o layout autenticado
   console.log("Rendering authenticated layout with profile:", userProfile);
   return (
     <AuthenticationManager onAuthStateChange={handleAuthStateChange}>

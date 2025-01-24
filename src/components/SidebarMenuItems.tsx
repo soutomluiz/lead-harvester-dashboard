@@ -60,8 +60,8 @@ export function SidebarMenuItems({ activeTab, setActiveTab }: SidebarMenuItemsPr
       label: t("addLeads"),
       subItems: [
         { id: "prospect-form", icon: PlusCircle, label: t("manualInput") },
-        { id: "prospect-places", icon: MapPin, label: t("googleMaps"), requiresAdmin: false },
-        { id: "prospect-websites", icon: Globe, label: t("websites"), requiresAdmin: false },
+        { id: "prospect-places", icon: MapPin, label: t("places"), requiresAdmin: false },
+        { id: "prospect-websites", icon: Globe, label: t("websiteSearch"), requiresAdmin: false },
       ],
     },
     { 
@@ -69,8 +69,8 @@ export function SidebarMenuItems({ activeTab, setActiveTab }: SidebarMenuItemsPr
       icon: Users, 
       label: t("leads"),
       subItems: [
-        { id: "leads-list", icon: ListChecks, label: t("leadsList") },
-        { id: "leads-score", icon: Award, label: t("leadScore"), requiresAdmin: false },
+        { id: "leads-list", icon: ListChecks, label: t("leads") },
+        { id: "leads-score", icon: Award, label: t("score"), requiresAdmin: false },
         { id: "leads-timeline", icon: Timer, label: t("timeline"), requiresAdmin: false },
       ],
     },

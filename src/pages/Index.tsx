@@ -15,6 +15,7 @@ const Index = () => {
 
   console.log("Index render state:", { isAuthenticated, isLoading, userName, userProfile });
 
+  // Se estiver carregando, mostra o loader
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-background">
@@ -26,11 +27,13 @@ const Index = () => {
     );
   }
 
+  // Se não estiver autenticado, mostra a página de login
   if (!isAuthenticated || !userProfile) {
     console.log("User not authenticated or profile not loaded, showing AuthPage");
     return <AuthPage />;
   }
 
+  // Se estiver autenticado, mostra o layout autenticado
   console.log("Rendering authenticated layout with profile:", userProfile);
   return (
     <AuthenticationManager 

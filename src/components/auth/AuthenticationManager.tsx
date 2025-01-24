@@ -16,10 +16,8 @@ export function AuthenticationManager({ onAuthStateChange, children }: Authentic
 
   const handleLogout = async () => {
     try {
-      console.log("Handling logout...");
-      const { error } = await supabase.auth.signOut();
-      if (error) throw error;
-      
+      console.log("Forcing logout...");
+      await supabase.auth.signOut();
       console.log("Logout successful");
       onAuthStateChange(false);
       navigate('/login');
@@ -41,33 +39,13 @@ export function AuthenticationManager({ onAuthStateChange, children }: Authentic
         .from('profiles')
         .select('*')
         .eq('id', userId)
-        .maybeSingle();
+        .single();
 
-      if (error) throw error;
-
-      if (!profile) {
-        console.log("No profile found, creating new one");
-        const { data: session } = await supabase.auth.getSession();
-        const user = session?.session?.user;
-        
-        if (!user) throw new Error("No user session found");
-
-        const { data: newProfile, error: createError } = await supabase
-          .from('profiles')
-          .insert([{ 
-            id: userId,
-            email: user.email,
-            full_name: user.user_metadata?.full_name || user.email
-          }])
-          .select()
-          .single();
-
-        if (createError) throw createError;
-
-        console.log("New profile created:", newProfile);
-        return newProfile;
+      if (error) {
+        console.error("Error fetching profile:", error);
+        throw error;
       }
-      
+
       console.log("Profile fetched successfully:", profile);
       return profile;
     } catch (error) {
@@ -101,16 +79,14 @@ export function AuthenticationManager({ onAuthStateChange, children }: Authentic
 
         console.log("Active session found:", session);
         
-        try {
-          const profile = await fetchUserProfile(session.user.id);
-          if (mounted) {
+        if (mounted) {
+          try {
+            const profile = await fetchUserProfile(session.user.id);
             onAuthStateChange(true, profile);
-            setIsLoading(false);
-          }
-        } catch (profileError) {
-          console.error("Error fetching profile:", profileError);
-          if (mounted) {
+          } catch (profileError) {
+            console.error("Error fetching profile:", profileError);
             await handleLogout();
+          } finally {
             setIsLoading(false);
           }
         }
@@ -121,7 +97,8 @@ export function AuthenticationManager({ onAuthStateChange, children }: Authentic
           const errorMessage = error.message || error.error?.message || '';
           const isAuthError = errorMessage.includes('Invalid Refresh Token') || 
                             errorMessage.includes('JWT expired') ||
-                            errorMessage.includes('JWT invalid');
+                            errorMessage.includes('JWT invalid') ||
+                            errorMessage.includes('refresh_token_not_found');
           
           if (isAuthError) {
             console.log("Auth error detected, logging out...");
@@ -148,16 +125,20 @@ export function AuthenticationManager({ onAuthStateChange, children }: Authentic
 
       if (event === 'SIGNED_IN' && session) {
         console.log("User signed in, fetching profile...");
+        setIsLoading(true);
         try {
           const profile = await fetchUserProfile(session.user.id);
           if (mounted) {
             onAuthStateChange(true, profile);
-            setIsLoading(false);
+            navigate('/');
           }
         } catch (error) {
           console.error("Error fetching profile after sign in:", error);
           if (mounted) {
             await handleLogout();
+          }
+        } finally {
+          if (mounted) {
             setIsLoading(false);
           }
         }

@@ -7,6 +7,7 @@ import { useToast } from "@/hooks/use-toast";
 import { LoginForm } from "./auth/LoginForm";
 import { SignUpForm } from "./auth/SignUpForm";
 import { AuthError } from "./auth/AuthError";
+import { Loader2 } from "lucide-react";
 
 export function AuthPage() {
   const [error, setError] = useState<string | null>(null);
@@ -67,7 +68,10 @@ export function AuthPage() {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+        <div className="text-center space-y-4">
+          <Loader2 className="h-8 w-8 animate-spin mx-auto text-primary" />
+          <p className="text-muted-foreground">Verificando sessão...</p>
+        </div>
       </div>
     );
   }

@@ -11,7 +11,6 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { TagInput } from "@/components/TagInput";
 import { Lead } from "@/types/lead";
 
 const formSchema = z.object({
@@ -24,10 +23,8 @@ const formSchema = z.object({
   website: z.string().url().optional().or(z.literal("")),
   industry: z.string().optional(),
   location: z.string().optional(),
-  deal_value: z.number().optional(),
   notes: z.string().optional(),
   status: z.string().optional(),
-  tags: z.array(z.string()).default([]),
 });
 
 interface LeadFormProps {
@@ -46,10 +43,8 @@ export const LeadForm = ({ onSubmit, initialData }: LeadFormProps) => {
       website: initialData?.website || "",
       industry: initialData?.industry || "",
       location: initialData?.location || "",
-      deal_value: initialData?.deal_value || 0,
       notes: initialData?.notes || "",
       status: initialData?.status || "novo",
-      tags: initialData?.tags || [],
     },
   });
 
@@ -156,25 +151,6 @@ export const LeadForm = ({ onSubmit, initialData }: LeadFormProps) => {
 
         <FormField
           control={form.control}
-          name="deal_value"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Valor do Negócio</FormLabel>
-              <FormControl>
-                <Input
-                  placeholder="Digite o valor do negócio"
-                  type="number"
-                  {...field}
-                  onChange={(e) => field.onChange(Number(e.target.value))}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
           name="notes"
           render={({ field }) => (
             <FormItem>
@@ -195,23 +171,6 @@ export const LeadForm = ({ onSubmit, initialData }: LeadFormProps) => {
               <FormLabel>Status</FormLabel>
               <FormControl>
                 <Input placeholder="Digite o status" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name="tags"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Tags</FormLabel>
-              <FormControl>
-                <TagInput
-                  tags={field.value || []}
-                  onChange={(newTags) => field.onChange(newTags)}
-                />
               </FormControl>
               <FormMessage />
             </FormItem>

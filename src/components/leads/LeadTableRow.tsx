@@ -1,8 +1,6 @@
 import { Lead } from "@/types/lead";
 import { TableCell, TableRow } from "@/components/ui/table";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Badge } from "@/components/ui/badge";
-import { LeadScore } from "./LeadScore";
 import { LeadNotes } from "./LeadNotes";
 import { TagInput } from "@/components/TagInput";
 
@@ -63,12 +61,10 @@ export function LeadTableRow({
         />
       </TableCell>
       <TableCell>
-        <LeadScore lead={lead} />
-      </TableCell>
-      <TableCell>
         <TagInput
           tags={lead.tags || []}
           onChange={(newTags) => onTagsChange(lead.id, newTags)}
+          leadId={lead.id}
         />
       </TableCell>
     </TableRow>

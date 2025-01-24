@@ -270,7 +270,6 @@ export const LeadTable = ({ leads: initialLeads }: LeadTableProps) => {
               Phone <LeadTableSort columnKey="phone" sortConfig={sortConfig} onSort={handleSort} />
             </TableHead>
             <TableHead>Notes</TableHead>
-            <TableHead>Score</TableHead>
             <TableHead>Tags</TableHead>
           </TableRow>
         </TableHeader>

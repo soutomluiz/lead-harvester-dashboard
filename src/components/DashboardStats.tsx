@@ -9,6 +9,8 @@ import { LeadsTimelineChart } from "./stats/LeadsTimelineChart";
 import { LeadStatusChart } from "./stats/LeadStatusChart";
 import { format, parseISO, differenceInDays } from "date-fns";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
 
 interface DashboardStatsProps {
   leads?: Lead[];
@@ -39,6 +41,36 @@ const chartConfig = {
 
 export function DashboardStats({ leads, results, searchType }: DashboardStatsProps) {
   const { t } = useLanguage();
+  const [channel, setChannel] = useState<ReturnType<typeof supabase.channel> | null>(null);
+
+  useEffect(() => {
+    // Subscribe to realtime updates
+    const newChannel = supabase
+      .channel('leads-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'leads'
+        },
+        (payload) => {
+          console.log('Realtime update received:', payload);
+          // The parent component should handle reloading the leads
+        }
+      )
+      .subscribe((status) => {
+        console.log('Realtime subscription status:', status);
+      });
+
+    setChannel(newChannel);
+
+    return () => {
+      if (channel) {
+        supabase.removeChannel(channel);
+      }
+    };
+  }, []);
 
   if (leads) {
     const totalLeads = leads.length;

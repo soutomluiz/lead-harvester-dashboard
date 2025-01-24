@@ -3,22 +3,45 @@ import { X } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 interface TagInputProps {
   tags: string[];
   onChange: (tags: string[]) => void;
+  leadId?: string;
   placeholder?: string;
 }
 
 export const TagInput: React.FC<TagInputProps> = ({ 
   tags, 
-  onChange, 
+  onChange,
+  leadId,
   placeholder = "Digite uma tag e pressione Enter" 
 }) => {
   const [inputValue, setInputValue] = useState("");
   const { toast } = useToast();
 
-  const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
+  const updateTagsInDatabase = async (newTags: string[]) => {
+    if (!leadId) return;
+
+    try {
+      const { error } = await supabase
+        .from('leads')
+        .update({ tags: newTags })
+        .eq('id', leadId);
+
+      if (error) throw error;
+    } catch (error) {
+      console.error('Error updating tags:', error);
+      toast({
+        title: "Erro ao salvar tags",
+        description: "Não foi possível salvar as tags. Tente novamente.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleKeyDown = async (e: KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
       e.preventDefault();
       const newTag = inputValue.trim();
@@ -36,7 +59,9 @@ export const TagInput: React.FC<TagInputProps> = ({
         return;
       }
 
-      onChange([...tags, newTag]);
+      const newTags = [...tags, newTag];
+      onChange(newTags);
+      await updateTagsInDatabase(newTags);
       setInputValue("");
       
       toast({
@@ -46,8 +71,11 @@ export const TagInput: React.FC<TagInputProps> = ({
     }
   };
 
-  const removeTag = (tagToRemove: string) => {
-    onChange(tags.filter((tag) => tag !== tagToRemove));
+  const removeTag = async (tagToRemove: string) => {
+    const newTags = tags.filter((tag) => tag !== tagToRemove);
+    onChange(newTags);
+    await updateTagsInDatabase(newTags);
+    
     toast({
       title: "Tag removida",
       description: `A tag "${tagToRemove}" foi removida.`,

@@ -1,5 +1,5 @@
-import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { Button } from "@/components/ui/button";
 import {
@@ -14,9 +14,7 @@ import { Input } from "@/components/ui/input";
 import { Lead } from "@/types/lead";
 
 const formSchema = z.object({
-  company_name: z.string().min(2, {
-    message: "Nome da empresa deve ter pelo menos 2 caracteres.",
-  }),
+  company_name: z.string().min(1, "Nome da empresa é obrigatório"),
   contact_name: z.string().optional(),
   email: z.string().email().optional().or(z.literal("")),
   phone: z.string().optional(),
@@ -28,11 +26,11 @@ const formSchema = z.object({
 });
 
 interface LeadFormProps {
-  onSubmit: (data: Partial<Lead>) => void;
+  onSubmit: (data: any) => void;
   initialData?: Partial<Lead>;
 }
 
-export const LeadForm = ({ onSubmit, initialData }: LeadFormProps) => {
+export function LeadForm({ onSubmit, initialData }: LeadFormProps) {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -50,7 +48,7 @@ export const LeadForm = ({ onSubmit, initialData }: LeadFormProps) => {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
         <FormField
           control={form.control}
           name="company_name"
@@ -163,24 +161,10 @@ export const LeadForm = ({ onSubmit, initialData }: LeadFormProps) => {
           )}
         />
 
-        <FormField
-          control={form.control}
-          name="status"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Status</FormLabel>
-              <FormControl>
-                <Input placeholder="Digite o status" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
         <Button type="submit" className="w-full">
           Salvar Lead
         </Button>
       </form>
     </Form>
   );
-};
+}

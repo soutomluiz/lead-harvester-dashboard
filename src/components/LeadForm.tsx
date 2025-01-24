@@ -2,17 +2,12 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { Button } from "@/components/ui/button";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { TagInput } from "@/components/TagInput";
+import { Form } from "@/components/ui/form";
 import { Lead } from "@/types/lead";
+import { BasicInfoFields } from "./leads/form/BasicInfoFields";
+import { ContactFields } from "./leads/form/ContactFields";
+import { BusinessFields } from "./leads/form/BusinessFields";
+import { AdditionalFields } from "./leads/form/AdditionalFields";
 
 const formSchema = z.object({
   company_name: z.string().min(2, {
@@ -56,168 +51,11 @@ export const LeadForm = ({ onSubmit, initialData }: LeadFormProps) => {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-        <FormField
-          control={form.control}
-          name="company_name"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Nome da Empresa</FormLabel>
-              <FormControl>
-                <Input placeholder="Digite o nome da empresa" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name="contact_name"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Nome do Contato</FormLabel>
-              <FormControl>
-                <Input placeholder="Digite o nome do contato" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name="email"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Email</FormLabel>
-              <FormControl>
-                <Input placeholder="Digite o email" type="email" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name="phone"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Telefone</FormLabel>
-              <FormControl>
-                <Input placeholder="Digite o telefone" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name="website"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Website</FormLabel>
-              <FormControl>
-                <Input placeholder="Digite o website" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name="industry"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Indústria</FormLabel>
-              <FormControl>
-                <Input placeholder="Digite a indústria" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name="location"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Localização</FormLabel>
-              <FormControl>
-                <Input placeholder="Digite a localização" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name="deal_value"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Valor do Negócio</FormLabel>
-              <FormControl>
-                <Input
-                  placeholder="Digite o valor do negócio"
-                  type="number"
-                  {...field}
-                  onChange={(e) => field.onChange(Number(e.target.value))}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name="notes"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Notas</FormLabel>
-              <FormControl>
-                <Input placeholder="Digite as notas" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name="status"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Status</FormLabel>
-              <FormControl>
-                <Input placeholder="Digite o status" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name="tags"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Tags</FormLabel>
-              <FormControl>
-                <TagInput
-                  tags={field.value || []}
-                  onChange={(newTags) => field.onChange(newTags)}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
+        <BasicInfoFields form={form} />
+        <ContactFields form={form} />
+        <BusinessFields form={form} />
+        <AdditionalFields form={form} />
+        
         <Button type="submit" className="w-full">
           Salvar Lead
         </Button>

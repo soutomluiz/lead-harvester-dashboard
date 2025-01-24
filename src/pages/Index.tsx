@@ -3,7 +3,6 @@ import { Dashboard } from "@/components/Dashboard";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
 import { AppFooter } from "@/components/AppFooter";
-import { WelcomeTour } from "@/components/WelcomeTour";
 import { Lead } from "@/types/lead";
 import { supabase } from "@/integrations/supabase/client";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -244,7 +243,6 @@ const Index = () => {
           </div>
         </main>
         <AppFooter />
-        <WelcomeTour />
       </div>
     </SidebarProvider>
   );

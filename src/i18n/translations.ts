@@ -97,6 +97,11 @@ export const translations = {
     // Auth translations
     "logoutSuccess": "Você foi desconectado com sucesso",
     "logoutError": "Erro ao tentar desconectar",
+    "googleMaps": "Google Maps",
+    "websites": "Websites",
+    "leadsList": "Lista de Leads",
+    "leadScore": "Pontuação de Leads",
+    "timeline": "Linha do Tempo",
   },
   "en": {
     "welcomeTour": "Welcome to our system! Let's take a quick tour to show you the main features.",
@@ -193,6 +198,11 @@ export const translations = {
     // Auth translations
     "logoutSuccess": "You have been successfully logged out",
     "logoutError": "Error trying to log out",
+    "googleMaps": "Google Maps",
+    "websites": "Websites", 
+    "leadsList": "Leads List",
+    "leadScore": "Lead Score",
+    "timeline": "Timeline",
   },
   "es": {
     "welcomeTour": "¡Bienvenido a nuestro sistema! Hagamos un recorrido rápido para mostrarle las características principales.",
@@ -289,5 +299,10 @@ export const translations = {
     // Auth translations
     "logoutSuccess": "Has cerrado sesión exitosamente",
     "logoutError": "Error al intentar cerrar sesión",
+    "googleMaps": "Google Maps",
+    "websites": "Sitios Web",
+    "leadsList": "Lista de Leads",
+    "leadScore": "Puntuación de Leads",
+    "timeline": "Línea de Tiempo",
   }
 };

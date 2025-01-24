@@ -1,8 +1,5 @@
 project_id = "pvkzcewudzvlqiwszzwi"
 
-[api]
-enabled = true
-url = "https://pvkzcewudzvlqiwszzwi.supabase.co"
-
+[functions]
 [functions.website-crawler]
 verify_jwt = true

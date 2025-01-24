@@ -17,7 +17,6 @@ import { ThemeToggle } from "@/components/ThemeToggle";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/hooks/useAuth";
 import { AuthPage } from "@/components/AuthPage";
-import { UserCredits } from "@/components/UserCredits";
 
 const getPageTitle = (tab: string) => {
   switch (tab) {
@@ -172,7 +171,6 @@ const Index = () => {
                 </span>
               )}
               <NotificationBell />
-              <UserCredits />
               <ThemeToggle />
               <Sheet>
                 <SheetTrigger asChild>

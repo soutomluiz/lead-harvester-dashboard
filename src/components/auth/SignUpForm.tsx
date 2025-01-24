@@ -52,15 +52,21 @@ export function SignUpForm() {
 
       if (error) {
         console.error("Erro no cadastro:", error);
-        let message = "Erro ao criar conta. Por favor, tente novamente.";
         
-        if (error.message.includes("already registered")) {
-          message = "Este email já está cadastrado. Tente fazer login.";
+        // Tratamento específico para usuário já cadastrado
+        if (error.message.includes("already registered") || error.message.includes("user_already_exists")) {
+          toast({
+            title: "Email já cadastrado",
+            description: "Este email já está em uso. Por favor, faça login ou use outro email.",
+            variant: "destructive",
+          });
+          return;
         }
         
+        // Tratamento para outros erros
         toast({
           title: "Erro no cadastro",
-          description: message,
+          description: "Ocorreu um erro ao criar sua conta. Por favor, tente novamente.",
           variant: "destructive",
         });
         return;

@@ -1,74 +1,105 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2 } from "lucide-react";
-import { Alert, AlertDescription } from "@/components/ui/alert";
 
 export function SignUpForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [fullName, setFullName] = useState("");
+  const [name, setName] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
-    setErrorMessage(null);
     
-    if (!email || !password || !fullName) {
-      setErrorMessage("Por favor, preencha todos os campos.");
+    if (!email || !password || !name) {
+      toast({
+        title: "Campos obrigatórios",
+        description: "Por favor, preencha todos os campos.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (password.length < 6) {
+      toast({
+        title: "Senha muito curta",
+        description: "A senha deve ter pelo menos 6 caracteres.",
+        variant: "destructive",
+      });
       return;
     }
 
     try {
       setIsLoading(true);
-      console.log("Attempting signup...");
+      console.log("Tentando criar conta com email:", email);
 
       const { data, error } = await supabase.auth.signUp({
-        email: email.trim(),
-        password: password.trim(),
+        email,
+        password,
         options: {
           data: {
-            full_name: fullName.trim(),
+            full_name: name,
           },
         },
       });
 
       if (error) {
-        console.error("Signup error:", error);
+        console.error("Erro no cadastro:", error);
+        let message = "Erro ao criar conta. Por favor, tente novamente.";
         
-        if (error.message.includes("User already registered")) {
-          setErrorMessage("Este email já está cadastrado. Por favor, faça login ou use outro email.");
-          toast({
-            title: "Email já cadastrado",
-            description: "Este email já está em uso. Por favor, faça login ou use outro email.",
-            variant: "destructive",
-          });
-        } else {
-          setErrorMessage("Erro ao tentar criar conta. Por favor, tente novamente.");
-          toast({
-            title: "Erro no cadastro",
-            description: "Ocorreu um erro ao tentar criar sua conta. Por favor, tente novamente.",
-            variant: "destructive",
-          });
+        if (error.message.includes("already registered")) {
+          message = "Este email já está cadastrado. Tente fazer login.";
         }
+        
+        toast({
+          title: "Erro no cadastro",
+          description: message,
+          variant: "destructive",
+        });
         return;
       }
 
       if (data.user) {
-        console.log("Signup successful, user created");
+        console.log("Conta criada com sucesso para usuário:", data.user.id);
+        
+        // Enviar email de boas-vindas
+        try {
+          const response = await supabase.functions.invoke('send-welcome-email', {
+            body: {
+              email,
+              name,
+            },
+          });
+
+          if ('error' in response) {
+            console.error("Erro ao enviar email de boas-vindas:", response.error);
+          } else {
+            console.log("Email de boas-vindas enviado com sucesso");
+          }
+        } catch (emailError) {
+          console.error("Erro ao enviar email de boas-vindas:", emailError);
+        }
+
         toast({
-          title: "Cadastro realizado com sucesso",
-          description: "Verifique seu email para confirmar sua conta.",
+          title: "Conta criada com sucesso",
+          description: "Bem-vindo ao sistema!",
         });
+        navigate("/");
       }
     } catch (error) {
-      console.error("Unexpected error during signup:", error);
-      setErrorMessage("Ocorreu um erro inesperado. Por favor, tente novamente.");
+      console.error("Erro inesperado durante cadastro:", error);
+      toast({
+        title: "Erro no cadastro",
+        description: "Ocorreu um erro inesperado. Por favor, tente novamente.",
+        variant: "destructive",
+      });
     } finally {
       setIsLoading(false);
     }
@@ -76,22 +107,14 @@ export function SignUpForm() {
 
   return (
     <form onSubmit={handleSignUp} className="space-y-4">
-      {errorMessage && (
-        <Alert variant="destructive">
-          <AlertDescription>
-            {errorMessage}
-          </AlertDescription>
-        </Alert>
-      )}
-
       <div className="space-y-2">
-        <Label htmlFor="fullName">Nome completo</Label>
+        <Label htmlFor="name">Nome completo</Label>
         <Input
-          id="fullName"
+          id="name"
           type="text"
           placeholder="Seu nome completo"
-          value={fullName}
-          onChange={(e) => setFullName(e.target.value)}
+          value={name}
+          onChange={(e) => setName(e.target.value)}
           disabled={isLoading}
           required
         />
@@ -115,7 +138,7 @@ export function SignUpForm() {
         <Input
           id="password"
           type="password"
-          placeholder="Sua senha"
+          placeholder="Mínimo 6 caracteres"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           disabled={isLoading}

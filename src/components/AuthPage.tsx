@@ -1,23 +1,56 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 import { LoginForm } from "./auth/LoginForm";
 import { SignUpForm } from "./auth/SignUpForm";
 import { AuthError } from "./auth/AuthError";
-import { useAuthState } from "@/hooks/useAuthState";
 
 export function AuthPage() {
   const [error, setError] = useState<string | null>(null);
   const [isSignUp, setIsSignUp] = useState(false);
-  const { setIsAuthenticated, setUserProfile } = useAuthState();
+  const navigate = useNavigate();
+  const { toast } = useToast();
 
-  const handleAuthStateChange = (authenticated: boolean, profile?: any) => {
-    console.log("Auth state changed in AuthPage:", { authenticated, profile });
-    setIsAuthenticated(authenticated);
-    if (profile) {
-      setUserProfile(profile);
-    }
-  };
+  useEffect(() => {
+    const checkSession = async () => {
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      
+      if (sessionError) {
+        console.error("Session check error:", sessionError);
+        return;
+      }
+      
+      if (session) {
+        console.log("Active session found, redirecting to dashboard");
+        navigate("/");
+      }
+    };
+    
+    checkSession();
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      console.log("Auth state changed:", event);
+      
+      if (event === 'SIGNED_IN' && session) {
+        console.log("User signed in, redirecting to dashboard");
+        navigate("/");
+        setError(null);
+      } else if (event === 'SIGNED_OUT') {
+        console.log("User signed out, staying on login page");
+        // Garantir que o usuário permaneça na página de login após o logout
+        if (window.location.pathname !== '/login') {
+          navigate("/login");
+        }
+      }
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, [navigate]);
 
   return (
     <div className="container max-w-lg mx-auto py-8">

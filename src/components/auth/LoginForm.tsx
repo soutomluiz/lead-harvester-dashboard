@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2 } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { useNavigate } from "react-router-dom";
 
 export function LoginForm() {
   const [email, setEmail] = useState("");
@@ -13,6 +14,7 @@ export function LoginForm() {
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -50,12 +52,12 @@ export function LoginForm() {
       }
 
       if (data.session) {
-        console.log("Login successful, session created");
+        console.log("Login successful, redirecting to dashboard...");
         toast({
           title: "Login realizado com sucesso",
-          description: "Você será redirecionado para o dashboard.",
+          description: "Redirecionando para o dashboard...",
         });
-        window.location.href = '/';
+        navigate("/");
       }
     } catch (error) {
       console.error("Unexpected error during login:", error);

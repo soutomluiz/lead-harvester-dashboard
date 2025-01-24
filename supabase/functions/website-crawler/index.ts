@@ -7,6 +7,12 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
 
+const BLOCKED_DOMAINS = ['linkedin.com', 'facebook.com', 'instagram.com'];
+
+function isBlockedDomain(url: string): boolean {
+  return BLOCKED_DOMAINS.some(domain => url.includes(domain));
+}
+
 serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
@@ -18,9 +24,22 @@ serve(async (req) => {
     const authHeader = req.headers.get('Authorization')
     
     if (!authHeader) {
+      console.error('No authorization header provided');
       return new Response(
         JSON.stringify({ error: 'No authorization header' }),
         { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      )
+    }
+
+    // Check for blocked domains
+    if (isBlockedDomain(url)) {
+      console.error('Attempted to crawl blocked domain:', url);
+      return new Response(
+        JSON.stringify({ 
+          success: false, 
+          error: 'Este site não permite extração automática de dados. Por favor, tente um site diferente.' 
+        }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       )
     }
 

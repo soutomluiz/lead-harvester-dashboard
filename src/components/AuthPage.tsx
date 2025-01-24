@@ -18,20 +18,16 @@ export function AuthPage() {
 
   useEffect(() => {
     let mounted = true;
-    let authListener: any = null;
 
     const checkSession = async () => {
       try {
         console.log("Checking session in AuthPage...");
         const { data: { session }, error: sessionError } = await supabase.auth.getSession();
         
-        if (sessionError) {
-          console.error("Session error:", sessionError);
-          throw sessionError;
-        }
+        if (sessionError) throw sessionError;
 
         if (session?.access_token && mounted) {
-          console.log("Active session found in AuthPage, redirecting to dashboard");
+          console.log("Active session found, redirecting...");
           navigate('/', { replace: true });
         }
       } catch (error) {
@@ -42,29 +38,29 @@ export function AuthPage() {
           description: "Ocorreu um erro ao verificar sua sessão. Por favor, tente novamente.",
         });
       } finally {
-        if (mounted) {
-          setIsLoading(false);
-        }
+        if (mounted) setIsLoading(false);
       }
     };
 
-    authListener = supabase.auth.onAuthStateChange(async (event, session) => {
-      console.log("Auth state changed in AuthPage:", event, session);
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      console.log("Auth state changed:", event, session);
       
-      if (event === 'SIGNED_IN' && session && mounted) {
-        console.log("User signed in in AuthPage, redirecting to dashboard");
-        navigate('/', { replace: true });
+      if (!mounted) return;
+
+      if (event === 'SIGNED_IN' && session) {
+        console.log("User signed in, redirecting...");
         setError(null);
+        navigate('/', { replace: true });
       }
     });
 
+    // Executa a verificação inicial
     checkSession();
 
+    // Cleanup
     return () => {
       mounted = false;
-      if (authListener) {
-        authListener.subscription.unsubscribe();
-      }
+      subscription.unsubscribe();
     };
   }, [navigate, toast]);
 

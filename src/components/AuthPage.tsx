@@ -40,7 +40,6 @@ export function AuthPage() {
         setError(null);
       } else if (event === 'SIGNED_OUT') {
         console.log("User signed out, staying on login page");
-        // Garantir que o usuário permaneça na página de login após o logout
         if (window.location.pathname !== '/login') {
           navigate("/login");
         }
@@ -53,7 +52,7 @@ export function AuthPage() {
   }, [navigate]);
 
   return (
-    <div className="min-h-screen w-full flex items-center justify-center">
+    <div className="min-h-screen w-full flex items-center justify-center -mt-[25vh]">
       <div className="w-full max-w-lg px-4">
         <Card className="p-8">
           <div className="mb-8 space-y-4">

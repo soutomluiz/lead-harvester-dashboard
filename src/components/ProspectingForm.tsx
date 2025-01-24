@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Lead } from "@/types/lead";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,6 +9,7 @@ import { Loader2 } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { SearchResult } from "@/types/search";
 import { DashboardStats } from "./DashboardStats";
+import { supabase } from "@/integrations/supabase/client";
 
 interface ProspectingFormProps {
   onAddLeads: (leads: Lead[]) => void;
@@ -20,8 +21,26 @@ export function ProspectingForm({ onAddLeads, searchType }: ProspectingFormProps
   const [location, setLocation] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [results, setResults] = useState<SearchResult[]>([]);
+  const [userProfile, setUserProfile] = useState<any>(null);
   const { toast } = useToast();
   const { t } = useLanguage();
+
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) {
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', session.user.id)
+          .single();
+        
+        setUserProfile(profile);
+      }
+    };
+
+    fetchUserProfile();
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -29,6 +48,16 @@ export function ProspectingForm({ onAddLeads, searchType }: ProspectingFormProps
       toast({
         title: t("error"),
         description: t("searchTermRequired"),
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Check if user is on free plan and has reached the limit
+    if (userProfile?.subscription_type === 'free' && userProfile?.extracted_leads_count >= 10) {
+      toast({
+        title: "Limite atingido",
+        description: "Você atingiu o limite de 10 leads no plano gratuito. Faça upgrade para continuar.",
         variant: "destructive",
       });
       return;
@@ -48,6 +77,7 @@ export function ProspectingForm({ onAddLeads, searchType }: ProspectingFormProps
         body: JSON.stringify({
           query: query.trim(),
           location: location.trim(),
+          limit: userProfile?.subscription_type === 'free' ? 10 : undefined
         }),
       });
 
@@ -56,9 +86,15 @@ export function ProspectingForm({ onAddLeads, searchType }: ProspectingFormProps
       }
 
       const data = await response.json();
-      setResults(data.results);
+      
+      // Limit results for free users
+      const limitedResults = userProfile?.subscription_type === 'free' 
+        ? data.results.slice(0, 10) 
+        : data.results;
+      
+      setResults(limitedResults);
 
-      if (data.results.length === 0) {
+      if (limitedResults.length === 0) {
         toast({
           title: t("noResults"),
           description: t("tryDifferentSearch")
@@ -66,7 +102,9 @@ export function ProspectingForm({ onAddLeads, searchType }: ProspectingFormProps
       } else {
         toast({
           title: t("success"),
-          description: t("resultsFound")
+          description: userProfile?.subscription_type === 'free' 
+            ? `${limitedResults.length} resultados encontrados (limite do plano gratuito)`
+            : t("resultsFound")
         });
       }
     } catch (error) {
@@ -81,7 +119,22 @@ export function ProspectingForm({ onAddLeads, searchType }: ProspectingFormProps
     }
   };
 
-  const handleAddToLeads = () => {
+  const handleAddToLeads = async () => {
+    // Check if adding these leads would exceed the free plan limit
+    if (userProfile?.subscription_type === 'free') {
+      const remainingLeads = 10 - (userProfile.extracted_leads_count || 0);
+      if (remainingLeads <= 0) {
+        toast({
+          title: "Limite atingido",
+          description: "Você atingiu o limite de 10 leads no plano gratuito. Faça upgrade para continuar.",
+          variant: "destructive",
+        });
+        return;
+      }
+      // Only add up to the remaining limit
+      results.splice(remainingLeads);
+    }
+
     const newLeads: Lead[] = results.map(result => ({
       id: crypto.randomUUID(),
       company_name: result.companyName || result.name,
@@ -102,6 +155,21 @@ export function ProspectingForm({ onAddLeads, searchType }: ProspectingFormProps
     }));
 
     onAddLeads(newLeads);
+    
+    // Update the extracted_leads_count in the profile
+    if (userProfile) {
+      const { error } = await supabase
+        .from('profiles')
+        .update({ 
+          extracted_leads_count: (userProfile.extracted_leads_count || 0) + newLeads.length 
+        })
+        .eq('id', userProfile.id);
+
+      if (error) {
+        console.error('Error updating extracted_leads_count:', error);
+      }
+    }
+
     toast({
       title: t("success"),
       description: t("leadsAdded")
@@ -111,6 +179,14 @@ export function ProspectingForm({ onAddLeads, searchType }: ProspectingFormProps
   return (
     <div className="space-y-6 p-6">
       <Card className="p-6">
+        {userProfile?.subscription_type === 'free' && (
+          <div className="mb-4 p-4 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg">
+            <p className="text-sm text-yellow-800 dark:text-yellow-200">
+              Plano Gratuito: Você pode extrair até 10 leads no total.
+              Leads extraídos: {userProfile.extracted_leads_count || 0}/10
+            </p>
+          </div>
+        )}
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="query">{t("searchTerm")}</Label>

@@ -7,7 +7,7 @@ serve(async (req) => {
   }
 
   try {
-    const { query, type, radius = 5000 } = await req.json()
+    const { query, type, radius = 5000, limit } = await req.json()
     const apiKey = Deno.env.get('GOOGLE_MAPS_API_KEY')
     
     if (!query) {
@@ -29,9 +29,12 @@ serve(async (req) => {
       throw new Error("Erro na configuração da API do Google Maps")
     }
 
+    // Limit results if specified (for free plan)
+    const resultsToProcess = limit ? searchData.results.slice(0, limit) : searchData.results;
+
     // For each place found, get additional details
     const detailedResults = await Promise.all(
-      searchData.results.map(async (place: any) => {
+      resultsToProcess.map(async (place: any) => {
         const detailsUrl = `https://maps.googleapis.com/maps/api/place/details/json?place_id=${place.place_id}&fields=name,formatted_phone_number,formatted_address,website,rating,user_ratings_total,opening_hours,photos&key=${apiKey}`
         const detailsResponse = await fetch(detailsUrl)
         const detailsData = await detailsResponse.json()

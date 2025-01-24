@@ -19,25 +19,39 @@ const Index = () => {
   useEffect(() => {
     const checkSession = async () => {
       try {
-        const { data: { session } } = await supabase.auth.getSession();
+        console.log("Checking session in Index...");
+        const { data: { session }, error } = await supabase.auth.getSession();
+        
+        if (error) {
+          console.error("Session error:", error);
+          setIsLoading(false);
+          return;
+        }
+
         if (session) {
-          console.log("Session found in Index:", session);
+          console.log("Active session found in Index");
           setIsAuthenticated(true);
-          // Fetch user profile if needed
-          const { data: profile } = await supabase
+          
+          const { data: profile, error: profileError } = await supabase
             .from('profiles')
             .select('*')
             .eq('id', session.user.id)
             .single();
             
-          if (profile) {
+          if (profileError) {
+            console.error("Error fetching profile:", profileError);
+          } else if (profile) {
+            console.log("Profile loaded:", profile);
             setUserName(profile.full_name || '');
             setAvatarUrl(profile.avatar_url);
             setUserProfile(profile);
           }
+        } else {
+          console.log("No active session in Index");
+          setIsAuthenticated(false);
         }
       } catch (error) {
-        console.error("Error checking session:", error);
+        console.error("Error in checkSession:", error);
       } finally {
         setIsLoading(false);
       }
@@ -45,16 +59,35 @@ const Index = () => {
 
     checkSession();
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       console.log("Auth state changed in Index:", event, session);
+      
       if (event === 'SIGNED_IN' && session) {
+        console.log("User signed in, updating state...");
         setIsAuthenticated(true);
+        
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', session.user.id)
+          .single();
+          
+        if (profile) {
+          setUserName(profile.full_name || '');
+          setAvatarUrl(profile.avatar_url);
+          setUserProfile(profile);
+        }
       } else if (event === 'SIGNED_OUT') {
+        console.log("User signed out");
         setIsAuthenticated(false);
+        setUserName('');
+        setAvatarUrl(null);
+        setUserProfile(null);
       }
     });
 
     return () => {
+      console.log("Cleaning up auth subscription");
       subscription.unsubscribe();
     };
   }, []);

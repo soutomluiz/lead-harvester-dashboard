@@ -26,17 +26,22 @@ export function AuthStateManager({ children }: { children: React.ReactNode }) {
         }
       } catch (error) {
         console.error("Error checking session:", error);
-        toast({
-          variant: "destructive",
-          title: "Erro de autenticação",
-          description: "Ocorreu um erro ao verificar sua sessão. Por favor, tente novamente.",
-        });
+        if (mounted) {
+          toast({
+            variant: "destructive",
+            title: "Erro de autenticação",
+            description: "Ocorreu um erro ao verificar sua sessão. Por favor, tente novamente.",
+          });
+        }
       } finally {
         if (mounted) setIsLoading(false);
       }
     };
 
-    const subscription = supabase.auth.onAuthStateChange((event, session) => {
+    // Configurar o listener de autenticação
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange(async (event, session) => {
       console.log("Auth state changed:", event, session);
       
       if (!mounted) return;
@@ -48,12 +53,14 @@ export function AuthStateManager({ children }: { children: React.ReactNode }) {
       }
     });
 
+    // Iniciar checagem de sessão
     checkSession();
 
+    // Cleanup function
     return () => {
       mounted = false;
       if (subscription) {
-        subscription.data.subscription.unsubscribe();
+        subscription.unsubscribe();
       }
     };
   }, [navigate, toast]);

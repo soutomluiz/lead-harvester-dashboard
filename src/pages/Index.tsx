@@ -12,6 +12,9 @@ const Index = () => {
   const [activeTab, setActiveTab] = useState("dashboard");
   const { isAuthenticated, userName, avatarUrl, userProfile, isLoading } = useAuthState();
 
+  console.log("Index render state:", { isAuthenticated, isLoading, userName });
+
+  // Mostra o loading apenas se estiver realmente carregando
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -20,14 +23,18 @@ const Index = () => {
     );
   }
 
+  // Se não estiver autenticado, mostra a página de login
   if (!isAuthenticated) {
     return <AuthPage />;
   }
 
+  // Se estiver autenticado e não estiver carregando, mostra o dashboard
   return (
-    <AuthenticationManager onAuthStateChange={(authenticated, profile) => {
-      console.log("Auth state changed in Index handleAuthStateChange:", authenticated, profile);
-    }}>
+    <AuthenticationManager 
+      onAuthStateChange={(authenticated, profile) => {
+        console.log("Auth state changed:", { authenticated, profile });
+      }}
+    >
       <SidebarProvider>
         <div className="flex min-h-screen w-full bg-background">
           <AppSidebar activeTab={activeTab} setActiveTab={setActiveTab} />

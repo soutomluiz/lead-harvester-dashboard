@@ -36,7 +36,7 @@ export function AuthStateManager({ children }: { children: React.ReactNode }) {
       }
     };
 
-    let authSubscription = supabase.auth.onAuthStateChange((event, session) => {
+    const subscription = supabase.auth.onAuthStateChange((event, session) => {
       console.log("Auth state changed:", event, session);
       
       if (!mounted) return;
@@ -52,8 +52,8 @@ export function AuthStateManager({ children }: { children: React.ReactNode }) {
 
     return () => {
       mounted = false;
-      if (authSubscription) {
-        authSubscription.unsubscribe();
+      if (subscription) {
+        subscription.data.subscription.unsubscribe();
       }
     };
   }, [navigate, toast]);

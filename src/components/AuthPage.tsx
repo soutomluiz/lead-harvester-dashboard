@@ -53,32 +53,34 @@ export function AuthPage() {
   }, [navigate]);
 
   return (
-    <div className="container max-w-lg mx-auto py-8">
-      <Card className="p-8">
-        <div className="mb-8 space-y-4">
-          <img src="/logo.svg" alt="Logo" className="h-24 mx-auto" />
-          <p className="text-center text-gray-600">
-            {isSignUp ? "Crie sua conta" : "Faça login para acessar sua conta"}
-          </p>
-        </div>
+    <div className="min-h-screen w-full flex items-center justify-center">
+      <div className="w-full max-w-lg px-4">
+        <Card className="p-8">
+          <div className="mb-8 space-y-4">
+            <img src="/logo.svg" alt="Logo" className="h-24 mx-auto" />
+            <p className="text-center text-gray-600">
+              {isSignUp ? "Crie sua conta" : "Faça login para acessar sua conta"}
+            </p>
+          </div>
 
-        <AuthError message={error} />
+          <AuthError message={error} />
 
-        <Tabs defaultValue="login" onValueChange={(value) => setIsSignUp(value === "signup")}>
-          <TabsList className="grid w-full grid-cols-2 mb-8">
-            <TabsTrigger value="login">Login</TabsTrigger>
-            <TabsTrigger value="signup">Cadastro</TabsTrigger>
-          </TabsList>
+          <Tabs defaultValue="login" onValueChange={(value) => setIsSignUp(value === "signup")}>
+            <TabsList className="grid w-full grid-cols-2 mb-8">
+              <TabsTrigger value="login">Login</TabsTrigger>
+              <TabsTrigger value="signup">Cadastro</TabsTrigger>
+            </TabsList>
 
-          <TabsContent value="login">
-            <LoginForm />
-          </TabsContent>
+            <TabsContent value="login">
+              <LoginForm />
+            </TabsContent>
 
-          <TabsContent value="signup">
-            <SignUpForm />
-          </TabsContent>
-        </Tabs>
-      </Card>
+            <TabsContent value="signup">
+              <SignUpForm />
+            </TabsContent>
+          </Tabs>
+        </Card>
+      </div>
     </div>
   );
 }

@@ -94,7 +94,6 @@ export const translations = {
     // Auth translations
     "logoutSuccess": "Você foi desconectado com sucesso",
     "logoutError": "Erro ao tentar desconectar",
-    "signOut": "Sair",
   },
   "en": {
     "welcomeTour": "Welcome to our system! Let's take a quick tour to show you the main features.",
@@ -188,7 +187,6 @@ export const translations = {
     // Auth translations
     "logoutSuccess": "You have been successfully logged out",
     "logoutError": "Error trying to log out",
-    "signOut": "Sign Out",
   },
   "es": {
     "welcomeTour": "¡Bienvenido a nuestro sistema! Hagamos un recorrido rápido para mostrarle las características principales.",
@@ -217,7 +215,7 @@ export const translations = {
     "leadsOverTime": "Leads a lo Largo del Tiempo",
     "leadsStatus": "Estado de los Leads",
     "leadsOrigin": "Origen de los Leads",
-    "topIndustries": "Principales Indústrias",
+    "topIndustries": "Principales Industrias",
     "websitesFound": "Sitios Web Encontrados",
     "withContactInfo": "Con Información de Contacto",
     "uniqueDomains": "Dominios Únicos",
@@ -282,6 +280,5 @@ export const translations = {
     // Auth translations
     "logoutSuccess": "Has cerrado sesión exitosamente",
     "logoutError": "Error al intentar cerrar sesión",
-    "signOut": "Cerrar Sesión",
   }
 };

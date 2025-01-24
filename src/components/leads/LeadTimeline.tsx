@@ -1,8 +1,8 @@
 import { Lead } from "@/types/lead";
 import { Card } from "@/components/ui/card";
 import { format, parseISO } from "date-fns";
-import { Timeline, TimelineItem, TimelineConnector, TimelineContent, TimelineDot, TimelineSeparator } from "@mui/lab";
 import { CalendarDays, Mail, Phone, Globe, Building2, MapPin, Tags, DollarSign } from "lucide-react";
+import { Separator } from "@/components/ui/separator";
 
 interface LeadTimelineProps {
   leads: Lead[];
@@ -39,65 +39,67 @@ export function LeadTimeline({ leads }: LeadTimelineProps) {
   return (
     <Card className="p-6">
       <h2 className="text-2xl font-bold mb-6">Timeline de Leads</h2>
-      <Timeline position="right">
+      <div className="space-y-8">
         {sortedLeads.map((lead, index) => (
-          <TimelineItem key={lead.id}>
-            <TimelineSeparator>
-              <TimelineDot color="primary">
+          <div key={lead.id} className="relative">
+            <div className="flex items-start gap-4">
+              <div className="min-w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
                 {getIcon("company_name")}
-              </TimelineDot>
-              {index < sortedLeads.length - 1 && <TimelineConnector />}
-            </TimelineSeparator>
-            <TimelineContent>
-              <div className="mb-4">
-                <h3 className="font-semibold">{lead.company_name}</h3>
-                <p className="text-sm text-muted-foreground">
-                  {lead.created_at && format(parseISO(lead.created_at), "dd/MM/yyyy HH:mm")}
-                </p>
-                <div className="mt-2 space-y-1">
-                  {lead.email && (
-                    <div className="flex items-center gap-2 text-sm">
-                      <Mail className="h-4 w-4" />
-                      {lead.email}
-                    </div>
-                  )}
-                  {lead.phone && (
-                    <div className="flex items-center gap-2 text-sm">
-                      <Phone className="h-4 w-4" />
-                      {lead.phone}
-                    </div>
-                  )}
-                  {lead.website && (
-                    <div className="flex items-center gap-2 text-sm">
-                      <Globe className="h-4 w-4" />
-                      {lead.website}
-                    </div>
-                  )}
-                  {lead.location && (
-                    <div className="flex items-center gap-2 text-sm">
-                      <MapPin className="h-4 w-4" />
-                      {lead.location}
-                    </div>
-                  )}
-                  {lead.deal_value > 0 && (
-                    <div className="flex items-center gap-2 text-sm">
-                      <DollarSign className="h-4 w-4" />
-                      {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' })
-                        .format(lead.deal_value)}
-                    </div>
-                  )}
-                  {lead.tags && lead.tags.length > 0 && (
-                    <div className="flex items-center gap-2 text-sm">
-                      <Tags className="h-4 w-4" />
-                      {lead.tags.join(", ")}
-                    </div>
-                  )}
+              </div>
+              <div className="flex-1">
+                <div className="mb-4">
+                  <h3 className="font-semibold">{lead.company_name}</h3>
+                  <p className="text-sm text-muted-foreground">
+                    {lead.created_at && format(parseISO(lead.created_at), "dd/MM/yyyy HH:mm")}
+                  </p>
+                  <div className="mt-2 space-y-1">
+                    {lead.email && (
+                      <div className="flex items-center gap-2 text-sm">
+                        <Mail className="h-4 w-4" />
+                        {lead.email}
+                      </div>
+                    )}
+                    {lead.phone && (
+                      <div className="flex items-center gap-2 text-sm">
+                        <Phone className="h-4 w-4" />
+                        {lead.phone}
+                      </div>
+                    )}
+                    {lead.website && (
+                      <div className="flex items-center gap-2 text-sm">
+                        <Globe className="h-4 w-4" />
+                        {lead.website}
+                      </div>
+                    )}
+                    {lead.location && (
+                      <div className="flex items-center gap-2 text-sm">
+                        <MapPin className="h-4 w-4" />
+                        {lead.location}
+                      </div>
+                    )}
+                    {lead.deal_value > 0 && (
+                      <div className="flex items-center gap-2 text-sm">
+                        <DollarSign className="h-4 w-4" />
+                        {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' })
+                          .format(lead.deal_value)}
+                      </div>
+                    )}
+                    {lead.tags && lead.tags.length > 0 && (
+                      <div className="flex items-center gap-2 text-sm">
+                        <Tags className="h-4 w-4" />
+                        {lead.tags.join(", ")}
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
-            </TimelineContent>
-          </TimelineItem>
+            </div>
+            {index < sortedLeads.length - 1 && (
+              <Separator className="my-4" />
+            )}
+          </div>
         ))}
-      </Timeline>
+      </div>
     </Card>
   );
 }

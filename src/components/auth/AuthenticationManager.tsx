@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Loader2 } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 interface AuthenticationManagerProps {
   onAuthStateChange: (isAuthenticated: boolean, userData?: any) => void;
@@ -11,6 +12,7 @@ interface AuthenticationManagerProps {
 export function AuthenticationManager({ onAuthStateChange, children }: AuthenticationManagerProps) {
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
+  const { toast } = useToast();
 
   const handleLogout = async () => {
     try {
@@ -18,13 +20,19 @@ export function AuthenticationManager({ onAuthStateChange, children }: Authentic
       const { error } = await supabase.auth.signOut();
       if (error) {
         console.error("Error during logout:", error);
-      } else {
-        console.log("Logout successful");
-        onAuthStateChange(false);
-        navigate('/login');
+        throw error;
       }
+      
+      console.log("Logout successful");
+      onAuthStateChange(false);
+      navigate('/login');
     } catch (error) {
       console.error("Error in handleLogout:", error);
+      toast({
+        variant: "destructive",
+        title: "Erro ao sair",
+        description: "Ocorreu um erro ao tentar sair. Por favor, tente novamente.",
+      });
     }
   };
 
@@ -40,8 +48,7 @@ export function AuthenticationManager({ onAuthStateChange, children }: Authentic
 
       if (error) {
         console.error("Error fetching profile:", error);
-        await handleLogout();
-        return null;
+        throw error;
       }
 
       if (!profile) {
@@ -51,8 +58,7 @@ export function AuthenticationManager({ onAuthStateChange, children }: Authentic
         
         if (!user) {
           console.error("No user session found");
-          await handleLogout();
-          return null;
+          throw new Error("No user session found");
         }
 
         const { data: newProfile, error: createError } = await supabase
@@ -69,8 +75,7 @@ export function AuthenticationManager({ onAuthStateChange, children }: Authentic
 
         if (createError) {
           console.error("Error creating profile:", createError);
-          await handleLogout();
-          return null;
+          throw createError;
         }
 
         console.log("New profile created:", newProfile);
@@ -81,8 +86,7 @@ export function AuthenticationManager({ onAuthStateChange, children }: Authentic
       return profile;
     } catch (error) {
       console.error("Error in fetchUserProfile:", error);
-      await handleLogout();
-      return null;
+      throw error;
     }
   };
 
@@ -96,10 +100,7 @@ export function AuthenticationManager({ onAuthStateChange, children }: Authentic
         
         if (sessionError) {
           console.error("Session error:", sessionError);
-          if (mounted) {
-            await handleLogout();
-          }
-          return;
+          throw sessionError;
         }
 
         if (!session) {
@@ -112,26 +113,33 @@ export function AuthenticationManager({ onAuthStateChange, children }: Authentic
         }
 
         console.log("Active session found:", session);
-        const profile = await fetchUserProfile(session.user.id);
         
-        if (mounted) {
-          if (!profile) {
-            await handleLogout();
-            return;
+        try {
+          const profile = await fetchUserProfile(session.user.id);
+          if (mounted) {
+            onAuthStateChange(true, profile);
+            setIsLoading(false);
           }
-          onAuthStateChange(true, profile);
-          setIsLoading(false);
-        }
-      } catch (error: any) {
-        console.error("Error in checkAuth:", error);
-        // Check for refresh token error
-        if (error.message?.includes('Invalid Refresh Token') || 
-            error.error?.message?.includes('Invalid Refresh Token')) {
-          console.log("Invalid refresh token detected, logging out...");
+        } catch (profileError) {
+          console.error("Error fetching profile:", profileError);
           if (mounted) {
             await handleLogout();
           }
         }
+      } catch (error: any) {
+        console.error("Error in checkAuth:", error);
+        
+        // Check for specific auth errors
+        const errorMessage = error.message || error.error?.message || '';
+        const isAuthError = errorMessage.includes('Invalid Refresh Token') || 
+                          errorMessage.includes('JWT expired') ||
+                          errorMessage.includes('JWT invalid');
+        
+        if (isAuthError && mounted) {
+          console.log("Auth error detected, logging out...");
+          await handleLogout();
+        }
+        
         if (mounted) {
           setIsLoading(false);
         }
@@ -153,13 +161,18 @@ export function AuthenticationManager({ onAuthStateChange, children }: Authentic
 
       if (event === 'SIGNED_IN' && session) {
         console.log("User signed in, fetching profile...");
-        const profile = await fetchUserProfile(session.user.id);
-        if (!profile) {
-          await handleLogout();
-          return;
+        try {
+          const profile = await fetchUserProfile(session.user.id);
+          if (mounted) {
+            onAuthStateChange(true, profile);
+            navigate('/');
+          }
+        } catch (error) {
+          console.error("Error fetching profile after sign in:", error);
+          if (mounted) {
+            await handleLogout();
+          }
         }
-        onAuthStateChange(true, profile);
-        navigate('/');
       }
     });
 

@@ -42,17 +42,28 @@ export function AuthPage() {
       }
     };
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      console.log("Auth state changed:", event, session);
-      
-      if (!mounted) return;
+    // Armazena a subscription em uma variável
+    let authSubscription;
 
-      if (event === 'SIGNED_IN' && session) {
-        console.log("User signed in, redirecting...");
-        setError(null);
-        navigate('/', { replace: true });
-      }
-    });
+    // Configura o listener de mudança de estado de autenticação
+    const setupAuthListener = () => {
+      const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+        console.log("Auth state changed:", event, session);
+        
+        if (!mounted) return;
+
+        if (event === 'SIGNED_IN' && session) {
+          console.log("User signed in, redirecting...");
+          setError(null);
+          navigate('/', { replace: true });
+        }
+      });
+
+      return subscription;
+    };
+
+    // Inicializa a subscription
+    authSubscription = setupAuthListener();
 
     // Executa a verificação inicial
     checkSession();
@@ -60,7 +71,9 @@ export function AuthPage() {
     // Cleanup
     return () => {
       mounted = false;
-      subscription.unsubscribe();
+      if (authSubscription) {
+        authSubscription.unsubscribe();
+      }
     };
   }, [navigate, toast]);
 

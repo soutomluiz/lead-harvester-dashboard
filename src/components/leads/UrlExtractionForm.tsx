@@ -16,7 +16,6 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Loader2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { useLanguage } from "@/contexts/LanguageContext";
 import { Lead } from "@/types/lead";
 
 const formSchema = z.object({
@@ -31,7 +30,6 @@ export const UrlExtractionForm = ({ onAddLeads }: UrlExtractionFormProps) => {
   const { toast } = useToast();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
-  const { t } = useLanguage();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -43,41 +41,55 @@ export const UrlExtractionForm = ({ onAddLeads }: UrlExtractionFormProps) => {
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     setIsLoading(true);
     try {
+      console.log('Starting website crawl for URL:', values.url);
+      
       const { data: response, error } = await supabase.functions.invoke('website-crawler', {
         body: { url: values.url }
       });
 
+      console.log('Crawler response:', response);
+
       if (error) {
+        console.error('Crawler error:', error);
         throw error;
       }
 
       if (response.error === 'Free plan limit reached') {
         toast({
           title: "Limite atingido",
-          description: t("freePlanLimit"),
+          description: "Você atingiu o limite máximo de 50 leads no plano gratuito. Para continuar utilizando as funcionalidades, assine um dos nossos planos pagos.",
           variant: "destructive",
         });
         navigate("/subscription");
         return;
       }
 
-      if (response.success) {
-        toast({
-          title: "Sucesso!",
-          description: `${response.leadsExtracted} ${t("leadsExtracted")}`,
-        });
-        form.reset();
-        if (response.leads) {
-          onAddLeads(response.leads);
-        }
-      } else {
-        throw new Error(response.error);
+      if (!response.success || !response.leads || !Array.isArray(response.leads)) {
+        throw new Error('Formato de resposta inválido');
       }
+
+      if (response.leads.length === 0) {
+        toast({
+          title: "Nenhum lead encontrado",
+          description: "Não foi possível encontrar leads neste website. Tente outro URL.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      toast({
+        title: "Sucesso!",
+        description: `${response.leadsExtracted} leads extraídos com sucesso!`,
+      });
+      
+      form.reset();
+      onAddLeads(response.leads);
+      
     } catch (error) {
       console.error('Error extracting leads:', error);
       toast({
         title: "Erro",
-        description: t("processingError"),
+        description: "Erro ao processar o link. Verifique se ele é válido e tente novamente.",
         variant: "destructive",
       });
     } finally {
@@ -93,7 +105,7 @@ export const UrlExtractionForm = ({ onAddLeads }: UrlExtractionFormProps) => {
           name="url"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>{t("websiteUrl")}</FormLabel>
+              <FormLabel>URL do Website</FormLabel>
               <FormControl>
                 <Input 
                   placeholder="https://exemplo.com" 
@@ -113,10 +125,10 @@ export const UrlExtractionForm = ({ onAddLeads }: UrlExtractionFormProps) => {
           {isLoading ? (
             <>
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              {t("extractingLeads")}
+              Extraindo Leads...
             </>
           ) : (
-            t("extractLeads")
+            'Extrair Leads'
           )}
         </Button>
       </form>

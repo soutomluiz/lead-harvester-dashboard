@@ -61,12 +61,12 @@ export function ProspectingForm({ onAddLeads, searchType }: ProspectingFormProps
       if (data.results.length === 0) {
         toast({
           title: t("noResults"),
-          description: t("tryDifferentSearch"),
+          description: t("tryDifferentSearch")
         });
       } else {
         toast({
           title: t("success"),
-          description: t("resultsFound", { count: data.results.length }),
+          description: t("resultsFound", { count: data.results.length })
         });
       }
     } catch (error) {
@@ -84,7 +84,7 @@ export function ProspectingForm({ onAddLeads, searchType }: ProspectingFormProps
   const handleAddToLeads = () => {
     const newLeads: Lead[] = results.map(result => ({
       id: crypto.randomUUID(),
-      company_name: result.name,
+      company_name: result.companyName || result.name,
       industry: result.category || null,
       location: result.location || null,
       contact_name: null,
@@ -104,7 +104,7 @@ export function ProspectingForm({ onAddLeads, searchType }: ProspectingFormProps
     onAddLeads(newLeads);
     toast({
       title: t("success"),
-      description: t("leadsAdded", { count: newLeads.length }),
+      description: t("leadsAdded", { count: newLeads.length })
     });
   };
 

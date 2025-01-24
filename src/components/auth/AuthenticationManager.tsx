@@ -17,12 +17,18 @@ export function AuthenticationManager({ onAuthStateChange, children }: Authentic
         .from('profiles')
         .select('*')
         .eq('id', userId)
-        .single();
+        .maybeSingle();
 
       if (error) {
         console.error("AuthenticationManager: Error fetching profile:", error);
         throw error;
       }
+      
+      if (!profile) {
+        console.log("AuthenticationManager: No profile found for user");
+        return null;
+      }
+      
       console.log("AuthenticationManager: Profile fetched successfully:", profile);
       return profile;
     } catch (error) {

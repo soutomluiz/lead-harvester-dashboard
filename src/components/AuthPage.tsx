@@ -46,7 +46,7 @@ export function AuthPage() {
         }
       }
     };
-    
+
     checkSession();
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {

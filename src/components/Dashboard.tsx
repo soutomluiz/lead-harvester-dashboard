@@ -14,6 +14,7 @@ import { ReportsPage } from "@/components/reports/ReportsPage";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { Lead } from "@/types/lead";
+import { useNavigate } from "react-router-dom";
 
 interface DashboardProps {
   activeTab: string;
@@ -25,7 +26,9 @@ interface DashboardProps {
 
 export function Dashboard({ activeTab, leads, onSubmit, onAddLeads, setActiveTab }: DashboardProps) {
   const [dbLeads, setDbLeads] = useState<Lead[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
+  const navigate = useNavigate();
   const searchType = activeTab.includes("prospect-places") 
     ? "places" 
     : activeTab.includes("prospect-websites") 
@@ -35,11 +38,24 @@ export function Dashboard({ activeTab, leads, onSubmit, onAddLeads, setActiveTab
   useEffect(() => {
     let channel: ReturnType<typeof supabase.channel>;
 
+    const checkAuth = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        navigate('/login');
+        return false;
+      }
+      return true;
+    };
+
     const fetchLeads = async () => {
       try {
+        const isAuthenticated = await checkAuth();
+        if (!isAuthenticated) return;
+
         const { data, error } = await supabase
           .from('leads')
-          .select('*');
+          .select('*')
+          .order('created_at', { ascending: false });
 
         if (error) throw error;
 
@@ -47,7 +63,8 @@ export function Dashboard({ activeTab, leads, onSubmit, onAddLeads, setActiveTab
           ...lead,
           type: lead.type as 'website' | 'place' | 'manual',
           status: (lead.status || 'new') as 'new' | 'qualified' | 'unqualified' | 'open',
-          deal_value: lead.deal_value || 0
+          deal_value: lead.deal_value || 0,
+          tags: lead.tags || []
         }));
 
         setDbLeads(typedLeads);
@@ -59,10 +76,15 @@ export function Dashboard({ activeTab, leads, onSubmit, onAddLeads, setActiveTab
           description: "Não foi possível carregar seus leads. Por favor, tente novamente.",
           variant: "destructive",
         });
+      } finally {
+        setIsLoading(false);
       }
     };
 
     const setupRealtimeSubscription = async () => {
+      const isAuthenticated = await checkAuth();
+      if (!isAuthenticated) return;
+
       try {
         channel = supabase
           .channel('leads-changes')
@@ -80,31 +102,29 @@ export function Dashboard({ activeTab, leads, onSubmit, onAddLeads, setActiveTab
           )
           .subscribe((status) => {
             console.log('Status da inscrição do canal:', status);
-            if (status === 'SUBSCRIBED') {
-              console.log('Canal inscrito com sucesso');
-            }
           });
       } catch (error) {
         console.error('Erro ao configurar inscrição em tempo real:', error);
       }
     };
 
-    // Inicializa
     fetchLeads();
     setupRealtimeSubscription();
 
-    // Cleanup
     return () => {
       if (channel) {
-        console.log('Removendo inscrição do canal...');
-        supabase.removeChannel(channel).then(() => {
-          console.log('Canal removido com sucesso');
-        }).catch(error => {
-          console.error('Erro ao remover canal:', error);
-        });
+        supabase.removeChannel(channel);
       }
     };
-  }, [toast]);
+  }, [toast, navigate]);
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="w-full bg-background">

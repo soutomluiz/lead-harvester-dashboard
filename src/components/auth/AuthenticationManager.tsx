@@ -71,13 +71,14 @@ export function AuthenticationManager({ onAuthStateChange, children }: Authentic
     checkAuth();
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      console.log("AuthenticationManager: Auth state changed:", event);
+      console.log("AuthenticationManager: Auth state changed:", event, session);
       
       if (!mounted) return;
 
       if (event === 'SIGNED_OUT' || !session) {
         console.log("AuthenticationManager: User signed out or session ended");
         onAuthStateChange(false);
+        window.location.href = '/login';
         return;
       }
 

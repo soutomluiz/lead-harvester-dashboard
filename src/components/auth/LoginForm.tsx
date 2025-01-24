@@ -55,6 +55,7 @@ export function LoginForm() {
           title: "Login realizado com sucesso",
           description: "Você será redirecionado para o dashboard.",
         });
+        window.location.href = '/';
       }
     } catch (error) {
       console.error("Unexpected error during login:", error);

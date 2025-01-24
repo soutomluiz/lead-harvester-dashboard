@@ -20,6 +20,7 @@ export function AuthPage() {
 
     const checkSession = async () => {
       try {
+        console.log("Checking session in AuthPage...");
         const { data: { session }, error: sessionError } = await supabase.auth.getSession();
         
         if (sessionError) {
@@ -28,8 +29,8 @@ export function AuthPage() {
         }
 
         if (session?.access_token && mounted) {
-          console.log("Active session found, redirecting to dashboard");
-          navigate("/");
+          console.log("Active session found in AuthPage, redirecting to dashboard");
+          window.location.href = '/';
         }
       } catch (error) {
         console.error("Error checking session:", error);
@@ -43,11 +44,11 @@ export function AuthPage() {
     checkSession();
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      console.log("Auth state changed:", event, session);
+      console.log("Auth state changed in AuthPage:", event, session);
       
       if (event === 'SIGNED_IN' && session && mounted) {
-        console.log("User signed in, redirecting to dashboard");
-        navigate("/");
+        console.log("User signed in in AuthPage, redirecting to dashboard");
+        window.location.href = '/';
         setError(null);
       }
     });
@@ -56,7 +57,7 @@ export function AuthPage() {
       mounted = false;
       subscription.unsubscribe();
     };
-  }, [navigate]);
+  }, []);
 
   if (isLoading) {
     return (

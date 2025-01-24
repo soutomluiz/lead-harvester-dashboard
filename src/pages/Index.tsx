@@ -22,14 +22,14 @@ const Index = () => {
     );
   }
 
-  if (!isAuthenticated) {
+  if (!isAuthenticated || !userProfile) {
     return <AuthPage />;
   }
 
   return (
     <AuthenticationManager 
       onAuthStateChange={(authenticated, profile) => {
-        console.log("Auth state changed:", { authenticated, profile });
+        console.log("Auth state changed in Index:", { authenticated, profile });
       }}
     >
       <SidebarProvider>

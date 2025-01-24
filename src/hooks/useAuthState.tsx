@@ -15,8 +15,8 @@ export function useAuthState() {
   const [isLoading, setIsLoading] = useState(true);
 
   const updateUserState = (profile: UserProfile | null) => {
-    console.log("Updating user state with profile:", profile);
     if (profile) {
+      console.log("Updating user state with profile:", profile);
       setUserName(profile.full_name || '');
       setAvatarUrl(profile.avatar_url);
       setUserProfile(profile);
@@ -27,7 +27,7 @@ export function useAuthState() {
     }
   };
 
-  const fetchUserProfile = async (userId: string) => {
+  const fetchUserProfile = async (userId: string): Promise<UserProfile | null> => {
     try {
       console.log("Fetching user profile for ID:", userId);
       const { data: profile, error } = await supabase
@@ -41,7 +41,7 @@ export function useAuthState() {
         return null;
       }
 
-      console.log("Profile loaded:", profile);
+      console.log("Profile loaded successfully:", profile);
       return profile;
     } catch (error) {
       console.error("Error in fetchUserProfile:", error);
@@ -54,9 +54,8 @@ export function useAuthState() {
 
     const initializeAuth = async () => {
       try {
-        console.log("Initializing auth state...");
         const { data: { session }, error } = await supabase.auth.getSession();
-
+        
         if (error) {
           console.error("Session error:", error);
           if (mounted) {
@@ -98,16 +97,19 @@ export function useAuthState() {
     initializeAuth();
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      console.log("Auth state changed:", event);
+      console.log("Auth state changed:", event, session);
 
       if (!mounted) return;
 
       if (event === 'SIGNED_IN' && session?.user) {
+        setIsLoading(true);
         console.log("User signed in, fetching profile...");
         const profile = await fetchUserProfile(session.user.id);
+        
         if (mounted) {
           setIsAuthenticated(true);
           updateUserState(profile);
+          setIsLoading(false);
         }
       } else if (event === 'SIGNED_OUT') {
         console.log("User signed out");

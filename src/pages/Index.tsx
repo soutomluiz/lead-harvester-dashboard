@@ -23,9 +23,11 @@ const Index = () => {
   }
 
   if (!isAuthenticated || !userProfile) {
+    console.log("User not authenticated or profile not loaded, showing AuthPage");
     return <AuthPage />;
   }
 
+  console.log("Rendering authenticated layout with profile:", userProfile);
   return (
     <AuthenticationManager 
       onAuthStateChange={(authenticated, profile) => {

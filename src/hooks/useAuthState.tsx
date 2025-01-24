@@ -21,6 +21,7 @@ export function useAuthState() {
       setAvatarUrl(profile.avatar_url);
       setUserProfile(profile);
     } else {
+      console.log("Clearing user state");
       setUserName('');
       setAvatarUrl(null);
       setUserProfile(null);
@@ -54,6 +55,7 @@ export function useAuthState() {
 
     const initializeAuth = async () => {
       try {
+        console.log("Starting auth initialization...");
         const { data: { session }, error } = await supabase.auth.getSession();
         
         if (error) {

@@ -11,6 +11,7 @@ export function AuthenticationManager({ onAuthStateChange, children }: Authentic
 
   const fetchUserProfile = async (userId: string) => {
     try {
+      console.log("AuthenticationManager: Fetching profile for user:", userId);
       const { data: profile, error } = await supabase
         .from('profiles')
         .select('*')
@@ -18,12 +19,13 @@ export function AuthenticationManager({ onAuthStateChange, children }: Authentic
         .single();
 
       if (error) {
-        console.error("Error fetching profile:", error);
+        console.error("AuthenticationManager: Error fetching profile:", error);
         throw error;
       }
+      console.log("AuthenticationManager: Profile fetched successfully:", profile);
       return profile;
     } catch (error) {
-      console.error("Error in fetchUserProfile:", error);
+      console.error("AuthenticationManager: Error in fetchUserProfile:", error);
       return null;
     }
   };
@@ -33,16 +35,16 @@ export function AuthenticationManager({ onAuthStateChange, children }: Authentic
 
     const checkAuth = async () => {
       try {
-        console.log("Checking authentication status...");
+        console.log("AuthenticationManager: Checking authentication status...");
         const { data: { session }, error: sessionError } = await supabase.auth.getSession();
         
         if (sessionError) {
-          console.error("Session error:", sessionError);
+          console.error("AuthenticationManager: Session error:", sessionError);
           throw sessionError;
         }
 
         if (!session) {
-          console.log("No active session found");
+          console.log("AuthenticationManager: No active session found");
           if (mounted) {
             onAuthStateChange(false);
             setIsLoading(false);
@@ -50,7 +52,7 @@ export function AuthenticationManager({ onAuthStateChange, children }: Authentic
           return;
         }
 
-        console.log("Active session found, fetching profile...");
+        console.log("AuthenticationManager: Active session found, fetching profile...");
         const profile = await fetchUserProfile(session.user.id);
         
         if (mounted) {
@@ -58,7 +60,7 @@ export function AuthenticationManager({ onAuthStateChange, children }: Authentic
           setIsLoading(false);
         }
       } catch (error) {
-        console.error("Error in checkAuth:", error);
+        console.error("AuthenticationManager: Error in checkAuth:", error);
         if (mounted) {
           onAuthStateChange(false);
           setIsLoading(false);
@@ -69,18 +71,18 @@ export function AuthenticationManager({ onAuthStateChange, children }: Authentic
     checkAuth();
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      console.log("Auth state changed:", event);
+      console.log("AuthenticationManager: Auth state changed:", event);
       
       if (!mounted) return;
 
       if (event === 'SIGNED_OUT' || !session) {
-        console.log("User signed out or session ended");
+        console.log("AuthenticationManager: User signed out or session ended");
         onAuthStateChange(false);
         return;
       }
 
       if (event === 'SIGNED_IN' && session) {
-        console.log("User signed in, fetching profile...");
+        console.log("AuthenticationManager: User signed in, fetching profile...");
         const profile = await fetchUserProfile(session.user.id);
         onAuthStateChange(true, profile);
       }

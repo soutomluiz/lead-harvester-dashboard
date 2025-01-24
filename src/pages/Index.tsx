@@ -17,6 +17,7 @@ import { ThemeToggle } from "@/components/ThemeToggle";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/hooks/useAuth";
 import { AuthPage } from "@/components/AuthPage";
+import { useToast } from "@/components/ui/use-toast";
 
 const getPageTitle = (tab: string) => {
   switch (tab) {
@@ -56,6 +57,7 @@ const Index = () => {
   const navigate = useNavigate();
   const { t } = useLanguage();
   const { handleSignOut } = useAuth();
+  const { toast } = useToast();
 
   const fetchUserProfile = async (userId: string) => {
     try {
@@ -67,6 +69,11 @@ const Index = () => {
 
       if (error) {
         console.error("Error fetching profile:", error);
+        toast({
+          title: "Error",
+          description: "Failed to load user profile",
+          variant: "destructive",
+        });
         return;
       }
 
@@ -78,56 +85,83 @@ const Index = () => {
       }
     } catch (error) {
       console.error("Error in fetchUserProfile:", error);
+      toast({
+        title: "Error",
+        description: "An unexpected error occurred",
+        variant: "destructive",
+      });
     } finally {
       setIsLoading(false);
     }
   };
 
   useEffect(() => {
+    let mounted = true;
+    let authSubscription: { data: { subscription: { unsubscribe: () => void } } };
+
     const checkAuth = async () => {
       try {
         const { data: { session }, error: sessionError } = await supabase.auth.getSession();
         
         if (sessionError) {
           console.error("Error checking session:", sessionError);
-          setIsAuthenticated(false);
-          setIsLoading(false);
+          if (mounted) {
+            setIsAuthenticated(false);
+            setIsLoading(false);
+          }
           return;
         }
 
         if (!session) {
           console.log("No active session found");
-          setIsAuthenticated(false);
-          setIsLoading(false);
+          if (mounted) {
+            setIsAuthenticated(false);
+            setIsLoading(false);
+          }
           return;
         }
 
-        setIsAuthenticated(true);
-        await fetchUserProfile(session.user.id);
+        if (mounted) {
+          setIsAuthenticated(true);
+          await fetchUserProfile(session.user.id);
+        }
       } catch (error) {
         console.error("Error in checkAuth:", error);
-        setIsLoading(false);
+        if (mounted) {
+          setIsLoading(false);
+        }
       }
     };
 
     checkAuth();
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      console.log("Auth state changed:", event);
-      
-      if (event === 'SIGNED_OUT' || !session) {
-        setIsAuthenticated(false);
-        setUserName('');
-        setAvatarUrl(null);
-        setUserProfile(null);
-      } else if (event === 'SIGNED_IN' && session) {
-        setIsAuthenticated(true);
-        await fetchUserProfile(session.user.id);
-      }
-    });
+    try {
+      authSubscription = supabase.auth.onAuthStateChange(async (event, session) => {
+        console.log("Auth state changed:", event);
+        
+        if (event === 'SIGNED_OUT' || !session) {
+          if (mounted) {
+            setIsAuthenticated(false);
+            setUserName('');
+            setAvatarUrl(null);
+            setUserProfile(null);
+          }
+        } else if (event === 'SIGNED_IN' && session) {
+          if (mounted) {
+            setIsAuthenticated(true);
+            await fetchUserProfile(session.user.id);
+          }
+        }
+      });
+    } catch (error) {
+      console.error("Error setting up auth subscription:", error);
+    }
 
     return () => {
-      subscription.unsubscribe();
+      mounted = false;
+      if (authSubscription?.data?.subscription) {
+        authSubscription.data.subscription.unsubscribe();
+      }
     };
   }, []);
 
@@ -136,11 +170,11 @@ const Index = () => {
       ...data,
       id: crypto.randomUUID(),
     };
-    setLeads([...leads, newLead]);
+    setLeads(prevLeads => [...prevLeads, newLead]);
   };
 
   const handleAddLeads = (newLeads: Lead[]) => {
-    setLeads([...leads, ...newLeads]);
+    setLeads(prevLeads => [...prevLeads, ...newLeads]);
   };
 
   if (isAuthenticated === null || isLoading) {

@@ -66,7 +66,7 @@ export function ProspectingForm({ onAddLeads, searchType }: ProspectingFormProps
       } else {
         toast({
           title: t("success"),
-          description: t("resultsFound", { count: data.results.length })
+          description: t("resultsFound")
         });
       }
     } catch (error) {
@@ -104,7 +104,7 @@ export function ProspectingForm({ onAddLeads, searchType }: ProspectingFormProps
     onAddLeads(newLeads);
     toast({
       title: t("success"),
-      description: t("leadsAdded", { count: newLeads.length })
+      description: t("leadsAdded")
     });
   };
 
@@ -124,7 +124,7 @@ export function ProspectingForm({ onAddLeads, searchType }: ProspectingFormProps
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="location">{t("location")}</Label>
+            <Label htmlFor="location">{t("locationLabel")}</Label>
             <Input
               id="location"
               value={location}

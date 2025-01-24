@@ -22,15 +22,13 @@ export function UserProfileButton({ avatarUrl, userProfile, onSignOut }: UserPro
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
-      // Aqui você pode implementar a lógica real de verificação de assinatura
-      // Por enquanto, vamos usar uma simulação
-      const { data: subscription } = await supabase
+      const { data: profile } = await supabase
         .from('profiles')
         .select('subscription_status')
         .eq('id', user.id)
         .single();
 
-      setHasSubscription(subscription?.subscription_status === 'active');
+      setHasSubscription(profile?.subscription_status === 'active');
     };
 
     checkSubscription();

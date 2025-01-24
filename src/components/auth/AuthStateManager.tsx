@@ -32,6 +32,7 @@ export function AuthStateManager({ onAuthStateChange, children }: AuthStateManag
           if (mounted) {
             onAuthStateChange(false);
             setIsLoading(false);
+            navigate('/login');
           }
           return;
         }
@@ -43,26 +44,51 @@ export function AuthStateManager({ onAuthStateChange, children }: AuthStateManag
             .from('profiles')
             .select('*')
             .eq('id', session.user.id)
-            .single();
+            .maybeSingle();
 
           if (profileError) throw profileError;
 
-          if (mounted) {
-            onAuthStateChange(true, profile);
-            setIsLoading(false);
+          if (!profile) {
+            console.log("Profile not found, creating new profile...");
+            const { data: newProfile, error: createError } = await supabase
+              .from('profiles')
+              .insert([{ id: session.user.id }])
+              .select()
+              .single();
+
+            if (createError) throw createError;
+
+            if (mounted) {
+              onAuthStateChange(true, newProfile);
+              setIsLoading(false);
+              navigate('/');
+            }
+          } else {
+            if (mounted) {
+              onAuthStateChange(true, profile);
+              setIsLoading(false);
+              navigate('/');
+            }
           }
         } catch (error) {
-          console.error("Error fetching profile:", error);
+          console.error("Error fetching/creating profile:", error);
           if (mounted) {
             await supabase.auth.signOut();
             onAuthStateChange(false);
             setIsLoading(false);
+            navigate('/login');
+            toast({
+              title: "Erro ao carregar perfil",
+              description: "Houve um problema ao carregar seu perfil. Por favor, tente novamente.",
+              variant: "destructive",
+            });
           }
         }
       } catch (error) {
         console.error("Error in checkSession:", error);
         if (mounted) {
           setIsLoading(false);
+          navigate('/login');
         }
       }
     };
@@ -75,6 +101,7 @@ export function AuthStateManager({ onAuthStateChange, children }: AuthStateManag
       if (event === 'SIGNED_OUT' || !session) {
         console.log("User signed out or session ended");
         onAuthStateChange(false);
+        navigate('/login');
         return;
       }
 
@@ -85,18 +112,41 @@ export function AuthStateManager({ onAuthStateChange, children }: AuthStateManag
             .from('profiles')
             .select('*')
             .eq('id', session.user.id)
-            .single();
+            .maybeSingle();
 
           if (profileError) throw profileError;
 
-          if (mounted) {
-            onAuthStateChange(true, profile);
+          if (!profile) {
+            console.log("Profile not found after sign in, creating new profile...");
+            const { data: newProfile, error: createError } = await supabase
+              .from('profiles')
+              .insert([{ id: session.user.id }])
+              .select()
+              .single();
+
+            if (createError) throw createError;
+
+            if (mounted) {
+              onAuthStateChange(true, newProfile);
+              navigate('/');
+            }
+          } else {
+            if (mounted) {
+              onAuthStateChange(true, profile);
+              navigate('/');
+            }
           }
         } catch (error) {
-          console.error("Error fetching profile after sign in:", error);
+          console.error("Error fetching/creating profile after sign in:", error);
           if (mounted) {
             await supabase.auth.signOut();
             onAuthStateChange(false);
+            toast({
+              title: "Erro ao carregar perfil",
+              description: "Houve um problema ao carregar seu perfil. Por favor, tente novamente.",
+              variant: "destructive",
+            });
+            navigate('/login');
           }
         }
       }
@@ -108,7 +158,7 @@ export function AuthStateManager({ onAuthStateChange, children }: AuthStateManag
       mounted = false;
       subscription?.unsubscribe();
     };
-  }, [navigate, onAuthStateChange]);
+  }, [navigate, onAuthStateChange, toast]);
 
   if (isLoading) {
     return (

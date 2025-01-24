@@ -5,13 +5,22 @@ import { LoginForm } from "./auth/LoginForm";
 import { SignUpForm } from "./auth/SignUpForm";
 import { AuthError } from "./auth/AuthError";
 import { AuthStateManager } from "./auth/AuthStateManager";
+import { useAuthState } from "@/hooks/useAuthState";
 
 export function AuthPage() {
   const [error, setError] = useState<string | null>(null);
   const [isSignUp, setIsSignUp] = useState(false);
+  const { setIsAuthenticated, setUserProfile } = useAuthState();
+
+  const handleAuthStateChange = (authenticated: boolean, profile?: any) => {
+    setIsAuthenticated(authenticated);
+    if (profile) {
+      setUserProfile(profile);
+    }
+  };
 
   return (
-    <AuthStateManager>
+    <AuthStateManager onAuthStateChange={handleAuthStateChange}>
       <div className="container max-w-lg mx-auto py-8">
         <Card className="p-8">
           <div className="mb-8 space-y-4">

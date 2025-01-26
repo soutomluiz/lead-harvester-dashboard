@@ -30,7 +30,7 @@ export default {
           hover: "#7E69AB", // Tom mais escuro para hover
         },
         secondary: {
-          DEFAULT: "#FEF7CD", // Amarelo suave
+          DEFAULT: "#FFFFFF", // Branco
           foreground: "#6E59A5", // Roxo mais escuro para contraste
         },
         destructive: {

@@ -15,16 +15,16 @@ interface AppSidebarProps {
 export function AppSidebar({ activeTab, setActiveTab }: AppSidebarProps) {
   return (
     <Sidebar className="bg-background border-r border-border">
-      <SidebarHeader className="p-4 border-b border-border">
-        <div className="flex items-center justify-center mb-2">
+      <SidebarHeader className="p-0 border-b border-border">
+        <div className="flex items-center justify-center">
           <img
             src="/logo.svg"
             alt="Logo"
-            className="h-20 w-auto"
+            className="h-20 w-auto my-0"
           />
         </div>
       </SidebarHeader>
-      
+
       <SidebarContent>
         <SidebarMenuItems activeTab={activeTab} setActiveTab={setActiveTab} />
       </SidebarContent>

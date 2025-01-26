@@ -22,6 +22,7 @@ interface Notification {
   action_type?: 'navigate' | 'mark_read';
   action_path?: string;
   action_tab?: string;
+  user_id: string;
 }
 
 export function NotificationBell() {
@@ -29,12 +30,16 @@ export function NotificationBell() {
   const queryClient = useQueryClient();
 
   // Fetch notifications
-  const { data: notifications = [], isLoading } = useQuery({
+  const { data: notifications = [], isLoading } = useQuery<Notification[]>({
     queryKey: ['notifications'],
     queryFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("User not authenticated");
+
       const { data, error } = await supabase
         .from('notifications')
         .select('*')
+        .eq('user_id', user.id)
         .order('created_at', { ascending: false });
 
       if (error) {
@@ -49,10 +54,14 @@ export function NotificationBell() {
   // Update notification mutation
   const updateNotification = useMutation({
     mutationFn: async (id: string) => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("User not authenticated");
+
       const { error } = await supabase
         .from('notifications')
         .update({ read: true })
-        .eq('id', id);
+        .eq('id', id)
+        .eq('user_id', user.id);
 
       if (error) throw error;
     },
@@ -67,10 +76,14 @@ export function NotificationBell() {
   // Update all notifications mutation
   const markAllAsRead = useMutation({
     mutationFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("User not authenticated");
+
       const { error } = await supabase
         .from('notifications')
         .update({ read: true })
-        .eq('read', false);
+        .eq('read', false)
+        .eq('user_id', user.id);
 
       if (error) throw error;
     },

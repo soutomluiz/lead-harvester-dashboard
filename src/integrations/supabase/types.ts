@@ -90,6 +90,42 @@ export type Database = {
         }
         Relationships: []
       }
+      notifications: {
+        Row: {
+          action_path: string | null
+          action_tab: string | null
+          action_type: string | null
+          created_at: string | null
+          id: string
+          message: string
+          read: boolean | null
+          type: string | null
+          user_id: string
+        }
+        Insert: {
+          action_path?: string | null
+          action_tab?: string | null
+          action_type?: string | null
+          created_at?: string | null
+          id?: string
+          message: string
+          read?: boolean | null
+          type?: string | null
+          user_id: string
+        }
+        Update: {
+          action_path?: string | null
+          action_tab?: string | null
+          action_type?: string | null
+          created_at?: string | null
+          id?: string
+          message?: string
+          read?: boolean | null
+          type?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null

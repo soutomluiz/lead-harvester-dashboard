@@ -16,11 +16,11 @@ export function AppSidebar({ activeTab, setActiveTab }: AppSidebarProps) {
   return (
     <Sidebar className="bg-background border-r border-border">
       <SidebarHeader className="p-4 border-b border-border">
-        <div className="flex items-center justify-center mb-4">
+        <div className="flex items-center justify-start pl-1  mb-4">
           <img
             src="/logo.svg"
             alt="Logo"
-            className="h-16 w-auto"
+            className="h-20 w-auto"
           />
         </div>
       </SidebarHeader>

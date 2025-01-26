@@ -56,7 +56,7 @@ export function AuthPage() {
       <div className="w-full max-w-lg px-4">
         <Card className="p-8">
           <div className="mb-8 space-y-4">
-            <img src="/logo.svg" alt="Logo" className="h-24 mx-auto" />
+            <img src="/logo.svg" alt="Logo" className="h-30 mx-auto" />
             <div className="space-y-2">
               <p className="text-center text-gray-600">
                 {isSignUp ? "Crie sua conta" : "Faça login para acessar sua conta"}

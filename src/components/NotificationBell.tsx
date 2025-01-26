@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Bell } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import {
@@ -9,106 +9,93 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { supabase } from "@/integrations/supabase/client";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 
 interface Notification {
   id: string;
   message: string;
   read: boolean;
   type?: 'info' | 'success' | 'warning' | 'error';
-  timestamp: Date;
-  action?: {
-    type: 'navigate' | 'mark_read';
-    path?: string;
-    tab?: string;
-  };
+  created_at: string;
+  action_type?: 'navigate' | 'mark_read';
+  action_path?: string;
+  action_tab?: string;
 }
 
 export function NotificationBell() {
   const navigate = useNavigate();
-  const [notifications, setNotifications] = useState<Notification[]>([
-    {
-      id: "1",
-      message: "Bem-vindo ao Lead Harvester! Comece importando seus leads.",
-      read: false,
-      type: 'info',
-      timestamp: new Date(),
-      action: {
-        type: 'navigate',
-        tab: 'prospect'
+  const queryClient = useQueryClient();
+
+  // Fetch notifications
+  const { data: notifications = [], isLoading } = useQuery({
+    queryKey: ['notifications'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('notifications')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        toast.error("Erro ao carregar notificações");
+        throw error;
       }
-    },
-    {
-      id: "2",
-      message: "Dica: Configure seu webhook para integração automática com seu CRM.",
-      read: false,
-      type: 'info',
-      timestamp: new Date(Date.now() - 1000 * 60 * 5),
-      action: {
-        type: 'navigate',
-        tab: 'config'
-      }
-    },
-    {
-      id: "3",
-      message: "Novo: Exporte seus leads em formato CSV ou Excel.",
-      read: false,
-      type: 'success',
-      timestamp: new Date(Date.now() - 1000 * 60 * 10),
-      action: {
-        type: 'navigate',
-        tab: 'leads-all'
-      }
-    },
-    {
-      id: "4",
-      message: "Lembrete: Complete seu perfil para melhor experiência.",
-      read: false,
-      type: 'warning',
-      timestamp: new Date(Date.now() - 1000 * 60 * 15),
-      action: {
-        type: 'navigate',
-        tab: 'config'
-      }
-    },
-    {
-      id: "5",
-      message: "Dica: Use tags para organizar seus leads por categoria.",
-      read: false,
-      type: 'info',
-      timestamp: new Date(Date.now() - 1000 * 60 * 20),
-      action: {
-        type: 'mark_read'
-      }
+
+      return data as Notification[];
     }
-  ]);
+  });
+
+  // Update notification mutation
+  const updateNotification = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase
+        .from('notifications')
+        .update({ read: true })
+        .eq('id', id);
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['notifications'] });
+    },
+    onError: () => {
+      toast.error("Erro ao atualizar notificação");
+    }
+  });
+
+  // Update all notifications mutation
+  const markAllAsRead = useMutation({
+    mutationFn: async () => {
+      const { error } = await supabase
+        .from('notifications')
+        .update({ read: true })
+        .eq('read', false);
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['notifications'] });
+      toast.success("Todas as notificações foram marcadas como lidas");
+    },
+    onError: () => {
+      toast.error("Erro ao atualizar notificações");
+    }
+  });
 
   const unreadCount = notifications.filter((n) => !n.read).length;
 
-  const handleNotificationClick = (notification: Notification) => {
-    if (notification.action?.type === 'navigate' && notification.action.tab) {
-      // Navigate to the specified tab
-      window.dispatchEvent(new CustomEvent('setActiveTab', { detail: notification.action.tab }));
+  const handleNotificationClick = async (notification: Notification) => {
+    if (notification.action_type === 'navigate' && notification.action_tab) {
+      window.dispatchEvent(new CustomEvent('setActiveTab', { detail: notification.action_tab }));
     }
     
-    // Mark as read in both cases
-    markAsRead(notification.id);
+    // Mark as read
+    await updateNotification.mutateAsync(notification.id);
   };
 
-  const markAsRead = (id: string) => {
-    setNotifications(
-      notifications.map((n) =>
-        n.id === id ? { ...n, read: true } : n
-      )
-    );
-  };
-
-  const markAllAsRead = () => {
-    setNotifications(
-      notifications.map((n) => ({ ...n, read: true }))
-    );
-  };
-
-  const formatTimestamp = (date: Date) => {
+  const formatTimestamp = (dateStr: string) => {
+    const date = new Date(dateStr);
     const now = new Date();
     const diffInMinutes = Math.floor((now.getTime() - date.getTime()) / (1000 * 60));
     
@@ -117,6 +104,14 @@ export function NotificationBell() {
     if (diffInMinutes < 1440) return `${Math.floor(diffInMinutes / 60)}h atrás`;
     return `${Math.floor(diffInMinutes / 1440)}d atrás`;
   };
+
+  if (isLoading) {
+    return (
+      <Button variant="ghost" size="icon" className="relative">
+        <Bell className="h-5 w-5 animate-pulse" />
+      </Button>
+    );
+  }
 
   return (
     <DropdownMenu>
@@ -140,7 +135,7 @@ export function NotificationBell() {
             <Button
               variant="ghost"
               size="sm"
-              onClick={markAllAsRead}
+              onClick={() => markAllAsRead.mutate()}
               className="text-xs"
             >
               Marcar todas como lidas
@@ -167,7 +162,7 @@ export function NotificationBell() {
                     )}
                   </div>
                   <span className="text-xs text-muted-foreground">
-                    {formatTimestamp(notification.timestamp)}
+                    {formatTimestamp(notification.created_at)}
                   </span>
                 </div>
               </DropdownMenuItem>

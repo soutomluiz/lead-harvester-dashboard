@@ -42,7 +42,7 @@ export default {
           foreground: "hsl(var(--muted-foreground))",
         },
         accent: {
-          DEFAULT: "#F97316", // Laranja vibrante para acentos
+          DEFAULT: "#f2c64b", // Nova cor amarela para acentos
           foreground: "#FFFFFF",
         },
         popover: {

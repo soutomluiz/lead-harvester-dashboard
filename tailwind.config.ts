@@ -25,12 +25,13 @@ export default {
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
         primary: {
-          DEFAULT: "#3080a3",
+          DEFAULT: "#9b87f5", // Cor roxa principal
           foreground: "#FFFFFF",
+          hover: "#7E69AB", // Tom mais escuro para hover
         },
         secondary: {
-          DEFAULT: "hsl(var(--secondary))",
-          foreground: "hsl(var(--secondary-foreground))",
+          DEFAULT: "#FEF7CD", // Amarelo suave
+          foreground: "#6E59A5", // Roxo mais escuro para contraste
         },
         destructive: {
           DEFAULT: "hsl(var(--destructive))",
@@ -41,8 +42,8 @@ export default {
           foreground: "hsl(var(--muted-foreground))",
         },
         accent: {
-          DEFAULT: "hsl(var(--accent))",
-          foreground: "hsl(var(--accent-foreground))",
+          DEFAULT: "#F97316", // Laranja vibrante para acentos
+          foreground: "#FFFFFF",
         },
         popover: {
           DEFAULT: "hsl(var(--popover))",

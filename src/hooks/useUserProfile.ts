@@ -21,11 +21,7 @@ export function useUserProfile() {
 
         if (error) {
           console.error("Error fetching profile:", error);
-          toast({
-            title: "Error",
-            description: "Failed to load user profile",
-            variant: "destructive",
-          });
+          toast.error("Failed to load user profile");
           return;
         }
 
@@ -35,11 +31,7 @@ export function useUserProfile() {
         }
       } catch (error) {
         console.error("Error in fetchUserProfile:", error);
-        toast({
-          title: "Error",
-          description: "An unexpected error occurred",
-          variant: "destructive",
-        });
+        toast.error("An unexpected error occurred");
       }
     };
 

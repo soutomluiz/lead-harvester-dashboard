@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useNotifications } from "@/hooks/useNotifications";
 import { NotificationItem } from "./NotificationItem";
+import { Notification } from "@/types/notification";
 
 export function NotificationBell() {
   const { notifications, isLoading, updateNotification, markAllAsRead } = useNotifications();

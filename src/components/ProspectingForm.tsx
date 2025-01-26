@@ -22,6 +22,7 @@ export function ProspectingForm({ onAddLeads, searchType }: ProspectingFormProps
   const [isLoading, setIsLoading] = useState(false);
   const [results, setResults] = useState<SearchResult[]>([]);
   const [userProfile, setUserProfile] = useState<any>(null);
+  const [isTrialValid, setIsTrialValid] = useState<boolean>(false);
   const { toast } = useToast();
   const { t } = useLanguage();
 
@@ -35,7 +36,15 @@ export function ProspectingForm({ onAddLeads, searchType }: ProspectingFormProps
           .eq('id', session.user.id)
           .single();
         
-        setUserProfile(profile);
+        if (profile) {
+          setUserProfile(profile);
+          
+          // Verificar se o trial é válido
+          const { data: trialValid } = await supabase
+            .rpc('is_valid_trial', { user_profile_id: profile.id });
+          
+          setIsTrialValid(trialValid);
+        }
       }
     };
 
@@ -54,7 +63,7 @@ export function ProspectingForm({ onAddLeads, searchType }: ProspectingFormProps
     }
 
     // Check if user is on free plan and has reached the limit
-    if (userProfile?.subscription_type === 'free' && userProfile?.extracted_leads_count >= 10) {
+    if (userProfile?.subscription_type === 'free' && !isTrialValid && userProfile?.extracted_leads_count >= 10) {
       toast({
         title: "Limite atingido",
         description: "Você atingiu o limite de 10 leads no plano gratuito. Faça upgrade para continuar.",
@@ -77,7 +86,7 @@ export function ProspectingForm({ onAddLeads, searchType }: ProspectingFormProps
         body: JSON.stringify({
           query: query.trim(),
           location: location.trim(),
-          limit: userProfile?.subscription_type === 'free' ? 10 : undefined
+          limit: userProfile?.subscription_type === 'free' && !isTrialValid ? 10 : undefined
         }),
       });
 
@@ -88,7 +97,7 @@ export function ProspectingForm({ onAddLeads, searchType }: ProspectingFormProps
       const data = await response.json();
       
       // Limit results for free users
-      const limitedResults = userProfile?.subscription_type === 'free' 
+      const limitedResults = userProfile?.subscription_type === 'free' && !isTrialValid
         ? data.results.slice(0, 10) 
         : data.results;
       
@@ -102,7 +111,7 @@ export function ProspectingForm({ onAddLeads, searchType }: ProspectingFormProps
       } else {
         toast({
           title: t("success"),
-          description: userProfile?.subscription_type === 'free' 
+          description: userProfile?.subscription_type === 'free' && !isTrialValid
             ? `${limitedResults.length} resultados encontrados (limite do plano gratuito)`
             : t("resultsFound")
         });
@@ -121,7 +130,7 @@ export function ProspectingForm({ onAddLeads, searchType }: ProspectingFormProps
 
   const handleAddToLeads = async () => {
     // Check if adding these leads would exceed the free plan limit
-    if (userProfile?.subscription_type === 'free') {
+    if (userProfile?.subscription_type === 'free' && !isTrialValid) {
       const remainingLeads = 10 - (userProfile.extracted_leads_count || 0);
       if (remainingLeads <= 0) {
         toast({
@@ -179,7 +188,20 @@ export function ProspectingForm({ onAddLeads, searchType }: ProspectingFormProps
   return (
     <div className="space-y-6 p-6">
       <Card className="p-6">
-        {userProfile?.subscription_type === 'free' && (
+        {userProfile?.subscription_type === 'trial' && (
+          <div className="mb-4 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+            <p className="text-sm text-blue-800 dark:text-blue-200">
+              Período de Trial: Você tem acesso completo a todas as funcionalidades por 14 dias.
+              {userProfile.trial_start_date && (
+                <span className="block mt-1">
+                  Início do trial: {new Date(userProfile.trial_start_date).toLocaleDateString()}
+                </span>
+              )}
+            </p>
+          </div>
+        )}
+        
+        {userProfile?.subscription_type === 'free' && !isTrialValid && (
           <div className="mb-4 p-4 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg">
             <p className="text-sm text-yellow-800 dark:text-yellow-200">
               Plano Gratuito: Você pode extrair até 10 leads no total.
@@ -187,6 +209,7 @@ export function ProspectingForm({ onAddLeads, searchType }: ProspectingFormProps
             </p>
           </div>
         )}
+
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="query">{t("searchTerm")}</Label>

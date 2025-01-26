@@ -140,6 +140,8 @@ export type Database = {
           location: string | null
           phone: string | null
           subscription_type: string | null
+          trial_start_date: string | null
+          trial_status: string | null
           updated_at: string | null
           webhook_url: string | null
           website: string | null
@@ -157,6 +159,8 @@ export type Database = {
           location?: string | null
           phone?: string | null
           subscription_type?: string | null
+          trial_start_date?: string | null
+          trial_status?: string | null
           updated_at?: string | null
           webhook_url?: string | null
           website?: string | null
@@ -174,6 +178,8 @@ export type Database = {
           location?: string | null
           phone?: string | null
           subscription_type?: string | null
+          trial_start_date?: string | null
+          trial_status?: string | null
           updated_at?: string | null
           webhook_url?: string | null
           website?: string | null
@@ -206,7 +212,12 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      is_valid_trial: {
+        Args: {
+          user_profile_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
       pipeline_stage:

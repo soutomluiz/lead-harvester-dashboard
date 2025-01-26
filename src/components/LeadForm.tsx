@@ -33,6 +33,7 @@ interface LeadFormProps {
 export function LeadForm({ onSubmit }: LeadFormProps) {
   const { toast } = useToast();
   const [userProfile, setUserProfile] = useState<any>(null);
+  const [isTrialValid, setIsTrialValid] = useState<boolean>(false);
 
   useEffect(() => {
     const fetchUserProfile = async () => {
@@ -44,7 +45,15 @@ export function LeadForm({ onSubmit }: LeadFormProps) {
           .eq('id', session.user.id)
           .single();
         
-        setUserProfile(profile);
+        if (profile) {
+          setUserProfile(profile);
+          
+          // Verificar se o trial é válido
+          const { data: trialValid } = await supabase
+            .rpc('is_valid_trial', { user_profile_id: profile.id });
+          
+          setIsTrialValid(trialValid);
+        }
       }
     };
 
@@ -67,7 +76,7 @@ export function LeadForm({ onSubmit }: LeadFormProps) {
 
   const handleSubmit = async (values: z.infer<typeof formSchema>) => {
     // Check if user is on free plan and has reached the limit
-    if (userProfile?.subscription_type === 'free' && userProfile?.extracted_leads_count >= 10) {
+    if (userProfile?.subscription_type === 'free' && !isTrialValid && userProfile?.extracted_leads_count >= 10) {
       toast({
         title: "Limite atingido",
         description: "Você atingiu o limite de 10 leads no plano gratuito. Faça upgrade para continuar.",
@@ -104,7 +113,20 @@ export function LeadForm({ onSubmit }: LeadFormProps) {
 
   return (
     <div className="max-w-2xl mx-auto p-6">
-      {userProfile?.subscription_type === 'free' && (
+      {userProfile?.subscription_type === 'trial' && (
+        <div className="mb-6 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+          <p className="text-sm text-blue-800 dark:text-blue-200">
+            Período de Trial: Você tem acesso completo a todas as funcionalidades por 14 dias.
+            {userProfile.trial_start_date && (
+              <span className="block mt-1">
+                Início do trial: {new Date(userProfile.trial_start_date).toLocaleDateString()}
+              </span>
+            )}
+          </p>
+        </div>
+      )}
+      
+      {userProfile?.subscription_type === 'free' && !isTrialValid && (
         <div className="mb-6 p-4 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg">
           <p className="text-sm text-yellow-800 dark:text-yellow-200">
             Plano Gratuito: Você pode extrair até 10 leads no total.
@@ -112,6 +134,7 @@ export function LeadForm({ onSubmit }: LeadFormProps) {
           </p>
         </div>
       )}
+
       <Form {...form}>
         <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
           <FormField

@@ -14,6 +14,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { TrialStatusBanner } from "./shared/TrialStatusBanner";
+import { useTrialStatus } from "@/hooks/useTrialStatus";
 
 const formSchema = z.object({
   company_name: z.string().min(1, "Nome da empresa é obrigatório"),
@@ -33,7 +35,7 @@ interface LeadFormProps {
 export function LeadForm({ onSubmit }: LeadFormProps) {
   const { toast } = useToast();
   const [userProfile, setUserProfile] = useState<any>(null);
-  const [isTrialValid, setIsTrialValid] = useState<boolean>(false);
+  const { isTrialValid, checkLeadLimit } = useTrialStatus(userProfile);
 
   useEffect(() => {
     const fetchUserProfile = async () => {
@@ -47,12 +49,6 @@ export function LeadForm({ onSubmit }: LeadFormProps) {
         
         if (profile) {
           setUserProfile(profile);
-          
-          // Verificar se o trial é válido
-          const { data: trialValid } = await supabase
-            .rpc('is_valid_trial', { user_profile_id: profile.id });
-          
-          setIsTrialValid(trialValid);
         }
       }
     };
@@ -75,8 +71,7 @@ export function LeadForm({ onSubmit }: LeadFormProps) {
   });
 
   const handleSubmit = async (values: z.infer<typeof formSchema>) => {
-    // Check if user is on free plan and has reached the limit
-    if (userProfile?.subscription_type === 'free' && !isTrialValid && userProfile?.extracted_leads_count >= 10) {
+    if (!checkLeadLimit()) {
       toast({
         title: "Limite atingido",
         description: "Você atingiu o limite de 10 leads no plano gratuito. Faça upgrade para continuar.",
@@ -94,7 +89,6 @@ export function LeadForm({ onSubmit }: LeadFormProps) {
 
     onSubmit(leadData);
 
-    // Update the extracted_leads_count in the profile
     if (userProfile) {
       const { error } = await supabase
         .from('profiles')
@@ -113,28 +107,8 @@ export function LeadForm({ onSubmit }: LeadFormProps) {
 
   return (
     <div className="max-w-2xl mx-auto p-6">
-      {userProfile?.subscription_type === 'trial' && (
-        <div className="mb-6 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-          <p className="text-sm text-blue-800 dark:text-blue-200">
-            Período de Trial: Você tem acesso completo a todas as funcionalidades por 14 dias.
-            {userProfile.trial_start_date && (
-              <span className="block mt-1">
-                Início do trial: {new Date(userProfile.trial_start_date).toLocaleDateString()}
-              </span>
-            )}
-          </p>
-        </div>
-      )}
+      <TrialStatusBanner userProfile={userProfile} />
       
-      {userProfile?.subscription_type === 'free' && !isTrialValid && (
-        <div className="mb-6 p-4 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg">
-          <p className="text-sm text-yellow-800 dark:text-yellow-200">
-            Plano Gratuito: Você pode extrair até 10 leads no total.
-            Leads extraídos: {userProfile.extracted_leads_count || 0}/10
-          </p>
-        </div>
-      )}
-
       <Form {...form}>
         <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
           <FormField

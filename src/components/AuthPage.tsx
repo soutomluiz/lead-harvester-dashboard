@@ -57,9 +57,19 @@ export function AuthPage() {
         <Card className="p-8">
           <div className="mb-8 space-y-4">
             <img src="/logo.svg" alt="Logo" className="h-24 mx-auto" />
-            <p className="text-center text-gray-600">
-              {isSignUp ? "Crie sua conta" : "Faça login para acessar sua conta"}
-            </p>
+            <div className="space-y-2">
+              <p className="text-center text-gray-600">
+                {isSignUp ? "Crie sua conta" : "Faça login para acessar sua conta"}
+              </p>
+              <div className="bg-primary/10 p-4 rounded-lg">
+                <p className="text-center text-primary font-medium">
+                  ✨ Experimente todas as funcionalidades gratuitamente por 14 dias! ✨
+                </p>
+                <p className="text-center text-sm text-gray-600 mt-1">
+                  Cadastre-se agora e aproveite o período de teste completo
+                </p>
+              </div>
+            </div>
           </div>
 
           <AuthError message={error} />

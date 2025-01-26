@@ -20,7 +20,7 @@ export function AppSidebar({ activeTab, setActiveTab }: AppSidebarProps) {
           <img
             src="/logo.svg"
             alt="Logo"
-            className="h-22 w-auto my-0"
+            className="h-19 w-auto my-0"
           />
         </div>
       </SidebarHeader>

@@ -16,7 +16,7 @@ export function AppSidebar({ activeTab, setActiveTab }: AppSidebarProps) {
   return (
     <Sidebar className="bg-background border-r border-border">
       <SidebarHeader className="p-2 border-b border-border">
-        <div className="flex items-center justify-start pl-2 mb-2">
+        <div className="flex items-center justify-center pl-2 mb-2">
           <img
             src="/logo.svg"
             alt="Logo"

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { ShoppingCart, AlertCircle, CheckCircle2 } from "lucide-react";
@@ -77,28 +77,45 @@ export function SubscriptionPanel() {
   const handleSubscribe = async () => {
     try {
       setIsCheckoutLoading(true);
-      const response = await fetch('/api/create-checkout', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}`
-        }
-      });
-
-      const { url, error } = await response.json();
-
-      if (error) {
-        console.error('Checkout error:', error);
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (!session) {
         toast({
           variant: "destructive",
           title: "Erro",
-          description: error
+          description: "Você precisa estar logado para assinar."
         });
         return;
       }
 
-      if (url) {
-        window.location.href = url;
+      const { data, error } = await supabase.functions.invoke('create-checkout', {
+        body: { price: 4990 },
+        headers: {
+          Authorization: `Bearer ${session.access_token}`
+        }
+      });
+      
+      if (error) {
+        console.error('Error details:', error);
+        let errorMessage;
+        
+        try {
+          const errorBody = JSON.parse(error.message);
+          errorMessage = errorBody.error || "Erro ao processar pagamento. Tente novamente.";
+        } catch {
+          errorMessage = "Erro ao processar pagamento. Tente novamente.";
+        }
+        
+        toast({
+          variant: "destructive",
+          title: "Erro",
+          description: errorMessage
+        });
+        return;
+      }
+      
+      if (data?.url) {
+        window.location.href = data.url;
       }
     } catch (error) {
       console.error('Error creating checkout:', error);

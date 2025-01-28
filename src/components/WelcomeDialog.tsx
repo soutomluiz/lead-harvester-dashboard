@@ -11,10 +11,16 @@ import { useState, useEffect } from "react";
 interface WelcomeDialogProps {
   isNewUser?: boolean;
   trialDaysLeft?: number;
+  userProfile?: any;
 }
 
-export function WelcomeDialog({ isNewUser, trialDaysLeft = 14 }: WelcomeDialogProps) {
+export function WelcomeDialog({ isNewUser, trialDaysLeft = 14, userProfile }: WelcomeDialogProps) {
   const [isOpen, setIsOpen] = useState(true);
+
+  // Don't show dialog if user has a subscription
+  if (userProfile?.subscription_type === 'premium') {
+    return null;
+  }
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>

@@ -24,6 +24,7 @@ const handler = async (req: Request): Promise<Response> => {
         <p>Olá ${name || ""},</p>
         <p>Ficamos muito felizes em ter você conosco! Seu cadastro foi realizado com sucesso.</p>
         <p>Você já pode fazer login e começar a usar nossa plataforma.</p>
+        <p>Você tem 14 dias de teste gratuito para explorar todas as funcionalidades.</p>
         <p>Se tiver alguma dúvida, não hesite em nos contatar.</p>
         <p>Atenciosamente,<br>Equipe do Sistema</p>
       </div>
@@ -36,7 +37,7 @@ const handler = async (req: Request): Promise<Response> => {
         Authorization: `Bearer ${RESEND_API_KEY}`,
       },
       body: JSON.stringify({
-        from: "Seu Sistema <onboarding@resend.dev>",
+        from: "Washington <washington.hardtec@gmail.com>",
         to: [email],
         subject: "Bem-vindo ao Sistema!",
         html: emailHtml,
@@ -46,7 +47,19 @@ const handler = async (req: Request): Promise<Response> => {
     if (!res.ok) {
       const error = await res.text();
       console.error("Error sending welcome email:", error);
-      throw new Error(`Failed to send email: ${error}`);
+      
+      // Instead of throwing an error, we'll return success even if email fails
+      // This way the user registration process continues
+      return new Response(
+        JSON.stringify({ 
+          status: "warning",
+          message: "User registered successfully but welcome email could not be sent"
+        }), 
+        {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          status: 200,
+        }
+      );
     }
 
     const data = await res.json();
@@ -59,11 +72,16 @@ const handler = async (req: Request): Promise<Response> => {
 
   } catch (error) {
     console.error("Error in send-welcome-email function:", error);
+    
+    // Return success response even if email fails
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ 
+        status: "warning",
+        message: "User registered successfully but welcome email could not be sent"
+      }),
       {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
-        status: 500,
+        status: 200,
       }
     );
   }

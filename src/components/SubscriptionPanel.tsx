@@ -10,6 +10,7 @@ export function SubscriptionPanel() {
   const [isAdmin, setIsAdmin] = useState(false);
   const [userEmail, setUserEmail] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isCheckoutLoading, setIsCheckoutLoading] = useState(false);
   const [subscriptionType, setSubscriptionType] = useState<string | null>(null);
   const [trialStatus, setTrialStatus] = useState<string | null>(null);
   const [trialStartDate, setTrialStartDate] = useState<string | null>(null);
@@ -72,6 +73,44 @@ export function SubscriptionPanel() {
 
     checkUserRole();
   }, [toast]);
+
+  const handleSubscribe = async () => {
+    try {
+      setIsCheckoutLoading(true);
+      const response = await fetch('/api/create-checkout', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}`
+        }
+      });
+
+      const { url, error } = await response.json();
+
+      if (error) {
+        console.error('Checkout error:', error);
+        toast({
+          variant: "destructive",
+          title: "Erro",
+          description: error
+        });
+        return;
+      }
+
+      if (url) {
+        window.location.href = url;
+      }
+    } catch (error) {
+      console.error('Error creating checkout:', error);
+      toast({
+        variant: "destructive",
+        title: "Erro",
+        description: "Não foi possível iniciar o processo de assinatura. Tente novamente mais tarde."
+      });
+    } finally {
+      setIsCheckoutLoading(false);
+    }
+  };
 
   const calculateTrialDaysLeft = () => {
     if (!trialStartDate) return 0;
@@ -149,9 +188,14 @@ export function SubscriptionPanel() {
             </div>
           </CardContent>
           <CardFooter>
-            <Button className="w-full" variant="default">
+            <Button 
+              className="w-full" 
+              variant="default"
+              onClick={handleSubscribe}
+              disabled={isCheckoutLoading}
+            >
               <ShoppingCart className="mr-2 h-4 w-4" />
-              Assinar Agora
+              {isCheckoutLoading ? "Processando..." : "Assinar Agora"}
             </Button>
           </CardFooter>
         </Card>
@@ -179,9 +223,14 @@ export function SubscriptionPanel() {
           </div>
         </CardContent>
         <CardFooter>
-          <Button className="w-full" variant="default">
+          <Button 
+            className="w-full" 
+            variant="default"
+            onClick={handleSubscribe}
+            disabled={isCheckoutLoading}
+          >
             <ShoppingCart className="mr-2 h-4 w-4" />
-            Fazer Upgrade
+            {isCheckoutLoading ? "Processando..." : "Fazer Upgrade"}
           </Button>
         </CardFooter>
       </Card>

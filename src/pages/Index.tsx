@@ -11,7 +11,6 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { AuthPage } from "@/components/AuthPage";
 import { useToast } from "@/components/ui/use-toast";
 import { useUserProfile } from "@/hooks/useUserProfile";
-import { WelcomeDialog } from "@/components/WelcomeDialog";
 
 const getPageTitle = (tab: string) => {
   switch (tab) {
@@ -58,18 +57,6 @@ const Index = () => {
     return <AuthPage />;
   }
 
-  const isNewUser = userProfile?.trial_status === 'active' && 
-                   new Date(userProfile?.trial_start_date).getTime() > Date.now() - (24 * 60 * 60 * 1000);
-
-  const calculateTrialDaysLeft = () => {
-    if (!userProfile?.trial_start_date) return 14;
-    const startDate = new Date(userProfile.trial_start_date);
-    const now = new Date();
-    const trialEndDate = new Date(startDate.getTime() + (14 * 24 * 60 * 60 * 1000));
-    const daysLeft = Math.max(0, Math.ceil((trialEndDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)));
-    return daysLeft;
-  };
-
   return (
     <SidebarProvider>
       <div className="flex min-h-screen w-full bg-background">
@@ -98,11 +85,6 @@ const Index = () => {
         </main>
         <AppFooter />
       </div>
-      <WelcomeDialog 
-        isNewUser={isNewUser} 
-        trialDaysLeft={calculateTrialDaysLeft()}
-        userProfile={userProfile}
-      />
     </SidebarProvider>
   );
 };

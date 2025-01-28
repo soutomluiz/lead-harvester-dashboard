@@ -15,6 +15,36 @@ export function SignUpForm() {
   const { toast } = useToast();
   const navigate = useNavigate();
 
+  const validateEmail = (email: string) => {
+    // Regex básica para validação de email
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return "Formato de email inválido";
+    }
+
+    // Validações adicionais
+    if (email.length > 254) {
+      return "Email muito longo";
+    }
+
+    const [localPart, domain] = email.split('@');
+    if (localPart.length > 64) {
+      return "Parte local do email muito longa";
+    }
+
+    if (!domain.includes('.')) {
+      return "Domínio inválido";
+    }
+
+    // Verificar caracteres especiais inválidos
+    const invalidChars = /[()<>[\]\\,;:\s]/;
+    if (invalidChars.test(email)) {
+      return "Email contém caracteres inválidos";
+    }
+
+    return null;
+  };
+
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -22,6 +52,17 @@ export function SignUpForm() {
       toast({
         title: "Campos obrigatórios",
         description: "Por favor, preencha todos os campos.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Validar email antes de prosseguir
+    const emailError = validateEmail(email);
+    if (emailError) {
+      toast({
+        title: "Email inválido",
+        description: emailError,
         variant: "destructive",
       });
       return;

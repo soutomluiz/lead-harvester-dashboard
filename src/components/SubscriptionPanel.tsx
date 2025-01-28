@@ -10,6 +10,9 @@ export function SubscriptionPanel() {
   const [isAdmin, setIsAdmin] = useState(false);
   const [userEmail, setUserEmail] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [subscriptionType, setSubscriptionType] = useState<string | null>(null);
+  const [trialStatus, setTrialStatus] = useState<string | null>(null);
+  const [trialStartDate, setTrialStartDate] = useState<string | null>(null);
 
   useEffect(() => {
     const checkUserRole = async () => {
@@ -23,6 +26,7 @@ export function SubscriptionPanel() {
 
         setUserEmail(user.email);
 
+        // Fetch user role
         const { data: roleData, error: roleError } = await supabase
           .from('user_roles')
           .select('role')
@@ -35,6 +39,25 @@ export function SubscriptionPanel() {
         }
 
         setIsAdmin(roleData?.role === 'admin');
+
+        // Fetch subscription info from profiles
+        const { data: profileData, error: profileError } = await supabase
+          .from('profiles')
+          .select('subscription_type, trial_status, trial_start_date')
+          .eq('id', user.id)
+          .maybeSingle();
+
+        if (profileError) {
+          console.error("Error fetching profile:", profileError);
+          return;
+        }
+
+        if (profileData) {
+          setSubscriptionType(profileData.subscription_type);
+          setTrialStatus(profileData.trial_status);
+          setTrialStartDate(profileData.trial_start_date);
+        }
+
       } catch (error) {
         console.error("Error checking user role:", error);
         toast({
@@ -49,6 +72,15 @@ export function SubscriptionPanel() {
 
     checkUserRole();
   }, [toast]);
+
+  const calculateTrialDaysLeft = () => {
+    if (!trialStartDate) return 0;
+    const start = new Date(trialStartDate);
+    const now = new Date();
+    const trialEndDate = new Date(start.getTime() + 14 * 24 * 60 * 60 * 1000);
+    const daysLeft = Math.ceil((trialEndDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+    return Math.max(0, daysLeft);
+  };
 
   if (isLoading) {
     return (
@@ -65,17 +97,75 @@ export function SubscriptionPanel() {
     );
   }
 
-  return (
-    <div className="container max-w-4xl py-6 space-y-6">
-      <h1 className="text-3xl font-bold">Assinatura</h1>
-      
+  const renderSubscriptionStatus = () => {
+    if (isAdmin) {
+      return (
+        <Card>
+          <CardHeader>
+            <CardTitle>Status da Assinatura</CardTitle>
+            <CardDescription>
+              <div className="flex items-center gap-2 text-green-500">
+                <CheckCircle2 className="h-5 w-5" />
+                <span>Assinatura Vitalícia Ativa (Admin)</span>
+              </div>
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="flex items-start gap-2 text-muted-foreground">
+              <AlertCircle className="h-5 w-5 mt-0.5" />
+              <div className="flex-1">
+                <p className="font-medium text-foreground">Plano Admin</p>
+                <p>Acesso vitalício a todas as funcionalidades da plataforma</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      );
+    }
+
+    if (subscriptionType === 'trial' && trialStatus === 'active') {
+      const daysLeft = calculateTrialDaysLeft();
+      return (
+        <Card>
+          <CardHeader>
+            <CardTitle>Status da Assinatura</CardTitle>
+            <CardDescription>
+              <div className="flex items-center gap-2 text-blue-500">
+                <AlertCircle className="h-5 w-5" />
+                <span>Período de Teste em Andamento</span>
+              </div>
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="flex items-start gap-2 text-muted-foreground">
+              <AlertCircle className="h-5 w-5 mt-0.5" />
+              <div className="flex-1">
+                <p className="font-medium text-foreground">Teste Gratuito</p>
+                <p>Você tem acesso a todas as funcionalidades por {daysLeft} dias</p>
+                <p className="text-sm mt-2">
+                  Início do teste: {new Date(trialStartDate!).toLocaleDateString()}
+                </p>
+              </div>
+            </div>
+          </CardContent>
+          <CardFooter>
+            <Button className="w-full" variant="default">
+              <ShoppingCart className="mr-2 h-4 w-4" />
+              Assinar Agora
+            </Button>
+          </CardFooter>
+        </Card>
+      );
+    }
+
+    return (
       <Card>
         <CardHeader>
           <CardTitle>Status da Assinatura</CardTitle>
           <CardDescription>
-            <div className="flex items-center gap-2 text-green-500">
-              <CheckCircle2 className="h-5 w-5" />
-              <span>Assinatura Vitalícia Ativa (Admin)</span>
+            <div className="flex items-center gap-2 text-yellow-500">
+              <AlertCircle className="h-5 w-5" />
+              <span>Plano Gratuito</span>
             </div>
           </CardDescription>
         </CardHeader>
@@ -83,18 +173,32 @@ export function SubscriptionPanel() {
           <div className="flex items-start gap-2 text-muted-foreground">
             <AlertCircle className="h-5 w-5 mt-0.5" />
             <div className="flex-1">
-              <p className="font-medium text-foreground">Plano Admin</p>
-              <p>Acesso vitalício a todas as funcionalidades da plataforma</p>
+              <p className="font-medium text-foreground">Funcionalidades Limitadas</p>
+              <p>Faça upgrade para ter acesso a todas as funcionalidades</p>
             </div>
           </div>
         </CardContent>
+        <CardFooter>
+          <Button className="w-full" variant="default">
+            <ShoppingCart className="mr-2 h-4 w-4" />
+            Fazer Upgrade
+          </Button>
+        </CardFooter>
       </Card>
+    );
+  };
 
+  return (
+    <div className="container max-w-4xl py-6 space-y-6">
+      <h1 className="text-3xl font-bold">Assinatura</h1>
+      {renderSubscriptionStatus()}
       <Card>
         <CardHeader>
           <CardTitle>Histórico de Pagamentos</CardTitle>
           <CardDescription>
-            Você possui uma assinatura vitalícia como administrador
+            {isAdmin 
+              ? "Você possui uma assinatura vitalícia como administrador"
+              : "Nenhum pagamento registrado ainda"}
           </CardDescription>
         </CardHeader>
       </Card>

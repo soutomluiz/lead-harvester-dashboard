@@ -14,24 +14,21 @@ interface WelcomeDialogProps {
 }
 
 export function WelcomeDialog({ isNewUser, trialDaysLeft = 14 }: WelcomeDialogProps) {
-  const [isOpen, setIsOpen] = useState(false);
-
-  useEffect(() => {
-    if (isNewUser) {
-      setIsOpen(true);
-    }
-  }, [isNewUser]);
+  const [isOpen, setIsOpen] = useState(true);
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle className="text-2xl font-bold text-primary">
-            Bem-vindo! 🎉
+            {isNewUser ? "Bem-vindo! 🎉" : "Olá novamente! 👋"}
           </DialogTitle>
           <DialogDescription className="space-y-4 pt-4">
             <p className="text-base">
-              Estamos muito felizes em ter você conosco! Você tem acesso a todas as funcionalidades premium por {trialDaysLeft} dias.
+              {isNewUser 
+                ? "Estamos muito felizes em ter você conosco!" 
+                : "Que bom ter você de volta!"} 
+              Você tem acesso a todas as funcionalidades premium por {trialDaysLeft} dias.
             </p>
             <div className="bg-primary/10 p-4 rounded-lg">
               <h4 className="font-semibold text-primary mb-2">Durante seu período de teste você pode:</h4>

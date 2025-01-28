@@ -7,6 +7,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
 
 interface WelcomeDialogProps {
   isNewUser?: boolean;
@@ -16,9 +17,27 @@ interface WelcomeDialogProps {
 
 export function WelcomeDialog({ isNewUser, trialDaysLeft = 14, userProfile }: WelcomeDialogProps) {
   const [isOpen, setIsOpen] = useState(true);
+  const [isAdmin, setIsAdmin] = useState(false);
 
-  // Don't show dialog if user has a subscription
-  if (userProfile?.subscription_type === 'premium') {
+  useEffect(() => {
+    const checkUserRole = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        const { data: roleData } = await supabase
+          .from('user_roles')
+          .select('role')
+          .eq('user_id', user.id)
+          .single();
+        
+        setIsAdmin(roleData?.role === 'admin');
+      }
+    };
+
+    checkUserRole();
+  }, []);
+
+  // Don't show dialog if user has a subscription or is admin
+  if (userProfile?.subscription_type === 'premium' || isAdmin) {
     return null;
   }
 

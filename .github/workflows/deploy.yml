@@ -25,7 +25,10 @@ jobs:
 
       - name: Install FTP deployment tool
         run: sudo apt-get install lftp
-
+ 
+      - name: Verificar estrutura do projeto após build
+        run: ls -lR
+        
       - name: Deploy via FTP  # 🔹 Removido o hífen extra e incluído no bloco steps
         env:
           FTP_HOST: ${{ secrets.FTP_HOST }}

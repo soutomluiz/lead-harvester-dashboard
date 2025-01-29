@@ -11,6 +11,9 @@ export default defineConfig(({ mode }) => ({
     host: true,
     port: 8080,
   },
+  build: {
+    outDir: "dist", // 🔹 Define explicitamente que a pasta de saída é 'dist'
+  },
   plugins: [
     react(),
     mode === 'development' &&

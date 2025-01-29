@@ -38,5 +38,5 @@ jobs:
           lftp -e "
           set ssl:verify-certificate no;
           open -u $FTP_USER,$FTP_PASS $FTP_HOST;
-          mirror -R ./dist /domains/maislead.com/public_html/app;
+          mirror -R ./dist /public_html/app;
           bye"

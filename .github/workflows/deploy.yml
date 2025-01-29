@@ -26,14 +26,14 @@ jobs:
       - name: Install FTP deployment tool
         run: sudo apt-get install lftp
 
-- name: Deploy via FTP
-  env:
-    FTP_HOST: ${{ secrets.FTP_HOST }}
-    FTP_USER: ${{ secrets.FTP_USER }}
-    FTP_PASS: ${{ secrets.FTP_PASS }}
-  run: |
-    lftp -e "
-    set ssl:verify-certificate no;
-    open -u $FTP_USER,$FTP_PASS $FTP_HOST;
-    mirror -R ./maislead/dist /domains/maislead.com/public_html/app;
-    bye"
+      - name: Deploy via FTP  # 🔹 Removido o hífen extra e incluído no bloco steps
+        env:
+          FTP_HOST: ${{ secrets.FTP_HOST }}
+          FTP_USER: ${{ secrets.FTP_USER }}
+          FTP_PASS: ${{ secrets.FTP_PASS }}
+        run: |
+          lftp -e "
+          set ssl:verify-certificate no;
+          open -u $FTP_USER,$FTP_PASS $FTP_HOST;
+          mirror -R ./maislead/dist /domains/maislead.com/public_html/app;
+          bye"

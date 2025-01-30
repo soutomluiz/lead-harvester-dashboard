@@ -21,24 +21,31 @@ serve(async (req) => {
       )
     }
 
+    if (!apiKey) {
+      console.error('Google Maps API key is missing');
+      return new Response(
+        JSON.stringify({ error: 'API key configuration error' }),
+        { 
+          status: 500,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        }
+      )
+    }
+
     console.log('Starting search with params:', { query, location });
 
-    // Construir a query com localização
     const searchQuery = location ? `${query} in ${location}` : query;
-    
-    // First, search for places
     const searchUrl = `https://maps.googleapis.com/maps/api/place/textsearch/json?query=${encodeURIComponent(searchQuery)}&key=${apiKey}`
-    console.log('Making request to Google Places API:', searchUrl);
     
+    console.log('Making request to Google Places API');
     const searchResponse = await fetch(searchUrl)
     const searchData = await searchResponse.json()
 
-    console.log('Search response status:', searchData.status);
-    console.log('Search response data:', JSON.stringify(searchData, null, 2));
+    console.log('Search response:', searchData);
 
     if (searchData.status === "REQUEST_DENIED") {
       console.error('Google API request denied:', searchData);
-      throw new Error("Erro na configuração da API do Google Maps")
+      throw new Error("API key error or quota exceeded")
     }
 
     if (!searchData.results || searchData.results.length === 0) {
@@ -49,22 +56,17 @@ serve(async (req) => {
       )
     }
 
-    console.log(`Found ${searchData.results.length} results`);
-
-    // For each place found, get additional details
     const detailedResults = await Promise.all(
       searchData.results.map(async (place: any) => {
         const detailsUrl = `https://maps.googleapis.com/maps/api/place/details/json?place_id=${place.place_id}&fields=name,formatted_phone_number,formatted_address,website,rating,user_ratings_total,opening_hours&key=${apiKey}`
         const detailsResponse = await fetch(detailsUrl)
         const detailsData = await detailsResponse.json()
         
-        console.log('Details for place:', place.name, detailsData);
-        
         return {
           companyName: place.name,
           address: place.formatted_address,
-          phone: detailsData.result?.formatted_phone_number || '',
-          website: detailsData.result?.website || '',
+          phone: detailsData.result?.formatted_phone_number || null,
+          website: detailsData.result?.website || null,
           rating: place.rating || 0,
           user_ratings_total: place.user_ratings_total || 0,
           type: 'place',
@@ -75,8 +77,6 @@ serve(async (req) => {
         }
       })
     )
-
-    console.log(`Processed ${detailedResults.length} results successfully:`, detailedResults);
 
     return new Response(
       JSON.stringify({ results: detailedResults }),

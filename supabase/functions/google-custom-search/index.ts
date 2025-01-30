@@ -26,6 +26,17 @@ serve(async (req) => {
       )
     }
 
+    if (!apiKey) {
+      console.error('Google Custom Search API key is missing');
+      return new Response(
+        JSON.stringify({ error: 'API key configuration error' }),
+        { 
+          status: 500,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        }
+      )
+    }
+
     const searchEngineId = "04876c2f3fd7a4e1f"
     const searchQuery = location ? `${query} em ${location}` : query;
     

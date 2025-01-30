@@ -49,7 +49,6 @@ export function ProspectingForm({ onAddLeads, searchType }: ProspectingFormProps
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Form submitted with:", { query, location, searchType });
     
     if (!query.trim()) {
       toast({
@@ -77,8 +76,7 @@ export function ProspectingForm({ onAddLeads, searchType }: ProspectingFormProps
       const { data, error } = await supabase.functions.invoke(functionName, {
         body: {
           query: query.trim(),
-          location: location.trim(),
-          limit: isFreePlan ? 10 : undefined
+          location: location.trim()
         }
       });
 

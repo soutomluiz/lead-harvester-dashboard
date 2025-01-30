@@ -12,6 +12,7 @@ import {
   PaginationPrevious,
 } from "@/components/ui/pagination";
 import { useState } from "react";
+import { MapPin, Globe, Phone, Star } from "lucide-react";
 
 interface SearchResultsProps {
   results: SearchResult[];
@@ -21,9 +22,14 @@ interface SearchResultsProps {
 export const SearchResults = ({ results, onAddToLeads }: SearchResultsProps) => {
   const [selectedLeads, setSelectedLeads] = useState<Set<number>>(new Set());
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 20;
+  const itemsPerPage = 10;
 
-  if (results.length === 0) return null;
+  console.log("Rendering SearchResults with:", results);
+
+  if (!results || results.length === 0) {
+    console.log("No results to display");
+    return null;
+  }
 
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
@@ -54,22 +60,10 @@ export const SearchResults = ({ results, onAddToLeads }: SearchResultsProps) => 
     setSelectedLeads(new Set());
   };
 
-  const handlePreviousPage = () => {
-    if (currentPage > 1) {
-      setCurrentPage(prev => prev - 1);
-    }
-  };
-
-  const handleNextPage = () => {
-    if (currentPage < totalPages) {
-      setCurrentPage(prev => prev + 1);
-    }
-  };
-
   return (
     <div className="mt-6 space-y-4">
-      <div className="flex justify-between items-center">
-        <h3 className="text-lg font-semibold">Resultados da Busca</h3>
+      <div className="flex justify-between items-center mb-4">
+        <h3 className="text-lg font-semibold">Resultados da Busca ({results.length})</h3>
         <div className="flex gap-4">
           <Button 
             onClick={handleSelectAll} 
@@ -88,7 +82,8 @@ export const SearchResults = ({ results, onAddToLeads }: SearchResultsProps) => 
           </Button>
         </div>
       </div>
-      <div className="space-y-4">
+
+      <div className="grid gap-4">
         {currentResults.map((result, index) => (
           <Card key={startIndex + index} className="p-4">
             <div className="flex items-start gap-4">
@@ -97,90 +92,76 @@ export const SearchResults = ({ results, onAddToLeads }: SearchResultsProps) => 
                 onCheckedChange={() => handleSelectLead(startIndex + index)}
                 className="mt-1"
               />
-              <div className="flex-1">
-                <h4 className="font-medium">{result.companyName}</h4>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mt-2">
-                  {result.type !== 'website' && (
-                    <>
-                      <p className="text-sm">
-                        <strong>Endereço:</strong> {result.address || "Não disponível"}
-                      </p>
-                      <p className="text-sm">
-                        <strong>Telefone:</strong> {result.phone || "Não disponível"}
-                      </p>
-                      <p className="text-sm">
-                        <strong>Avaliação:</strong>{" "}
-                        {result.rating ? `${result.rating}/5` : "Sem avaliação"}
-                      </p>
-                      <p className="text-sm">
-                        <strong>Total de Avaliações:</strong>{" "}
-                        {result.user_ratings_total || 0}
-                      </p>
-                      <p className="text-sm">
-                        <strong>Horário de Funcionamento:</strong>{" "}
-                        {result.opening_date || "Não disponível"}
-                      </p>
-                    </>
-                  )}
-                  <p className="text-sm">
-                    <strong>Website:</strong>{" "}
-                    {result.website ? (
-                      <a
-                        href={result.website}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-blue-500 hover:underline"
-                      >
-                        {result.website}
-                      </a>
-                    ) : (
-                      "Não disponível"
-                    )}
-                  </p>
-                  <p className="text-sm">
-                    <strong>Cidade:</strong> {result.city}
-                  </p>
-                  <p className="text-sm">
-                    <strong>Palavra-chave:</strong> {result.keyword}
-                  </p>
-                  <p className="text-sm">
-                    <strong>Data de Exportação:</strong>{" "}
-                    {new Date(result.extractionDate).toLocaleDateString()}
-                  </p>
-                  {result.type === 'website' && (
-                    <p className="text-sm">
-                      <strong>Fonte:</strong> {result.source}
-                    </p>
+              <div className="flex-1 space-y-2">
+                <div className="flex justify-between items-start">
+                  <h4 className="font-medium text-lg">{result.companyName || result.name}</h4>
+                  {result.rating && (
+                    <div className="flex items-center gap-1">
+                      <Star className="h-4 w-4 text-yellow-400 fill-current" />
+                      <span>{result.rating}/5</span>
+                      {result.user_ratings_total && (
+                        <span className="text-sm text-gray-500">
+                          ({result.user_ratings_total} avaliações)
+                        </span>
+                      )}
+                    </div>
                   )}
                 </div>
-                <a
-                  href={result.link}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-sm text-blue-500 hover:underline mt-2 inline-block"
-                >
-                  Visitar {result.type === 'website' ? 'Website' : 'no Google Maps'}
-                </a>
+
+                {result.address && (
+                  <div className="flex items-center gap-2 text-gray-600">
+                    <MapPin className="h-4 w-4" />
+                    <span>{result.address}</span>
+                  </div>
+                )}
+
+                {result.phone && (
+                  <div className="flex items-center gap-2 text-gray-600">
+                    <Phone className="h-4 w-4" />
+                    <span>{result.phone}</span>
+                  </div>
+                )}
+
+                {result.website && (
+                  <div className="flex items-center gap-2 text-gray-600">
+                    <Globe className="h-4 w-4" />
+                    <a
+                      href={result.website}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-blue-500 hover:underline"
+                    >
+                      {result.website}
+                    </a>
+                  </div>
+                )}
+
+                <div className="flex gap-2 mt-2">
+                  <a
+                    href={result.link}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-sm text-blue-500 hover:underline"
+                  >
+                    Ver no {result.type === 'website' ? 'Website' : 'Google Maps'}
+                  </a>
+                </div>
               </div>
             </div>
           </Card>
         ))}
       </div>
+
       {totalPages > 1 && (
         <Pagination className="mt-4">
           <PaginationContent>
             <PaginationItem>
-              {currentPage > 1 ? (
-                <PaginationPrevious 
-                  onClick={handlePreviousPage}
-                  className="cursor-pointer"
-                />
-              ) : (
-                <span className="opacity-50">
-                  <PaginationPrevious className="pointer-events-none" />
-                </span>
-              )}
+              <PaginationPrevious 
+                onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                className="cursor-pointer"
+              />
             </PaginationItem>
+            
             {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
               <PaginationItem key={page}>
                 <PaginationLink
@@ -192,17 +173,12 @@ export const SearchResults = ({ results, onAddToLeads }: SearchResultsProps) => 
                 </PaginationLink>
               </PaginationItem>
             ))}
+            
             <PaginationItem>
-              {currentPage < totalPages ? (
-                <PaginationNext 
-                  onClick={handleNextPage}
-                  className="cursor-pointer"
-                />
-              ) : (
-                <span className="opacity-50">
-                  <PaginationNext className="pointer-events-none" />
-                </span>
-              )}
+              <PaginationNext 
+                onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                className="cursor-pointer"
+              />
             </PaginationItem>
           </PaginationContent>
         </Pagination>

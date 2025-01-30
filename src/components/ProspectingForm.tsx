@@ -141,7 +141,7 @@ export function ProspectingForm({ onAddLeads, searchType }: ProspectingFormProps
 
     const newLeads: Lead[] = leadsToAdd.map(result => ({
       id: crypto.randomUUID(),
-      company_name: result.companyName || result.name,
+      company_name: result.companyName || result.name || '',
       industry: result.category || null,
       location: result.location || null,
       contact_name: null,
@@ -150,8 +150,8 @@ export function ProspectingForm({ onAddLeads, searchType }: ProspectingFormProps
       website: result.website || null,
       address: result.address || null,
       type: searchType === "places" ? "place" : "website",
-      rating: result.rating,
-      user_ratings_total: result.user_ratings_total,
+      rating: result.rating || 0,
+      user_ratings_total: result.user_ratings_total || 0,
       created_at: new Date().toISOString(),
       status: "new",
       deal_value: 0,

@@ -8,6 +8,7 @@ interface TrialStatusBannerProps {
 export function TrialStatusBanner({ userProfile }: TrialStatusBannerProps) {
   const [isTrialValid, setIsTrialValid] = useState<boolean>(false);
   const [isAdmin, setIsAdmin] = useState<boolean>(false);
+  const [isPremium, setIsPremium] = useState<boolean>(false);
 
   useEffect(() => {
     const checkTrialStatus = async () => {
@@ -31,13 +32,21 @@ export function TrialStatusBanner({ userProfile }: TrialStatusBannerProps) {
       }
     };
 
+    const checkSubscriptionStatus = () => {
+      if (userProfile) {
+        setIsPremium(userProfile.subscription_type === 'premium');
+      }
+    };
+
     checkTrialStatus();
     checkUserRole();
+    checkSubscriptionStatus();
   }, [userProfile]);
 
-  if (!userProfile || isAdmin) return null;
+  // Don't show banner for admin, premium users, or if no profile
+  if (!userProfile || isAdmin || isPremium) return null;
 
-  if (userProfile.subscription_type === 'trial') {
+  if (userProfile.subscription_type === 'trial' && isTrialValid) {
     return (
       <div className="mb-6 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
         <p className="text-sm text-blue-800 dark:text-blue-200">
@@ -52,12 +61,22 @@ export function TrialStatusBanner({ userProfile }: TrialStatusBannerProps) {
     );
   }
 
+  // Only show this for free users who are not in trial
   if (userProfile.subscription_type === 'free' && !isTrialValid) {
+    const currentMonth = new Date().getMonth();
+    const currentYear = new Date().getFullYear();
+    const extractionDate = userProfile.last_extraction_reset;
+    const shouldResetCount = !extractionDate || 
+      new Date(extractionDate).getMonth() !== currentMonth || 
+      new Date(extractionDate).getFullYear() !== currentYear;
+    
+    const leadsCount = shouldResetCount ? 0 : (userProfile.extracted_leads_count || 0);
+
     return (
       <div className="mb-6 p-4 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg">
         <p className="text-sm text-yellow-800 dark:text-yellow-200">
-          Plano Gratuito: Você pode extrair até 10 leads no total.
-          Leads extraídos: {userProfile.extracted_leads_count || 0}/10
+          Plano Gratuito: Você pode extrair até 10 leads por mês.
+          Leads extraídos este mês: {leadsCount}/10
         </p>
       </div>
     );

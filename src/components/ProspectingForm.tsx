@@ -63,12 +63,36 @@ export function ProspectingForm({ onAddLeads, searchType }: ProspectingFormProps
     }
 
     if (!checkLeadLimit()) {
-      toast({
-        title: "Limite atingido",
-        description: "Você atingiu o limite de 10 leads no plano gratuito. Faça upgrade para continuar.",
-        variant: "destructive",
-      });
-      return;
+      const currentMonth = new Date().getMonth();
+      const currentYear = new Date().getFullYear();
+      const extractionDate = userProfile?.last_extraction_reset;
+      const shouldResetCount = !extractionDate || 
+        new Date(extractionDate).getMonth() !== currentMonth || 
+        new Date(extractionDate).getFullYear() !== currentYear;
+
+      if (shouldResetCount) {
+        // Reset the counter for the new month
+        if (userProfile) {
+          const { error } = await supabase
+            .from('profiles')
+            .update({ 
+              extracted_leads_count: 0,
+              last_extraction_reset: new Date().toISOString()
+            })
+            .eq('id', userProfile.id);
+
+          if (error) {
+            console.error('Error resetting extracted_leads_count:', error);
+          }
+        }
+      } else {
+        toast({
+          title: "Limite atingido",
+          description: "Você atingiu o limite de 10 leads para este mês no plano gratuito. Faça upgrade para continuar.",
+          variant: "destructive",
+        });
+        return;
+      }
     }
 
     setIsLoading(true);
@@ -129,12 +153,36 @@ export function ProspectingForm({ onAddLeads, searchType }: ProspectingFormProps
 
   const handleAddToLeads = async (selectedResults: SearchResult[]) => {
     if (!checkLeadLimit()) {
-      toast({
-        title: "Limite atingido",
-        description: "Você atingiu o limite de 10 leads no plano gratuito. Faça upgrade para continuar.",
-        variant: "destructive",
-      });
-      return;
+      const currentMonth = new Date().getMonth();
+      const currentYear = new Date().getFullYear();
+      const extractionDate = userProfile?.last_extraction_reset;
+      const shouldResetCount = !extractionDate || 
+        new Date(extractionDate).getMonth() !== currentMonth || 
+        new Date(extractionDate).getFullYear() !== currentYear;
+
+      if (shouldResetCount) {
+        // Reset the counter for the new month
+        if (userProfile) {
+          const { error } = await supabase
+            .from('profiles')
+            .update({ 
+              extracted_leads_count: 0,
+              last_extraction_reset: new Date().toISOString()
+            })
+            .eq('id', userProfile.id);
+
+          if (error) {
+            console.error('Error resetting extracted_leads_count:', error);
+          }
+        }
+      } else {
+        toast({
+          title: "Limite atingido",
+          description: "Você atingiu o limite de 10 leads para este mês no plano gratuito. Faça upgrade para continuar.",
+          variant: "destructive",
+        });
+        return;
+      }
     }
 
     const remainingLeads = isFreePlan ? 10 - (userProfile.extracted_leads_count || 0) : selectedResults.length;

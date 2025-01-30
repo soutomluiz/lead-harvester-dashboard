@@ -49,6 +49,8 @@ export function ProspectingForm({ onAddLeads, searchType }: ProspectingFormProps
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    console.log("Form submitted with:", { query, location, searchType });
+    
     if (!query.trim()) {
       toast({
         title: t("error"),
@@ -73,21 +75,22 @@ export function ProspectingForm({ onAddLeads, searchType }: ProspectingFormProps
       console.log(`Calling ${functionName} function with:`, { query, location });
 
       const { data, error } = await supabase.functions.invoke(functionName, {
-        body: JSON.stringify({
+        body: {
           query: query.trim(),
           location: location.trim(),
           limit: isFreePlan ? 10 : undefined
-        })
+        }
       });
+
+      console.log("Function response:", { data, error });
 
       if (error) {
         console.error(`Error in ${functionName}:`, error);
         throw error;
       }
 
-      console.log(`${functionName} response:`, data);
-
       if (!data || !data.results) {
+        console.error("Invalid response format:", data);
         throw new Error('Invalid response format');
       }
 

@@ -14,6 +14,8 @@ import { ReportsPage } from "@/components/reports/ReportsPage";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { Lead } from "@/types/lead";
+import { useQuery } from "@tanstack/react-query";
+import { Loader2 } from "lucide-react";
 
 interface DashboardProps {
   activeTab: string;
@@ -24,7 +26,6 @@ interface DashboardProps {
 }
 
 export function Dashboard({ activeTab, leads, onSubmit, onAddLeads, setActiveTab }: DashboardProps) {
-  const [dbLeads, setDbLeads] = useState<Lead[]>([]);
   const { toast } = useToast();
   const searchType = activeTab.includes("prospect-places") 
     ? "places" 
@@ -32,14 +33,14 @@ export function Dashboard({ activeTab, leads, onSubmit, onAddLeads, setActiveTab
     ? "websites" 
     : undefined;
 
-  useEffect(() => {
-    let channel: ReturnType<typeof supabase.channel>;
-
-    const fetchLeads = async () => {
+  const { data: dbLeads = [], isLoading } = useQuery({
+    queryKey: ['leads'],
+    queryFn: async () => {
       try {
         const { data, error } = await supabase
           .from('leads')
-          .select('*');
+          .select('*')
+          .order('created_at', { ascending: false });
 
         if (error) throw error;
 
@@ -50,8 +51,7 @@ export function Dashboard({ activeTab, leads, onSubmit, onAddLeads, setActiveTab
           deal_value: lead.deal_value || 0
         }));
 
-        setDbLeads(typedLeads);
-        console.log("Leads carregados com sucesso:", typedLeads);
+        return typedLeads;
       } catch (error) {
         console.error("Erro ao carregar leads:", error);
         toast({
@@ -59,52 +59,49 @@ export function Dashboard({ activeTab, leads, onSubmit, onAddLeads, setActiveTab
           description: "Não foi possível carregar seus leads. Por favor, tente novamente.",
           variant: "destructive",
         });
+        return [];
       }
-    };
+    },
+    staleTime: 1000 * 60, // Consider data fresh for 1 minute
+    cacheTime: 1000 * 60 * 5, // Keep unused data in cache for 5 minutes
+  });
 
-    const setupRealtimeSubscription = async () => {
-      try {
-        channel = supabase
-          .channel('leads-changes')
-          .on(
-            'postgres_changes',
-            {
-              event: '*',
-              schema: 'public',
-              table: 'leads'
-            },
-            (payload) => {
-              console.log('Atualização em tempo real recebida:', payload);
-              fetchLeads();
-            }
-          )
-          .subscribe((status) => {
-            console.log('Status da inscrição do canal:', status);
-            if (status === 'SUBSCRIBED') {
-              console.log('Canal inscrito com sucesso');
-            }
-          });
-      } catch (error) {
-        console.error('Erro ao configurar inscrição em tempo real:', error);
-      }
-    };
+  useEffect(() => {
+    const channel = supabase
+      .channel('leads-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'leads'
+        },
+        () => {
+          // Invalidate and refetch leads query when data changes
+          queryClient.invalidateQueries({ queryKey: ['leads'] });
+        }
+      )
+      .subscribe();
 
-    // Inicializa
-    fetchLeads();
-    setupRealtimeSubscription();
-
-    // Cleanup
     return () => {
-      if (channel) {
-        console.log('Removendo inscrição do canal...');
-        supabase.removeChannel(channel).then(() => {
-          console.log('Canal removido com sucesso');
-        }).catch(error => {
-          console.error('Erro ao remover canal:', error);
-        });
-      }
+      supabase.removeChannel(channel);
     };
-  }, [toast]);
+  }, []);
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <Loader2 className="h-8 w-8 animate-spin" />
+      </div>
+    );
+  }
+
+  const filteredLeads = dbLeads.filter(lead => {
+    if (activeTab === "leads-manual") return lead.type === 'manual';
+    if (activeTab === "leads-places") return lead.type === 'place';
+    if (activeTab === "leads-websites") return lead.type === 'website';
+    return true;
+  });
 
   return (
     <div className="w-full bg-background">
@@ -130,14 +127,7 @@ export function Dashboard({ activeTab, leads, onSubmit, onAddLeads, setActiveTab
         activeTab === "leads-manual" || 
         activeTab === "leads-places" || 
         activeTab === "leads-websites") && (
-        <LeadTable 
-          leads={dbLeads.filter(lead => {
-            if (activeTab === "leads-manual") return lead.type === 'manual';
-            if (activeTab === "leads-places") return lead.type === 'place';
-            if (activeTab === "leads-websites") return lead.type === 'website';
-            return true;
-          })} 
-        />
+        <LeadTable leads={filteredLeads} />
       )}
       {activeTab === "prospect" && (
         <ExtractionCards setActiveTab={setActiveTab} />

@@ -7,8 +7,14 @@ serve(async (req) => {
   }
 
   try {
-    const { query, location } = await req.json()
-    const apiKey = Deno.env.get('GOOGLE_MAPS_API_KEY')
+    console.log('Received request:', req);
+    const requestBody = await req.text();
+    console.log('Request body:', requestBody);
+    
+    let { query, location } = JSON.parse(requestBody);
+    const apiKey = Deno.env.get('GOOGLE_MAPS_API_KEY');
+    
+    console.log('Parsed request data:', { query, location });
     
     if (!query) {
       console.error('Query is missing');
@@ -37,7 +43,7 @@ serve(async (req) => {
     const searchQuery = location ? `${query} in ${location}` : query;
     const searchUrl = `https://maps.googleapis.com/maps/api/place/textsearch/json?query=${encodeURIComponent(searchQuery)}&key=${apiKey}`
     
-    console.log('Making request to Google Places API');
+    console.log('Making request to Google Places API with URL:', searchUrl);
     const searchResponse = await fetch(searchUrl)
     const searchData = await searchResponse.json()
 
@@ -56,11 +62,16 @@ serve(async (req) => {
       )
     }
 
+    console.log(`Found ${searchData.results.length} results, fetching details...`);
+
     const detailedResults = await Promise.all(
       searchData.results.map(async (place: any) => {
         const detailsUrl = `https://maps.googleapis.com/maps/api/place/details/json?place_id=${place.place_id}&fields=name,formatted_phone_number,formatted_address,website,rating,user_ratings_total,opening_hours&key=${apiKey}`
+        console.log(`Fetching details for ${place.name}`);
         const detailsResponse = await fetch(detailsUrl)
         const detailsData = await detailsResponse.json()
+        
+        console.log(`Details for ${place.name}:`, detailsData);
         
         return {
           companyName: place.name,
@@ -77,6 +88,8 @@ serve(async (req) => {
         }
       })
     )
+
+    console.log('Final results:', detailedResults);
 
     return new Response(
       JSON.stringify({ results: detailedResults }),

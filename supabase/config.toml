@@ -6,3 +6,6 @@ verify_jwt = true
 
 [functions.google-places-search]
 verify_jwt = true
+
+[functions.google-custom-search]
+verify_jwt = true

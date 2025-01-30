@@ -11,13 +11,14 @@ serve(async (req) => {
   }
 
   try {
-    const { query } = await req.json()
+    const { query, location } = await req.json()
     const apiKey = Deno.env.get('GOOGLE_CUSTOM_SEARCH_API_KEY')
-    console.log('Received request with query:', query)
+    console.log('Received request with params:', { query, location })
     
-    if (!query || !apiKey) {
+    if (!query) {
+      console.error('Query is missing');
       return new Response(
-        JSON.stringify({ error: 'Query e chave da API são obrigatórios' }),
+        JSON.stringify({ error: 'Query is required' }),
         { 
           status: 400,
           headers: { ...corsHeaders, 'Content-Type': 'application/json' }
@@ -25,14 +26,15 @@ serve(async (req) => {
       )
     }
 
-    const searchEngineId = "04876c2f3fd7a4e1f";
+    const searchEngineId = "04876c2f3fd7a4e1f"
+    const searchQuery = location ? `${query} em ${location}` : query;
     
     const searchUrl = new URL('https://www.googleapis.com/customsearch/v1');
-    searchUrl.searchParams.append('q', query);
+    searchUrl.searchParams.append('q', searchQuery);
     searchUrl.searchParams.append('key', apiKey);
     searchUrl.searchParams.append('cx', searchEngineId);
     
-    console.log('Making request to Google API URL:', searchUrl.toString());
+    console.log('Making request to Google Custom Search API');
     
     const response = await fetch(searchUrl.toString(), {
       headers: {
@@ -43,7 +45,7 @@ serve(async (req) => {
     console.log('Google API response status:', response.status);
     
     const data = await response.json();
-    console.log('Google API response:', JSON.stringify(data, null, 2));
+    console.log('Found results:', data.items?.length || 0);
 
     if (!response.ok) {
       console.error('Error from Google API:', data);
@@ -75,13 +77,13 @@ serve(async (req) => {
       companyName: item.title,
       website: item.link,
       extractionDate: new Date().toISOString(),
-      keyword: query.split(' em ')[0],
-      city: query.split(' em ')[1],
+      keyword: query,
+      city: location,
       source: new URL(item.link).hostname,
       type: 'website'
     }));
 
-    console.log('Processed results:', results);
+    console.log('Processed results successfully');
 
     return new Response(
       JSON.stringify({ results }),

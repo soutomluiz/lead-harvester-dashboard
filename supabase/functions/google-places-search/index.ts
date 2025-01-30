@@ -2,7 +2,6 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { corsHeaders } from "../_shared/cors.ts"
 
 serve(async (req) => {
-  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders })
   }
@@ -12,6 +11,7 @@ serve(async (req) => {
     const apiKey = Deno.env.get('GOOGLE_MAPS_API_KEY')
     
     if (!query) {
+      console.error('Query is missing');
       return new Response(
         JSON.stringify({ error: 'Query is required' }),
         { 
@@ -27,14 +27,13 @@ serve(async (req) => {
     const searchQuery = location ? `${query} in ${location}` : query;
     
     // First, search for places
-    const searchUrl = `https://maps.googleapis.com/maps/api/place/textsearch/json?query=${encodeURIComponent(searchQuery)}&radius=${radius}&key=${apiKey}`
-    console.log('Making request to:', searchUrl);
+    const searchUrl = `https://maps.googleapis.com/maps/api/place/textsearch/json?query=${encodeURIComponent(searchQuery)}&key=${apiKey}`
+    console.log('Making request to Google Places API');
     
     const searchResponse = await fetch(searchUrl)
     const searchData = await searchResponse.json()
 
     console.log('Search response status:', searchData.status);
-    console.log('Search response:', searchData);
 
     if (searchData.status === "REQUEST_DENIED") {
       console.error('Google API request denied:', searchData);
@@ -49,25 +48,27 @@ serve(async (req) => {
       )
     }
 
+    console.log(`Found ${searchData.results.length} results`);
+
     // Limit results if specified (for free plan)
     const resultsToProcess = limit ? searchData.results.slice(0, limit) : searchData.results;
 
     // For each place found, get additional details
     const detailedResults = await Promise.all(
       resultsToProcess.map(async (place: any) => {
-        const detailsUrl = `https://maps.googleapis.com/maps/api/place/details/json?place_id=${place.place_id}&fields=name,formatted_phone_number,formatted_address,website,rating,user_ratings_total,opening_hours,photos&key=${apiKey}`
+        const detailsUrl = `https://maps.googleapis.com/maps/api/place/details/json?place_id=${place.place_id}&fields=name,formatted_phone_number,formatted_address,website,rating,user_ratings_total,opening_hours&key=${apiKey}`
         const detailsResponse = await fetch(detailsUrl)
         const detailsData = await detailsResponse.json()
         
-        console.log('Details for place:', place.name, detailsData);
+        console.log('Details for place:', place.name);
         
         return {
           companyName: place.name,
           address: place.formatted_address,
           phone: detailsData.result?.formatted_phone_number || '',
           website: detailsData.result?.website || '',
-          rating: detailsData.result?.rating || 0,
-          user_ratings_total: detailsData.result?.user_ratings_total || 0,
+          rating: place.rating || 0,
+          user_ratings_total: place.user_ratings_total || 0,
           type: 'place',
           extractionDate: new Date().toISOString(),
           city: location,
@@ -77,18 +78,19 @@ serve(async (req) => {
       })
     )
 
-    console.log(`Processed ${detailedResults.length} results`);
+    console.log(`Processed ${detailedResults.length} results successfully`);
 
     return new Response(
       JSON.stringify({ results: detailedResults }),
-      { 
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-      }
+      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     )
   } catch (error) {
     console.error('Error in google-places-search:', error)
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ 
+        error: error instanceof Error ? error.message : 'Unknown error',
+        details: error 
+      }),
       { 
         status: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }

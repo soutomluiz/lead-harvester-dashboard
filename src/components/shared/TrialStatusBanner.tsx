@@ -7,6 +7,7 @@ interface TrialStatusBannerProps {
 
 export function TrialStatusBanner({ userProfile }: TrialStatusBannerProps) {
   const [isTrialValid, setIsTrialValid] = useState<boolean>(false);
+  const [isAdmin, setIsAdmin] = useState<boolean>(false);
 
   useEffect(() => {
     const checkTrialStatus = async () => {
@@ -18,10 +19,23 @@ export function TrialStatusBanner({ userProfile }: TrialStatusBannerProps) {
       }
     };
 
+    const checkUserRole = async () => {
+      if (userProfile) {
+        const { data: roleData } = await supabase
+          .from('user_roles')
+          .select('role')
+          .eq('user_id', userProfile.id)
+          .single();
+        
+        setIsAdmin(roleData?.role === 'admin');
+      }
+    };
+
     checkTrialStatus();
+    checkUserRole();
   }, [userProfile]);
 
-  if (!userProfile) return null;
+  if (!userProfile || isAdmin) return null;
 
   if (userProfile.subscription_type === 'trial') {
     return (

@@ -12,6 +12,7 @@ import { DashboardStats } from "./DashboardStats";
 import { supabase } from "@/integrations/supabase/client";
 import { TrialStatusBanner } from "./shared/TrialStatusBanner";
 import { useTrialStatus } from "@/hooks/useTrialStatus";
+import { SearchResults } from "./SearchResults";
 
 interface ProspectingFormProps {
   onAddLeads: (leads: Lead[]) => void;
@@ -125,7 +126,7 @@ export function ProspectingForm({ onAddLeads, searchType }: ProspectingFormProps
     }
   };
 
-  const handleAddToLeads = async () => {
+  const handleAddToLeads = async (selectedResults: SearchResult[]) => {
     if (!checkLeadLimit()) {
       toast({
         title: "Limite atingido",
@@ -135,8 +136,8 @@ export function ProspectingForm({ onAddLeads, searchType }: ProspectingFormProps
       return;
     }
 
-    const remainingLeads = isFreePlan ? 10 - (userProfile.extracted_leads_count || 0) : results.length;
-    const leadsToAdd = results.slice(0, remainingLeads);
+    const remainingLeads = isFreePlan ? 10 - (userProfile.extracted_leads_count || 0) : selectedResults.length;
+    const leadsToAdd = selectedResults.slice(0, remainingLeads);
 
     const newLeads: Lead[] = leadsToAdd.map(result => ({
       id: crypto.randomUUID(),
@@ -206,27 +207,18 @@ export function ProspectingForm({ onAddLeads, searchType }: ProspectingFormProps
             />
           </div>
 
-          <div className="flex gap-4">
-            <Button type="submit" disabled={isLoading} className="w-full">
-              {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              {t("search")}
-            </Button>
-            {results.length > 0 && (
-              <Button
-                type="button"
-                onClick={handleAddToLeads}
-                disabled={isLoading}
-                className="w-full"
-              >
-                {t("addToLeads")}
-              </Button>
-            )}
-          </div>
+          <Button type="submit" disabled={isLoading} className="w-full">
+            {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+            {t("search")}
+          </Button>
         </form>
       </Card>
 
       {results.length > 0 && (
-        <DashboardStats results={results} searchType={searchType} />
+        <>
+          <DashboardStats results={results} searchType={searchType} />
+          <SearchResults results={results} onAddToLeads={handleAddToLeads} />
+        </>
       )}
     </div>
   );

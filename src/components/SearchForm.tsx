@@ -21,8 +21,14 @@ export const SearchForm = ({
   onLocationChange,
   onSubmit,
 }: SearchFormProps) => {
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    console.log("Form submitted with:", { industry, location, searchType });
+    onSubmit(e);
+  };
+
   return (
-    <form onSubmit={onSubmit} className="space-y-6">
+    <form onSubmit={handleSubmit} className="space-y-6">
       <div className="text-center mb-4">
         <h2 className="text-xl font-semibold">
           Buscar em {searchType === "places" ? "Google Places" : "Websites"}

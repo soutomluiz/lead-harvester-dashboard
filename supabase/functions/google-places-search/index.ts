@@ -7,7 +7,7 @@ serve(async (req) => {
   }
 
   try {
-    const { query, type, radius = 5000, limit } = await req.json()
+    const { query, location, type, radius = 5000, limit } = await req.json()
     const apiKey = Deno.env.get('GOOGLE_MAPS_API_KEY')
     
     if (!query) {
@@ -20,13 +20,31 @@ serve(async (req) => {
       )
     }
 
+    console.log('Starting search with params:', { query, location, type, radius });
+
+    // Construir a query com localização
+    const searchQuery = location ? `${query} in ${location}` : query;
+    
     // First, search for places
-    const searchUrl = `https://maps.googleapis.com/maps/api/place/textsearch/json?query=${encodeURIComponent(query)}&radius=${radius}&key=${apiKey}`
+    const searchUrl = `https://maps.googleapis.com/maps/api/place/textsearch/json?query=${encodeURIComponent(searchQuery)}&radius=${radius}&key=${apiKey}`
+    console.log('Making request to:', searchUrl);
+    
     const searchResponse = await fetch(searchUrl)
     const searchData = await searchResponse.json()
 
+    console.log('Search response status:', searchData.status);
+
     if (searchData.status === "REQUEST_DENIED") {
+      console.error('Google API request denied:', searchData);
       throw new Error("Erro na configuração da API do Google Maps")
+    }
+
+    if (!searchData.results || searchData.results.length === 0) {
+      console.log('No results found');
+      return new Response(
+        JSON.stringify({ results: [] }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      )
     }
 
     // Limit results if specified (for free plan)
@@ -40,31 +58,25 @@ serve(async (req) => {
         const detailsData = await detailsResponse.json()
         
         return {
-          ...place,
-          formatted_phone_number: detailsData.result?.formatted_phone_number || '',
+          companyName: place.name,
+          address: place.formatted_address,
+          phone: detailsData.result?.formatted_phone_number || '',
           website: detailsData.result?.website || '',
-          opening_hours: detailsData.result?.opening_hours,
           rating: detailsData.result?.rating || 0,
           user_ratings_total: detailsData.result?.user_ratings_total || 0,
-          photos: detailsData.result?.photos || []
+          type: 'place',
+          extractionDate: new Date().toISOString(),
+          city: location,
+          keyword: query,
+          link: `https://www.google.com/maps/place/?q=place_id:${place.place_id}`
         }
       })
     )
 
-    // Filter results based on search type if specified
-    let filteredResults = detailedResults;
-    if (type === 'opportunities') {
-      filteredResults = detailedResults.filter((result: any) => {
-        const hasWebsite = !!result.website;
-        const hasRating = result.rating > 0;
-        return !hasWebsite && !hasRating;
-      });
-    }
-
-    searchData.results = filteredResults;
+    console.log(`Processed ${detailedResults.length} results`);
 
     return new Response(
-      JSON.stringify(searchData),
+      JSON.stringify({ results: detailedResults }),
       { 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }
       }

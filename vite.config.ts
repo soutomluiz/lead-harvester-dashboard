@@ -12,7 +12,15 @@ export default defineConfig(({ mode }) => ({
     port: 8080,
   },
   build: {
-    outDir: "dist", // 🔹 Define explicitamente que a pasta de saída é 'dist'
+    outDir: "dist",
+    rollupOptions: {
+      input: {
+        main: path.resolve(__dirname, 'index.html'),
+      },
+      output: {
+        manualChunks: undefined,
+      },
+    },
   },
   plugins: [
     react(),

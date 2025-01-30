@@ -14,7 +14,7 @@ import { ReportsPage } from "@/components/reports/ReportsPage";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { Lead } from "@/types/lead";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Loader2 } from "lucide-react";
 
 interface DashboardProps {
@@ -27,6 +27,7 @@ interface DashboardProps {
 
 export function Dashboard({ activeTab, leads, onSubmit, onAddLeads, setActiveTab }: DashboardProps) {
   const { toast } = useToast();
+  const queryClient = useQueryClient();
   const searchType = activeTab.includes("prospect-places") 
     ? "places" 
     : activeTab.includes("prospect-websites") 
@@ -63,7 +64,6 @@ export function Dashboard({ activeTab, leads, onSubmit, onAddLeads, setActiveTab
       }
     },
     staleTime: 1000 * 60, // Consider data fresh for 1 minute
-    cacheTime: 1000 * 60 * 5, // Keep unused data in cache for 5 minutes
   });
 
   useEffect(() => {
@@ -77,7 +77,6 @@ export function Dashboard({ activeTab, leads, onSubmit, onAddLeads, setActiveTab
           table: 'leads'
         },
         () => {
-          // Invalidate and refetch leads query when data changes
           queryClient.invalidateQueries({ queryKey: ['leads'] });
         }
       )
@@ -86,7 +85,7 @@ export function Dashboard({ activeTab, leads, onSubmit, onAddLeads, setActiveTab
     return () => {
       supabase.removeChannel(channel);
     };
-  }, []);
+  }, [queryClient]);
 
   if (isLoading) {
     return (
@@ -96,7 +95,7 @@ export function Dashboard({ activeTab, leads, onSubmit, onAddLeads, setActiveTab
     );
   }
 
-  const filteredLeads = dbLeads.filter(lead => {
+  const filteredLeads = dbLeads.filter((lead) => {
     if (activeTab === "leads-manual") return lead.type === 'manual';
     if (activeTab === "leads-places") return lead.type === 'place';
     if (activeTab === "leads-websites") return lead.type === 'website';

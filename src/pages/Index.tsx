@@ -16,7 +16,7 @@ const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       staleTime: 1000 * 60, // Consider data fresh for 1 minute
-      cacheTime: 1000 * 60 * 5, // Keep unused data in cache for 5 minutes
+      gcTime: 1000 * 60 * 5, // Keep unused data in cache for 5 minutes
       refetchOnWindowFocus: false, // Don't refetch when window regains focus
       retry: 1, // Only retry failed requests once
     },
@@ -50,13 +50,11 @@ const Index = () => {
       id: crypto.randomUUID(),
     };
     setLeads(prevLeads => [...prevLeads, newLead]);
-    // Invalidate leads query to trigger a refetch
     queryClient.invalidateQueries({ queryKey: ['leads'] });
   };
 
   const handleAddLeads = (newLeads: Lead[]) => {
     setLeads(prevLeads => [...prevLeads, ...newLeads]);
-    // Invalidate leads query to trigger a refetch
     queryClient.invalidateQueries({ queryKey: ['leads'] });
   };
 

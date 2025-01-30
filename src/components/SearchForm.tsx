@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Search } from "lucide-react";
+import { Loader2, Search } from "lucide-react";
 
 interface SearchFormProps {
   industry: string;
@@ -46,6 +46,7 @@ export const SearchForm = ({
             onChange={(e) => onIndustryChange(e.target.value)}
             placeholder="Ex: Restaurantes, Academias..."
             required
+            disabled={isLoading}
           />
         </div>
         <div className="space-y-2">
@@ -58,13 +59,23 @@ export const SearchForm = ({
             onChange={(e) => onLocationChange(e.target.value)}
             placeholder="Ex: São Paulo, SP"
             required
+            disabled={isLoading}
           />
         </div>
       </div>
 
       <Button type="submit" disabled={isLoading} className="w-full">
-        <Search className="mr-2 h-4 w-4" />
-        {isLoading ? "Buscando..." : "Buscar"}
+        {isLoading ? (
+          <>
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            Buscando...
+          </>
+        ) : (
+          <>
+            <Search className="mr-2 h-4 w-4" />
+            Buscar
+          </>
+        )}
       </Button>
     </form>
   );

@@ -13,6 +13,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { TrialStatusBanner } from "./shared/TrialStatusBanner";
 import { useTrialStatus } from "@/hooks/useTrialStatus";
 import { SearchResults } from "./SearchResults";
+import { SearchForm } from "./SearchForm";
 
 interface ProspectingFormProps {
   onAddLeads: (leads: Lead[]) => void;
@@ -184,34 +185,15 @@ export function ProspectingForm({ onAddLeads, searchType }: ProspectingFormProps
       <Card className="p-6">
         <TrialStatusBanner userProfile={userProfile} />
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="query">{t("searchTerm")}</Label>
-            <Input
-              id="query"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder={t("searchPlaceholder")}
-              disabled={isLoading}
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="location">{t("locationLabel")}</Label>
-            <Input
-              id="location"
-              value={location}
-              onChange={(e) => setLocation(e.target.value)}
-              placeholder={t("locationPlaceholder")}
-              disabled={isLoading}
-            />
-          </div>
-
-          <Button type="submit" disabled={isLoading} className="w-full">
-            {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            {t("search")}
-          </Button>
-        </form>
+        <SearchForm
+          industry={query}
+          location={location}
+          isLoading={isLoading}
+          searchType={searchType || "places"}
+          onIndustryChange={setQuery}
+          onLocationChange={setLocation}
+          onSubmit={handleSubmit}
+        />
       </Card>
 
       {results.length > 0 && (

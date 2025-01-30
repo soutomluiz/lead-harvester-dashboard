@@ -2,6 +2,7 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { corsHeaders } from "../_shared/cors.ts"
 
 serve(async (req) => {
+  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders })
   }
@@ -33,6 +34,7 @@ serve(async (req) => {
     const searchData = await searchResponse.json()
 
     console.log('Search response status:', searchData.status);
+    console.log('Search response:', searchData);
 
     if (searchData.status === "REQUEST_DENIED") {
       console.error('Google API request denied:', searchData);
@@ -56,6 +58,8 @@ serve(async (req) => {
         const detailsUrl = `https://maps.googleapis.com/maps/api/place/details/json?place_id=${place.place_id}&fields=name,formatted_phone_number,formatted_address,website,rating,user_ratings_total,opening_hours,photos&key=${apiKey}`
         const detailsResponse = await fetch(detailsUrl)
         const detailsData = await detailsResponse.json()
+        
+        console.log('Details for place:', place.name, detailsData);
         
         return {
           companyName: place.name,

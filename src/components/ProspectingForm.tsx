@@ -69,32 +69,33 @@ export function ProspectingForm({ onAddLeads, searchType }: ProspectingFormProps
 
     setIsLoading(true);
     try {
-      const endpoint = searchType === "places" 
-        ? "/api/search/places"
-        : "/api/search/websites";
+      const functionName = searchType === "places" ? "google-places-search" : "google-custom-search";
+      console.log(`Calling ${functionName} function with:`, { query, location });
 
-      const response = await fetch(endpoint, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+      const { data, error } = await supabase.functions.invoke(functionName, {
         body: JSON.stringify({
           query: query.trim(),
           location: location.trim(),
           limit: isFreePlan ? 10 : undefined
-        }),
+        })
       });
 
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+      if (error) {
+        console.error(`Error in ${functionName}:`, error);
+        throw error;
       }
 
-      const data = await response.json();
-      
+      console.log(`${functionName} response:`, data);
+
+      if (!data || !data.results) {
+        throw new Error('Invalid response format');
+      }
+
       const limitedResults = isFreePlan
-        ? data.results.slice(0, 10) 
+        ? data.results.slice(0, 10)
         : data.results;
-      
+
+      console.log('Setting results:', limitedResults);
       setResults(limitedResults);
 
       if (limitedResults.length === 0) {
@@ -107,14 +108,14 @@ export function ProspectingForm({ onAddLeads, searchType }: ProspectingFormProps
           title: t("success"),
           description: isFreePlan
             ? `${limitedResults.length} resultados encontrados (limite do plano gratuito)`
-            : t("resultsFound")
+            : `${limitedResults.length} resultados encontrados`
         });
       }
     } catch (error) {
       console.error("Search error:", error);
       toast({
         title: t("error"),
-        description: t("searchError"),
+        description: error instanceof Error ? error.message : t("searchError"),
         variant: "destructive",
       });
     } finally {

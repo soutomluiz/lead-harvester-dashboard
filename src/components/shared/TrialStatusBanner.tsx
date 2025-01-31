@@ -43,9 +43,10 @@ export function TrialStatusBanner({ userProfile }: TrialStatusBannerProps) {
     checkSubscriptionStatus();
   }, [userProfile]);
 
-  // Don't show banner for admin, premium users, or if no profile
+  // Don't show banner for admin users or if no profile
   if (!userProfile || isAdmin || isPremium) return null;
 
+  // Show trial banner only for active trial users
   if (userProfile.subscription_type === 'trial' && isTrialValid) {
     return (
       <div className="mb-6 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
@@ -61,8 +62,8 @@ export function TrialStatusBanner({ userProfile }: TrialStatusBannerProps) {
     );
   }
 
-  // Only show this for free users who are not in trial
-  if (userProfile.subscription_type === 'free' && !isTrialValid) {
+  // Only show this for free users or expired trial users
+  if ((userProfile.subscription_type === 'free' || (userProfile.subscription_type === 'trial' && !isTrialValid))) {
     const currentMonth = new Date().getMonth();
     const currentYear = new Date().getFullYear();
     const extractionDate = userProfile.last_extraction_reset;

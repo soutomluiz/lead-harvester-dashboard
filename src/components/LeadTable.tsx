@@ -7,6 +7,15 @@ import { useToast } from "@/components/ui/use-toast";
 import { LeadTableHeader } from "./leads/LeadTableHeader";
 import { LeadTableBody } from "./leads/LeadTableBody";
 import { LeadTableFilters } from "./leads/LeadTableFilters";
+import { 
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
 
 interface LeadTableProps {
   leads: Lead[];
@@ -18,6 +27,7 @@ export const LeadTable = ({ leads: initialLeads }: LeadTableProps) => {
   const [editingNoteId, setEditingNoteId] = useState<string | null>(null);
   const [noteContent, setNoteContent] = useState("");
   const [filters, setFilters] = useState<Partial<Lead>>({});
+  const [currentPage, setCurrentPage] = useState(1);
   const [sortConfig, setSortConfig] = useState<{
     key: keyof Lead | null;
     direction: 'asc' | 'desc' | null;
@@ -26,6 +36,7 @@ export const LeadTable = ({ leads: initialLeads }: LeadTableProps) => {
     direction: null
   });
   const { toast } = useToast();
+  const itemsPerPage = 10;
 
   const capitalizeFirstLetter = (string: string | null) => {
     if (!string) return "";
@@ -230,6 +241,11 @@ export const LeadTable = ({ leads: initialLeads }: LeadTableProps) => {
     location: capitalizeFirstLetter(lead.location)
   }));
 
+  const totalPages = Math.ceil(filteredLeads.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const currentLeads = filteredLeads.slice(startIndex, endIndex);
+
   return (
     <Card className="w-full">
       <LeadTableFilters
@@ -245,7 +261,7 @@ export const LeadTable = ({ leads: initialLeads }: LeadTableProps) => {
           onSort={handleSort}
         />
         <LeadTableBody
-          leads={filteredLeads}
+          leads={currentLeads}
           editingNoteId={editingNoteId}
           noteContent={noteContent}
           onStatusChange={handleStatusChange}
@@ -255,6 +271,39 @@ export const LeadTable = ({ leads: initialLeads }: LeadTableProps) => {
           onTagsChange={handleTagsChange}
         />
       </Table>
+      {totalPages > 1 && (
+        <div className="flex justify-center py-4">
+          <Pagination>
+            <PaginationContent>
+              <PaginationItem>
+                <PaginationPrevious 
+                  onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                  className="cursor-pointer"
+                />
+              </PaginationItem>
+              
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                <PaginationItem key={page}>
+                  <PaginationLink
+                    onClick={() => setCurrentPage(page)}
+                    isActive={currentPage === page}
+                    className="cursor-pointer"
+                  >
+                    {page}
+                  </PaginationLink>
+                </PaginationItem>
+              ))}
+              
+              <PaginationItem>
+                <PaginationNext 
+                  onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                  className="cursor-pointer"
+                />
+              </PaginationItem>
+            </PaginationContent>
+          </Pagination>
+        </div>
+      )}
     </Card>
   );
 };

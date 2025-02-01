@@ -41,17 +41,25 @@ export function WelcomeDialog({ isNewUser, trialDaysLeft = 14, userProfile }: We
     return null;
   }
 
+  const handleOpenChange = (open: boolean) => {
+    // Only allow closing through the button click
+    if (open === false) {
+      return;
+    }
+    setIsOpen(open);
+  };
+
   return (
     <Dialog 
       open={isOpen} 
-      onOpenChange={setIsOpen}
+      onOpenChange={handleOpenChange}
       modal={true}
-      defaultOpen={true}
     >
       <DialogContent 
         className="sm:max-w-[425px]"
-        onPointerDownOutside={(e) => e.preventDefault()} // Prevent closing on clicking outside
-        onEscapeKeyDown={(e) => e.preventDefault()} // Prevent closing on Escape key
+        onPointerDownOutside={(e) => e.preventDefault()} 
+        onEscapeKeyDown={(e) => e.preventDefault()} 
+        onInteractOutside={(e) => e.preventDefault()}
       >
         <DialogHeader>
           <DialogTitle className="text-2xl font-bold text-primary">

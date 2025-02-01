@@ -7,7 +7,6 @@ import {
 import { SidebarMenuItems } from "./SidebarMenuItems";
 import { SidebarUserSection } from "./SidebarUserSection";
 import { useNavigate } from "react-router-dom";
-import { Home } from "lucide-react";
 
 interface AppSidebarProps {
   activeTab: string;
@@ -34,7 +33,6 @@ export function AppSidebar({ activeTab, setActiveTab }: AppSidebarProps) {
             alt="Logo"
             className="h-20 w-auto"
           />
-          <Home className="ml-2 h-6 w-6 text-primary" />
         </div>
       </SidebarHeader>
 

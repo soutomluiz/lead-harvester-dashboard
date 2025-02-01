@@ -42,8 +42,17 @@ export function WelcomeDialog({ isNewUser, trialDaysLeft = 14, userProfile }: We
   }
 
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogContent className="sm:max-w-[425px]">
+    <Dialog 
+      open={isOpen} 
+      onOpenChange={setIsOpen}
+      modal={true}
+      defaultOpen={true}
+    >
+      <DialogContent 
+        className="sm:max-w-[425px]"
+        onPointerDownOutside={(e) => e.preventDefault()} // Prevent closing on clicking outside
+        onEscapeKeyDown={(e) => e.preventDefault()} // Prevent closing on Escape key
+      >
         <DialogHeader>
           <DialogTitle className="text-2xl font-bold text-primary">
             {isNewUser ? "Bem-vindo! 🎉" : "Olá novamente! 👋"}

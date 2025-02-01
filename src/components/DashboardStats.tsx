@@ -3,8 +3,9 @@ import { SearchResult } from "@/types/search";
 import { Card } from "@/components/ui/card";
 import { StatsHeader } from "./stats/StatsHeader";
 import { StatsCharts } from "./stats/StatsCharts";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { useQueryClient } from "@tanstack/react-query";
 
 interface DashboardStatsProps {
   leads?: Lead[];
@@ -34,10 +35,11 @@ const chartConfig = {
 };
 
 export function DashboardStats({ leads, results, searchType }: DashboardStatsProps) {
-  const [channel, setChannel] = useState<ReturnType<typeof supabase.channel> | null>(null);
+  const queryClient = useQueryClient();
 
   useEffect(() => {
-    const newChannel = supabase
+    // Subscribe to real-time changes
+    const channel = supabase
       .channel('leads-changes')
       .on(
         'postgres_changes',
@@ -48,20 +50,19 @@ export function DashboardStats({ leads, results, searchType }: DashboardStatsPro
         },
         (payload) => {
           console.log('Realtime update received:', payload);
+          // Invalidate and refetch leads data
+          queryClient.invalidateQueries({ queryKey: ['leads'] });
+          queryClient.invalidateQueries({ queryKey: ['leads-list'] });
         }
       )
       .subscribe((status) => {
         console.log('Realtime subscription status:', status);
       });
 
-    setChannel(newChannel);
-
     return () => {
-      if (channel) {
-        supabase.removeChannel(channel);
-      }
+      supabase.removeChannel(channel);
     };
-  }, []);
+  }, [queryClient]);
 
   if (leads) {
     return (

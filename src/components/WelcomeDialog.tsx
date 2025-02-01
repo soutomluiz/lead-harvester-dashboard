@@ -18,6 +18,7 @@ interface WelcomeDialogProps {
 export function WelcomeDialog({ isNewUser, trialDaysLeft = 14, userProfile }: WelcomeDialogProps) {
   const [isOpen, setIsOpen] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [hasInteracted, setHasInteracted] = useState(false);
 
   useEffect(() => {
     const checkUserRole = async () => {
@@ -41,9 +42,14 @@ export function WelcomeDialog({ isNewUser, trialDaysLeft = 14, userProfile }: We
     return null;
   }
 
+  const handleClose = () => {
+    setHasInteracted(true);
+    setIsOpen(false);
+  };
+
   const handleOpenChange = (open: boolean) => {
-    // Only allow closing through the button click
-    if (open === false) {
+    // Prevent closing unless it's through the button click
+    if (!hasInteracted) {
       return;
     }
     setIsOpen(open);
@@ -84,7 +90,7 @@ export function WelcomeDialog({ isNewUser, trialDaysLeft = 14, userProfile }: We
           </DialogDescription>
         </DialogHeader>
         <div className="flex justify-end">
-          <Button onClick={() => setIsOpen(false)}>
+          <Button onClick={handleClose}>
             Começar a usar
           </Button>
         </div>

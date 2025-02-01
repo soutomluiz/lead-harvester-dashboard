@@ -9,8 +9,9 @@ interface SidebarUserSectionProps {
 export function SidebarUserSection({ className }: SidebarUserSectionProps) {
   const version = "1.0.0";
   const supportEmail = "contato@abbacreator.com.br";
-  const supportPhone = "(48) 9 9142-4168";
-  const whatsappLink = `https://wa.me/${supportPhone.replace(/\D/g, '')}`;
+  const supportPhone = "+1 423 677-2018";
+  const whatsappMessage = encodeURIComponent("Olá preciso de ajuda no app Mais Lead");
+  const whatsappLink = `https://wa.me/${supportPhone.replace(/\D/g, '')}?text=${whatsappMessage}`;
   const { t } = useLanguage();
 
   return (

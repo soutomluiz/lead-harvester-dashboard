@@ -61,23 +61,30 @@ export const SearchResults = ({ results, onAddLeads }: SearchResultsProps) => {
 
       const leadsToAdd = selectedResults.map(result => ({
         company_name: result.companyName || result.name || '',
-        industry: result.category || result.industry || null,
-        location: result.city || result.location || null,
+        industry: result.industry || result.category || null,
+        location: result.location || result.city || null,
         contact_name: null,
         email: result.email || null,
         phone: result.phone || null,
         website: result.website || null,
         address: result.address || null,
         type: result.type || 'place',
-        rating: result.rating || 0,
-        user_ratings_total: result.user_ratings_total || 0,
+        rating: result.rating || null,
+        user_ratings_total: result.user_ratings_total || null,
+        opening_date: result.opening_date || null,
         created_at: new Date().toISOString(),
         user_id: user.id,
         status: 'new',
         deal_value: 0,
         tags: [],
         extraction_date: new Date().toISOString(),
+        last_interaction_at: null,
+        stage: 'novo',
+        kanban_order: 0,
+        notes: null,
       }));
+
+      console.log('Leads to add:', leadsToAdd);
 
       const { error } = await supabase
         .from('leads')

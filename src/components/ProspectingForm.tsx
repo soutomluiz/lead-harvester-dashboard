@@ -249,8 +249,8 @@ export function ProspectingForm({ onAddLeads, searchType }: ProspectingFormProps
           <DashboardStats results={results} searchType={searchType} />
           <SearchResults 
             results={results} 
-            onAddLeads={handleAddLeads} 
-            searchQuery={query} // Pass the search query (industry)
+            onAddLeads={handleAddToLeads} 
+            searchQuery={query}
           />
         </>
       )}

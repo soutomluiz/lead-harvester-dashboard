@@ -13,6 +13,7 @@ export interface SearchResult {
   source?: string;
   link?: string;
   city?: string;
+  industry?: string;
   keyword?: string;
   extractionDate?: string;
   opening_date?: string;

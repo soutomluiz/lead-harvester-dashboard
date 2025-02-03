@@ -74,10 +74,10 @@ export const SearchResults = ({ results, onAddLeads }: SearchResultsProps) => {
 
       const leadsToAdd = selectedResults.map(result => ({
         company_name: result.companyName || result.name || '',
-        industry: result.category || null,
-        location: result.location || null,
+        industry: result.category || result.industry || null,
+        location: result.city || result.location || null,
         contact_name: null,
-        email: null,
+        email: result.email || null,
         phone: result.phone || null,
         website: result.website || null,
         address: result.address || null,
@@ -89,7 +89,10 @@ export const SearchResults = ({ results, onAddLeads }: SearchResultsProps) => {
         status: 'new',
         deal_value: 0,
         tags: [],
+        extraction_date: new Date().toISOString(),
       }));
+
+      console.log("Saving leads to database:", leadsToAdd);
 
       const { error } = await supabase
         .from('leads')

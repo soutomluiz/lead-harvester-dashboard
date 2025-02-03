@@ -12,9 +12,10 @@ type PipelineStage = Database['public']['Enums']['pipeline_stage'];
 interface SearchResultsProps {
   results: SearchResult[];
   onAddLeads: (selectedResults: SearchResult[]) => void;
+  searchQuery: string; // Add the search query prop
 }
 
-export const SearchResults = ({ results, onAddLeads }: SearchResultsProps) => {
+export const SearchResults = ({ results, onAddLeads, searchQuery }: SearchResultsProps) => {
   const [selectedLeads, setSelectedLeads] = useState<Set<number>>(new Set());
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
@@ -64,7 +65,7 @@ export const SearchResults = ({ results, onAddLeads }: SearchResultsProps) => {
 
       const leadsToAdd = selectedResults.map(result => ({
         company_name: result.companyName || result.name || '',
-        industry: result.industry || result.category || null,
+        industry: searchQuery, // Use the search query as the industry
         location: result.location || result.city || null,
         contact_name: null,
         email: result.email || null,

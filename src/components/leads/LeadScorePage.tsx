@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Lead } from "@/types/lead";
 import { Card } from "@/components/ui/card";
 import { LeadScore } from "@/components/leads/LeadScore";
-import { Award, Loader2, Building2, Mail, Phone, Globe } from "lucide-react";
+import { Award, Loader2, Mail, Phone, Globe } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -103,29 +103,31 @@ export function LeadScorePage() {
       {leads.map((lead) => (
         <Card key={lead.id} className="p-4">
           <div className="flex items-start justify-between mb-4">
-            <div>
-              <h3 className="font-medium">{lead.company_name}</h3>
-              <p className="text-sm text-muted-foreground">{lead.industry || 'Indústria não especificada'}</p>
+            <div className="max-w-[70%]">
+              <h3 className="font-medium truncate" title={lead.company_name}>{lead.company_name}</h3>
+              <p className="text-sm text-muted-foreground truncate" title={lead.industry || 'Indústria não especificada'}>
+                {lead.industry || 'Indústria não especificada'}
+              </p>
             </div>
             <LeadScore lead={lead} />
           </div>
           <div className="space-y-2">
             {lead.email && (
               <div className="flex items-center text-sm text-muted-foreground">
-                <Mail className="h-4 w-4 mr-2" />
-                {lead.email}
+                <Mail className="h-4 w-4 mr-2 flex-shrink-0" />
+                <span className="truncate" title={lead.email}>{lead.email}</span>
               </div>
             )}
             {lead.phone && (
               <div className="flex items-center text-sm text-muted-foreground">
-                <Phone className="h-4 w-4 mr-2" />
-                {lead.phone}
+                <Phone className="h-4 w-4 mr-2 flex-shrink-0" />
+                <span className="truncate" title={lead.phone}>{lead.phone}</span>
               </div>
             )}
             {lead.website && (
               <div className="flex items-center text-sm text-muted-foreground">
-                <Globe className="h-4 w-4 mr-2" />
-                {lead.website}
+                <Globe className="h-4 w-4 mr-2 flex-shrink-0" />
+                <span className="truncate" title={lead.website}>{lead.website}</span>
               </div>
             )}
           </div>

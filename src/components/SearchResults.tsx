@@ -5,6 +5,9 @@ import { useToast } from "@/components/ui/use-toast";
 import { SearchHeader } from "./search/SearchHeader";
 import { SearchResultCard } from "./search/SearchResultCard";
 import { SearchPagination } from "./search/SearchPagination";
+import { Database } from "@/integrations/supabase/types";
+
+type PipelineStage = Database['public']['Enums']['pipeline_stage'];
 
 interface SearchResultsProps {
   results: SearchResult[];
@@ -79,7 +82,7 @@ export const SearchResults = ({ results, onAddLeads }: SearchResultsProps) => {
         tags: [],
         extraction_date: new Date().toISOString(),
         last_interaction_at: null,
-        stage: 'novo',
+        stage: 'novo' as PipelineStage,
         kanban_order: 0,
         notes: null,
       }));
